@@ -46,6 +46,7 @@ def parser() -> argparse.ArgumentParser:
     evaluate.add_argument("--plots",action="store_true",help="Also write Arial 7 pt, 600 DPI PNG figures.")
     evaluate.add_argument("--arial-font",type=Path,help="Path to a locally licensed Arial TrueType font.")
     dl = sub.add_parser("download",help="Download and verify published Zenodo assets.")
+    dl.add_argument("--source",choices=["zenodo","github"],default="github",help="Select the published asset host explicitly; default github.")
     dl.add_argument("--record-id",type=int)
     dl.add_argument("--download-dir",type=Path,default=Path("downloads"))
     dl.add_argument("--output",type=Path,default=Path("assets"))

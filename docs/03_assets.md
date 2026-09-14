@@ -4,6 +4,8 @@
 
 Configure Python as in Chapter 2. The release-specific Zenodo status, record identifier, archive sizes, and SHA-256 values are recorded in `src/coarsepgnn_release/assets.json`. **Until the deposit is published, its files require owner access and the public downloader cannot retrieve them.** An upload draft or reserved DOI is not a published data record.
 
+The four complete archives are available as assets of [GitHub release v1.0.0](https://github.com/WangGroupFDU/CoarsePGNN/releases/tag/v1.0.0). Zenodo API calls returned HTTP 504 or timed out during deposit preparation, so no draft identifier or DOI is confirmed. The GitHub copies are the same SHA-256-verified files prepared for Zenodo.
+
 The code release is version `1.0.0`. Use the matching code and asset manifests together.
 
 ## Archive layout
@@ -17,20 +19,20 @@ The code release is version `1.0.0`. Use the matching code and asset manifests t
 
 Each archive contains a top-level directory named after its part. Shared data are stored once. No Qwen base weights or article full-text PDFs are included.
 
-## Automatic download after publication
+## Download the available GitHub assets
 
 ```bash
-python -m coarsepgnn_release download --download-dir downloads --output assets
+python -m coarsepgnn_release download --source github --download-dir downloads --output assets
 python -m coarsepgnn_release verify-assets --assets assets
 ```
 
-To download a single component, add `--part pu`, `--part openpoly`, `--part hybrid`, or `--part models`. A record can be supplied explicitly with `--record-id RECORD_ID`, but its files must still match the pinned archive hashes. No personal Zenodo token is needed for a published public record.
+To download a single component, add `--part pu`, `--part openpoly`, `--part hybrid`, or `--part models`. After a Zenodo record is published, select `--source zenodo`. A record can be supplied explicitly with `--record-id RECORD_ID`, but its files must still match the pinned archive hashes. No personal Zenodo token is needed for a published public record.
 
 The command verifies file size and SHA-256 before extraction, rejects unsafe archive members, and refuses to overwrite an existing asset part. A complete, matching download can be reused. Inspect an interrupted `.partial` file before removing it and retrying.
 
 ## Manual extraction
 
-Download the four ZIP files from the matching published record. Run from the repository root:
+Download the four ZIP files from the matching GitHub release, or from the matching Zenodo record once published. Run from the repository root:
 
 ```bash
 python -m zipfile -e downloads/CoarsePGNN_openpoly_v1.0.0.zip assets

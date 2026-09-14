@@ -19,7 +19,7 @@ python -m coarsepgnn_release predict --assets assets --dataset pu \
   --output outputs/pu_tg_hybrid.csv --device cpu
 ```
 
-PU defaults to `formulation_graph_grouped`. Specify `--strategy record_random_interpolation` explicitly to use the random-partition checkpoint family. The four PU example files and the OpenPoly example each contain two archived inputs. They demonstrate execution, not prospective validation.
+PU defaults to `formulation_graph_grouped`. Specify `--strategy record_random_interpolation` explicitly to use the random-partition checkpoint family. The four PU example files and the OpenPoly example each contain two archived inputs. They demonstrate execution, not prospective validation. Corresponding CPU outputs, including all five predictions, mean, and standard deviation, are supplied in `results/prediction_examples/`.
 
 ## New PU samples
 

@@ -1,4 +1,4 @@
-"""Download, verify and unpack the immutable public Zenodo asset files."""
+"""Download, verify and unpack the immutable public release assets."""
 from __future__ import annotations
 
 import json
@@ -15,25 +15,32 @@ from .io import read_json, sha256
 def download(args: Any) -> None:
     """Fetch selected published files and verify their release hashes before extraction.
 
-    The command uses the public record API and never needs a Zenodo token.
+    The command uses the selected public host API and never needs a personal token.
     A draft has no public files and therefore cannot satisfy this command.
     Existing local archives are reused only when their exact hash matches.
     """
     config = read_json(Path(__file__).with_name("assets.json"))
-    record_id = args.record_id or config.get("zenodo_record_id")
-    if not record_id:
-        raise RuntimeError("The Zenodo deposit is not published yet; see docs/03_assets.md.")
-    request = urllib.request.Request(f"https://zenodo.org/api/records/{record_id}",
-                                     headers={"User-Agent":"CoarsePGNN/1.0.0"})
-    try:
+    if args.source == "github":
+        url = "https://api.github.com/repos/WangGroupFDU/CoarsePGNN/releases/tags/v1.0.0"
+        request = urllib.request.Request(url,headers={"User-Agent":"CoarsePGNN/1.0.0","Accept":"application/vnd.github+json"})
         with urllib.request.urlopen(request,timeout=60) as response:
-            record = json.load(response)
-    except Exception as error:
-        raise RuntimeError(f"Cannot read public Zenodo record {record_id}. A private draft is not downloadable.") from error
-    entries = record.get("files",[])
-    if isinstance(entries,dict):
-        entries = list(entries.get("entries",{}).values())
-    by_key = {entry["key"]:entry for entry in entries}
+            release=json.load(response)
+        by_key={entry["name"]:{"links":{"content":entry["browser_download_url"]}} for entry in release["assets"]}
+    else:
+        record_id = args.record_id or config.get("zenodo_record_id")
+        if not record_id:
+            raise RuntimeError("The Zenodo deposit is unavailable; use --source github or see docs/03_assets.md.")
+        request = urllib.request.Request(f"https://zenodo.org/api/records/{record_id}",
+                                         headers={"User-Agent":"CoarsePGNN/1.0.0"})
+        try:
+            with urllib.request.urlopen(request,timeout=60) as response:
+                record = json.load(response)
+        except Exception as error:
+            raise RuntimeError(f"Cannot read public Zenodo record {record_id}. A private draft is not downloadable.") from error
+        entries = record.get("files",[])
+        if isinstance(entries,dict):
+            entries = list(entries.get("entries",{}).values())
+        by_key = {entry["key"]:entry for entry in entries}
     args.download_dir.mkdir(parents=True,exist_ok=True)
     args.output.mkdir(parents=True,exist_ok=True)
     selected = config["archives"] if args.part=="all" else [x for x in config["archives"] if x["part"]==args.part]

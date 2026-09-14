@@ -18,6 +18,7 @@ All commands assume that the current directory is this repository. The public in
 ```bash
 export PYTHONPATH="$PWD/src"
 python -m coarsepgnn_release --help
+python -m coarsepgnn_release download --source github --output assets
 python -m coarsepgnn_release verify-assets --assets assets
 python -m coarsepgnn_release predict --assets assets \
   --dataset pu --model hybrid --target tg \
@@ -46,7 +47,7 @@ Additional references: [data card](docs/DATA_CARD.md), [model card](docs/MODEL_C
 
 ## Availability and license
 
-Code and compact results are hosted at [WangGroupFDU/CoarsePGNN](https://github.com/WangGroupFDU/CoarsePGNN). The assets are deposited separately on Zenodo; consult [the asset status](docs/03_assets.md) before attempting a public download. An unpublished draft is not publicly downloadable.
+Code and compact results are hosted at [WangGroupFDU/CoarsePGNN](https://github.com/WangGroupFDU/CoarsePGNN). The complete assets are attached to [release v1.0.0](https://github.com/WangGroupFDU/CoarsePGNN/releases/tag/v1.0.0). The intended Zenodo deposit remains pending because its API returned gateway timeouts; no draft identifier or DOI is confirmed. See [asset status and download instructions](docs/03_assets.md).
 
 Original code is licensed under [MIT](LICENSE). Original data curation and model weights are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Third-party sources retain their own rights and attribution. Use [CITATION.cff](CITATION.cff) to cite this software; cite the underlying literature when reusing individual experimental measurements.
 

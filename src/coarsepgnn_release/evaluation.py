@@ -53,7 +53,7 @@ def _figures(output: Path, groups: dict, histories: dict, arial: Path | None) ->
         lo=min(true.min(),pred.min());hi=max(true.max(),pred.max())
         ax.plot([lo,hi],[lo,hi],color="#444444",linewidth=0.75,linestyle="--")
         m=metrics(rows)
-        ax.text(0.04,0.96,f"MAE = {m['mae']:.3g} {unit}\n$R^2$ = {m['r2']:.3f}",transform=ax.transAxes,va="top")
+        ax.text(0.04,0.96,f"MAE = {m['mae']:.3g} {unit}\nR² = {m['r2']:.3f}",transform=ax.transAxes,va="top")
         ax.set(xlabel=f"Observed ({unit})",ylabel=f"Predicted ({unit})")
         fig.subplots_adjust(left=0.24,bottom=0.22,right=0.96,top=0.96)
         fig.savefig(folder/f"{target}_oof_600dpi.png",dpi=600)
