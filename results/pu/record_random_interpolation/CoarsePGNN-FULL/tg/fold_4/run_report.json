@@ -1,0 +1,160 @@
+{
+  "assay_fields": [
+    "property_subtype",
+    "property_task",
+    "transition_kind",
+    "transition_criterion",
+    "transition_scope",
+    "statistic_type",
+    "definition_status"
+  ],
+  "assay_vocab": {
+    "definition_status": {
+      "<UNK>": 0,
+      "specified": 1,
+      "unspecified": 2
+    },
+    "property_subtype": {
+      "<UNK>": 0,
+      "tg": 1
+    },
+    "property_task": {
+      "<UNK>": 0,
+      "tg:DMA:dma_loss_modulus_peak:soft_segment": 1,
+      "tg:DMA:dma_loss_modulus_peak:whole_material": 2,
+      "tg:DMA:dma_storage_modulus_drop:whole_material": 3,
+      "tg:DMA:dma_tan_delta_peak:soft_segment": 4,
+      "tg:DMA:dma_tan_delta_peak:whole_material": 5,
+      "tg:DMA:dsc_endset:whole_material": 6,
+      "tg:DMA:dsc_midpoint:soft_segment": 7,
+      "tg:DMA:dsc_onset:whole_material": 8,
+      "tg:DMA:reported_unspecified:hard_segment": 9,
+      "tg:DMA:reported_unspecified:soft_segment": 10,
+      "tg:DMA:reported_unspecified:whole_material": 11,
+      "tg:DSC:dma_tan_delta_peak:soft_segment": 12,
+      "tg:DSC:dsc_endset:hard_segment": 13,
+      "tg:DSC:dsc_endset:soft_segment": 14,
+      "tg:DSC:dsc_endset:whole_material": 15,
+      "tg:DSC:dsc_midpoint:hard_segment": 16,
+      "tg:DSC:dsc_midpoint:soft_segment": 17,
+      "tg:DSC:dsc_midpoint:whole_material": 18,
+      "tg:DSC:dsc_onset:soft_segment": 19,
+      "tg:DSC:dsc_onset:whole_material": 20,
+      "tg:DSC:reported_unspecified:hard_segment": 21,
+      "tg:DSC:reported_unspecified:soft_segment": 22,
+      "tg:DSC:reported_unspecified:whole_material": 23,
+      "tg:other:dma_storage_modulus_drop:soft_segment": 24,
+      "tg:other:dma_tan_delta_peak:soft_segment": 25,
+      "tg:other:dma_tan_delta_peak:whole_material": 26,
+      "tg:other:dsc_endset:whole_material": 27,
+      "tg:other:dsc_midpoint:soft_segment": 28,
+      "tg:other:dsc_midpoint:whole_material": 29,
+      "tg:other:dsc_onset:whole_material": 30,
+      "tg:other:dta_peak:hard_segment": 31,
+      "tg:other:dta_peak:whole_material": 32,
+      "tg:other:reported_unspecified:whole_material": 33,
+      "tg:other:tma_softening_start:whole_material": 34
+    },
+    "statistic_type": {
+      "<UNK>": 0,
+      "mean": 1,
+      "single": 2,
+      "unknown": 3
+    },
+    "transition_criterion": {
+      "<UNK>": 0,
+      "dma_loss_modulus_peak": 1,
+      "dma_storage_modulus_drop": 2,
+      "dma_tan_delta_peak": 3,
+      "dsc_endset": 4,
+      "dsc_midpoint": 5,
+      "dsc_onset": 6,
+      "dta_peak": 7,
+      "reported_unspecified": 8,
+      "tma_softening_start": 9
+    },
+    "transition_kind": {
+      "<UNK>": 0,
+      "glass_transition": 1
+    },
+    "transition_scope": {
+      "<UNK>": 0,
+      "hard_segment": 1,
+      "soft_segment": 2,
+      "whole_material": 3
+    }
+  },
+  "best_epoch": 57,
+  "best_validation_mae": 9.057103447348538,
+  "best_validation_r2": 0.9051248784259772,
+  "checkpoint_reload_atol": 1e-05,
+  "checkpoint_reload_comparison_space": "target_transform_output",
+  "checkpoint_reload_max_abs_diff": 1.586422916943775e-05,
+  "checkpoint_reload_max_tolerance_ratio": 0.0304184134716477,
+  "checkpoint_reload_rtol": 1e-06,
+  "checkpoint_reload_transformed_max_abs_diff": 3.5762786843029915e-07,
+  "checkpoint_sha256": "9512ed86f7209f4da657eca6bd3704ca1508569025192a1a7f7a4e337a279b20",
+  "condition_alpha_raw": 0.5,
+  "condition_cache_read": true,
+  "config": {
+    "batch_size": 64,
+    "dropout": 0.15,
+    "gradient_clip": 5.0,
+    "learning_rate": 0.0005,
+    "max_epochs": 250,
+    "patience": 40,
+    "warmup_fraction": 0.05,
+    "weight_decay": 0.0001
+  },
+  "frozen_structure_max_abs_diff": 0.0,
+  "frozen_structure_parameter_count": 5040856,
+  "graph_cache_policy": "all_unique_graphs_for_property_prefetched_once",
+  "interface_sha256": {
+    "dataset_manifest": "61fc69e56366c6e9c391841cd9c61ca5500b92c9e7942dae079c3a8c31200531",
+    "fold_manifest": "ba847315f6b5587d1fa1edacc6ea8b72025691445a71723bb4a138e39359e15a"
+  },
+  "metrics": {
+    "test": {
+      "mae": 11.99989684502099,
+      "n": 160,
+      "r2": 0.8556267949836889,
+      "rmse": 17.276142340736378,
+      "spearman": 0.8662455382360397
+    },
+    "train": {
+      "mae": 5.115208311234584,
+      "n": 578,
+      "r2": 0.9661841930171386,
+      "rmse": 8.15731998377385,
+      "spearman": 0.9662549087845204
+    },
+    "validation": {
+      "mae": 9.057103683150983,
+      "n": 65,
+      "r2": 0.9051248684819282,
+      "rmse": 12.665558178540538,
+      "spearman": 0.921041130299774
+    }
+  },
+  "mode": "full",
+  "model": "CoarsePGNN-FULL",
+  "outer_fold": 4,
+  "phase": "formal",
+  "seed": 20260905,
+  "source_structure_checkpoint_sha256": "74302ecc436d406a86f801b29d411b2e5f7acdbd5b6f24604683dad91125c5fd",
+  "split_counts": {
+    "test": 160,
+    "train": 578,
+    "validation": 65
+  },
+  "status": "complete",
+  "strategy": "record_random_interpolation",
+  "target": "tg",
+  "target_transform": {
+    "kind": "standardize",
+    "mean": -19.20297481737793,
+    "std": 44.359599918337096
+  },
+  "test_used_for_selection": false,
+  "unique_graph_count": 669
+}

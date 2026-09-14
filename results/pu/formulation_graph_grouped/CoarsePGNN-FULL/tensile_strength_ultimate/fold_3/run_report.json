@@ -1,0 +1,115 @@
+{
+  "assay_fields": [
+    "property_subtype",
+    "property_task",
+    "transition_kind",
+    "transition_criterion",
+    "transition_scope",
+    "statistic_type",
+    "definition_status"
+  ],
+  "assay_vocab": {
+    "definition_status": {
+      "<UNK>": 0,
+      "specified": 1,
+      "unspecified": 2
+    },
+    "property_subtype": {
+      "<UNK>": 0,
+      "tensile_strength_ultimate": 1,
+      "tensile_strength_unspecified": 2
+    },
+    "property_task": {
+      "<UNK>": 0,
+      "tensile_strength_ultimate": 1
+    },
+    "statistic_type": {
+      "<UNK>": 0,
+      "mean": 1,
+      "single": 2,
+      "unknown": 3
+    },
+    "transition_criterion": {
+      "<UNK>": 0
+    },
+    "transition_kind": {
+      "<UNK>": 0
+    },
+    "transition_scope": {
+      "<UNK>": 0
+    }
+  },
+  "best_epoch": 10,
+  "best_validation_mae": 9.501330394211355,
+  "best_validation_r2": 0.2896806685581318,
+  "checkpoint_reload_atol": 1e-05,
+  "checkpoint_reload_comparison_space": "target_transform_output",
+  "checkpoint_reload_max_abs_diff": 1.2784283320854684e-05,
+  "checkpoint_reload_max_tolerance_ratio": 0.03644847515981745,
+  "checkpoint_reload_rtol": 1e-06,
+  "checkpoint_reload_transformed_max_abs_diff": 4.76837158203125e-07,
+  "checkpoint_sha256": "482cc371a82c0bcb93c59950fb541582627a11cd90bf8ba4e85c38be5c6af3da",
+  "condition_alpha_raw": 0.5,
+  "condition_cache_read": true,
+  "config": {
+    "batch_size": 64,
+    "dropout": 0.15,
+    "gradient_clip": 5.0,
+    "learning_rate": 0.0005,
+    "max_epochs": 250,
+    "patience": 40,
+    "warmup_fraction": 0.05,
+    "weight_decay": 0.0001
+  },
+  "frozen_structure_max_abs_diff": 0.0,
+  "frozen_structure_parameter_count": 5040856,
+  "graph_cache_policy": "all_unique_graphs_for_property_prefetched_once",
+  "interface_sha256": {
+    "dataset_manifest": "61fc69e56366c6e9c391841cd9c61ca5500b92c9e7942dae079c3a8c31200531",
+    "fold_manifest": "ba847315f6b5587d1fa1edacc6ea8b72025691445a71723bb4a138e39359e15a"
+  },
+  "metrics": {
+    "test": {
+      "mae": 9.257570292336071,
+      "n": 173,
+      "r2": 0.39403488642844586,
+      "rmse": 13.2137506445157,
+      "spearman": 0.6532233485816018
+    },
+    "train": {
+      "mae": 6.149239915077589,
+      "n": 625,
+      "r2": 0.691893332148392,
+      "rmse": 8.640808069934947,
+      "spearman": 0.8467132094543639
+    },
+    "validation": {
+      "mae": 9.501330916794354,
+      "n": 70,
+      "r2": 0.2896806383056809,
+      "rmse": 12.84668260967857,
+      "spearman": 0.5483924589614566
+    }
+  },
+  "mode": "full",
+  "model": "CoarsePGNN-FULL",
+  "outer_fold": 3,
+  "phase": "formal",
+  "seed": 20260904,
+  "source_structure_checkpoint_sha256": "a228338f0792a4c03cb8c5d4224fb04bec65029b055e6a2557e0c227253eb93f",
+  "split_counts": {
+    "test": 173,
+    "train": 625,
+    "validation": 70
+  },
+  "status": "complete",
+  "strategy": "formulation_graph_grouped",
+  "target": "tensile_strength_ultimate",
+  "target_transform": {
+    "kind": "log1p",
+    "mean": 0.0,
+    "std": 1.0
+  },
+  "test_used_for_selection": false,
+  "unique_graph_count": 802
+}

@@ -1,0 +1,130 @@
+{
+  "assay_fields": [
+    "property_subtype",
+    "property_task",
+    "transition_kind",
+    "transition_criterion",
+    "transition_scope",
+    "statistic_type",
+    "definition_status"
+  ],
+  "assay_vocab": {
+    "definition_status": {
+      "<UNK>": 0,
+      "specified": 1,
+      "unspecified": 2
+    },
+    "property_subtype": {
+      "<UNK>": 0,
+      "tm_dsc_onset": 1,
+      "tm_dsc_peak": 2,
+      "tm_other": 3
+    },
+    "property_task": {
+      "<UNK>": 0,
+      "tm_dsc_onset": 1,
+      "tm_dsc_peak": 2,
+      "tm_other": 3
+    },
+    "statistic_type": {
+      "<UNK>": 0,
+      "mean": 1,
+      "single": 2,
+      "unknown": 3
+    },
+    "transition_criterion": {
+      "<UNK>": 0,
+      "dma_storage_modulus_drop": 1,
+      "dsc_endset": 2,
+      "dsc_midpoint": 3,
+      "dsc_onset": 4,
+      "dsc_peak": 5,
+      "dta_peak": 6,
+      "reported_unspecified": 7
+    },
+    "transition_kind": {
+      "<UNK>": 0,
+      "domain_disruption": 1,
+      "melting": 2
+    },
+    "transition_scope": {
+      "<UNK>": 0,
+      "hard_segment": 1,
+      "soft_segment": 2,
+      "unspecified": 3
+    }
+  },
+  "best_epoch": 89,
+  "best_validation_mae": 24.450864129796514,
+  "best_validation_r2": 0.6762023944711129,
+  "checkpoint_reload_atol": 1e-05,
+  "checkpoint_reload_comparison_space": "target_transform_output",
+  "checkpoint_reload_max_abs_diff": 2.233248736160931e-05,
+  "checkpoint_reload_max_tolerance_ratio": 0.03034991291016311,
+  "checkpoint_reload_rtol": 1e-06,
+  "checkpoint_reload_transformed_max_abs_diff": 3.5762786887438835e-07,
+  "checkpoint_sha256": "259624d22ea3ca1ab60e9212dcc026e6fd20e16eba6f1cbd746d30b888b1d9fe",
+  "condition_alpha_raw": 0.5,
+  "condition_cache_read": true,
+  "config": {
+    "batch_size": 64,
+    "dropout": 0.15,
+    "gradient_clip": 5.0,
+    "learning_rate": 0.0005,
+    "max_epochs": 250,
+    "patience": 40,
+    "warmup_fraction": 0.05,
+    "weight_decay": 0.0001
+  },
+  "frozen_structure_max_abs_diff": 0.0,
+  "frozen_structure_parameter_count": 5040856,
+  "graph_cache_policy": "all_unique_graphs_for_property_prefetched_once",
+  "interface_sha256": {
+    "dataset_manifest": "61fc69e56366c6e9c391841cd9c61ca5500b92c9e7942dae079c3a8c31200531",
+    "fold_manifest": "ba847315f6b5587d1fa1edacc6ea8b72025691445a71723bb4a138e39359e15a"
+  },
+  "metrics": {
+    "test": {
+      "mae": 21.768095196526733,
+      "n": 191,
+      "r2": 0.708394780790508,
+      "rmse": 34.30971433241916,
+      "spearman": 0.8305856346366374
+    },
+    "train": {
+      "mae": 15.148694345886831,
+      "n": 686,
+      "r2": 0.876821219988731,
+      "rmse": 21.91662574502616,
+      "spearman": 0.9272766736169862
+    },
+    "validation": {
+      "mae": 24.45086411771183,
+      "n": 77,
+      "r2": 0.6762023867779081,
+      "rmse": 34.63241648468917,
+      "spearman": 0.8177700685952367
+    }
+  },
+  "mode": "full",
+  "model": "CoarsePGNN-FULL",
+  "outer_fold": 0,
+  "phase": "formal",
+  "seed": 20260901,
+  "source_structure_checkpoint_sha256": "50cd519a9869d27632f5c4f014242abc3406461a33f9703e4c413b3da2660674",
+  "split_counts": {
+    "test": 191,
+    "train": 686,
+    "validation": 77
+  },
+  "status": "complete",
+  "strategy": "formulation_graph_grouped",
+  "target": "tm",
+  "target_transform": {
+    "kind": "standardize",
+    "mean": 100.118221574344,
+    "std": 62.44616069903761
+  },
+  "test_used_for_selection": false,
+  "unique_graph_count": 481
+}

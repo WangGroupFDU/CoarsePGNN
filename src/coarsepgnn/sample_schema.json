@@ -1,0 +1,117 @@
+{
+  "schema_version": "coarsepgnn_sample_v2",
+  "package_version": "0.2.0",
+  "scope": "generic_non_periodic_polymer_or_polymer_network",
+  "graph_contract": {
+    "node_count": "variable_positive_integer",
+    "edge_count": "variable_nonnegative_integer",
+    "connected_component_count": "variable_positive_integer",
+    "supports_arbitrary_monomer_type_count": true,
+    "supports_unbounded_explicit_functionality": true,
+    "supports_branching": true,
+    "supports_cycles": true,
+    "supports_crosslinks": true,
+    "supports_parallel_edges": true,
+    "supports_intramolecular_self_edges": true,
+    "supports_disconnected_components": true,
+    "supports_periodic_cell_offsets": false,
+    "required_graph_tensors": {
+      "node_fp_psmiles": ["N", 2048],
+      "node_fp_raw": ["N", 2048],
+      "node_fp_mask": ["N", 2],
+      "node_num": ["N", 9],
+      "node_num_mask": ["N", 9],
+      "node_structure_kind": ["N"],
+      "node_weight": ["N"],
+      "site_token_id": ["S"],
+      "site_owner_index": ["S"],
+      "site_state": ["S"],
+      "site_num": ["S", 3],
+      "site_num_mask": ["S", 3],
+      "edge_index": [2, "2E"],
+      "edge_rule_id": ["2E"],
+      "edge_bond_type": ["2E"],
+      "edge_src_site_token": ["2E"],
+      "edge_dst_site_token": ["2E"],
+      "edge_src_site_index": ["2E"],
+      "edge_dst_site_index": ["2E"],
+      "edge_num": ["2E", 5],
+      "edge_num_mask": ["2E", 5],
+      "edge_pair_id": ["2E"],
+      "edge_is_reverse": ["2E"],
+      "graph_num": [1, 9],
+      "graph_num_mask": [1, 9]
+    }
+  },
+  "feature_contract": {
+    "fingerprint": {"kind": "Morgan bit vector", "radius": 2, "dimension": 2048},
+    "node_numeric_fields": [
+      "stoichiometric_fraction",
+      "log1p_molecular_weight_g_mol",
+      "log1p_mn_g_mol",
+      "functionality",
+      "total_site_capacity",
+      "reacted_site_count",
+      "free_site_count",
+      "degree",
+      "branch_indicator"
+    ],
+    "site_numeric_fields": ["capacity", "used_count", "hirshfeld_charge"],
+    "edge_numeric_fields": [
+      "source_hirshfeld_charge",
+      "target_hirshfeld_charge",
+      "electrophile_hirshfeld_charge",
+      "nucleophile_hirshfeld_charge",
+      "reaction_score"
+    ],
+    "graph_numeric_fields": [
+      "log1p_node_count",
+      "log1p_edge_count",
+      "log1p_connected_component_count",
+      "cycle_rank_per_node",
+      "mean_degree",
+      "max_degree",
+      "branch_node_fraction",
+      "free_site_fraction",
+      "component_type_entropy"
+    ],
+    "missing_value_policy": "zero_value_plus_explicit_mask"
+  },
+  "condition_contract": {
+    "encoder": "Qwen3-Embedding-4B",
+    "input": "property_name + original_conditions + normalized_conditions",
+    "embedding_dimension": 512,
+    "pooling": "last_valid_token",
+    "mrl": "first_512_then_L2_normalize",
+    "max_length": 1024,
+    "frozen_during_property_training": true,
+    "explicit_numeric_condition_branch": false
+  },
+  "vocabularies": {
+    "site_token": [
+      "<UNK>",
+      "electrophile|isocyanate",
+      "nucleophile|alcohol",
+      "nucleophile|amine",
+      "nucleophile|phenol",
+      "nucleophile|thiol",
+      "electrophile|carboxyl_or_acyl_halide",
+      "electrophile|activated_aryl_halide",
+      "electrophile|cyclic_anhydride_imide",
+      "electrophile|epoxide_for_oxazolidone",
+      "electrophile|alkene",
+      "nucleophile|alkene",
+      "other|unknown"
+    ],
+    "reaction_rule": ["<UNK>", "6", "7", "104", "105", "108", "109", "110", "111", "112", "113", "114", "115"],
+    "bond_type": ["<UNK>", "single", "double", "triple", "aromatic", "coarse_grained_reaction"],
+    "structure_kind": ["<UNK>", "exact_smiles", "repeat_unit_psmiles", "numbered_psmiles", "coarse_fragment"],
+    "unknown_id": 0
+  },
+  "model_contract": {
+    "polymer_embedding_dimension": 256,
+    "condition_projection_dimension": 128,
+    "output_shape": ["B", 1],
+    "one_independent_model_per_property": true
+  }
+}

@@ -1,0 +1,210 @@
+{
+  "automatic_rows_filtered": 2,
+  "automatic_rows_note": "SMiPoly moncls 自动追加的 CO/HCHO 未参与用户反应候选。",
+  "candidate_whitelist_rule_ids": [
+    111
+  ],
+  "monomers": [
+    {
+      "canonical_smiles": "O=C=Nc1ccc(Cc2ccc(N=C=O)cc2)cc1",
+      "classes": {
+        "BzodiF": false,
+        "CO": false,
+        "HCHO": false,
+        "aminCOOH": false,
+        "cAnhyd": false,
+        "cOle": false,
+        "diCOOH": false,
+        "diNCO": true,
+        "diamin": false,
+        "dicAnhyd": false,
+        "diepo": false,
+        "diol": false,
+        "diol_b": false,
+        "epo": false,
+        "hindPhenol": false,
+        "hydCOOH": false,
+        "lactam": false,
+        "lactone": false,
+        "pridiamin": false,
+        "sfonediX": false,
+        "vinyl": false
+      },
+      "input_id": "INPUT_0",
+      "input_index": 0,
+      "mechanism_labels": [],
+      "name": "NCO_ph_C_ph_NCO",
+      "olefin_classes": {
+        "acryl": false,
+        "aliphCH": false,
+        "allyl": false,
+        "bEWole": false,
+        "conjdiene": false,
+        "cycCH": false,
+        "haloCH": false,
+        "malei": false,
+        "styryl": false,
+        "tertcatCH": false,
+        "vinylester": false,
+        "vinylether": false
+      },
+      "raw_smiles": "O=C=Nc1ccc(Cc2ccc(N=C=O)cc2)cc1"
+    },
+    {
+      "canonical_smiles": "OCCCCO",
+      "classes": {
+        "BzodiF": false,
+        "CO": false,
+        "HCHO": false,
+        "aminCOOH": false,
+        "cAnhyd": false,
+        "cOle": false,
+        "diCOOH": false,
+        "diNCO": false,
+        "diamin": false,
+        "dicAnhyd": false,
+        "diepo": false,
+        "diol": true,
+        "diol_b": true,
+        "epo": false,
+        "hindPhenol": false,
+        "hydCOOH": false,
+        "lactam": false,
+        "lactone": false,
+        "pridiamin": false,
+        "sfonediX": false,
+        "vinyl": false
+      },
+      "input_id": "INPUT_1",
+      "input_index": 1,
+      "mechanism_labels": [],
+      "name": "OH_C4_OH",
+      "olefin_classes": {
+        "acryl": false,
+        "aliphCH": false,
+        "allyl": false,
+        "bEWole": false,
+        "conjdiene": false,
+        "cycCH": false,
+        "haloCH": false,
+        "malei": false,
+        "styryl": false,
+        "tertcatCH": false,
+        "vinylester": false,
+        "vinylether": false
+      },
+      "raw_smiles": "OCCCCO"
+    },
+    {
+      "canonical_smiles": "OCCCCCCCCCCCCCCCCCCCCCCCCCO",
+      "classes": {
+        "BzodiF": false,
+        "CO": false,
+        "HCHO": false,
+        "aminCOOH": false,
+        "cAnhyd": false,
+        "cOle": false,
+        "diCOOH": false,
+        "diNCO": false,
+        "diamin": false,
+        "dicAnhyd": false,
+        "diepo": false,
+        "diol": true,
+        "diol_b": true,
+        "epo": false,
+        "hindPhenol": false,
+        "hydCOOH": false,
+        "lactam": false,
+        "lactone": false,
+        "pridiamin": false,
+        "sfonediX": false,
+        "vinyl": false
+      },
+      "input_id": "INPUT_2",
+      "input_index": 2,
+      "mechanism_labels": [],
+      "name": "OH_C20_OH",
+      "olefin_classes": {
+        "acryl": false,
+        "aliphCH": false,
+        "allyl": false,
+        "bEWole": false,
+        "conjdiene": false,
+        "cycCH": false,
+        "haloCH": false,
+        "malei": false,
+        "styryl": false,
+        "tertcatCH": false,
+        "vinylester": false,
+        "vinylether": false
+      },
+      "raw_smiles": "OCCCCCCCCCCCCCCCCCCCCCCCCCO"
+    }
+  ],
+  "qmdesc": {
+    "checkpoint_sha256": "7d3565fef65ee0f9cbf0e5ca42df9a8e176e6975a7a4cd7e0f658c0d687c3464",
+    "device": "cpu",
+    "input_semantics": "canonical raw neutral monomer SMILES without dummy atoms",
+    "version": "1.0.6"
+  },
+  "routing_policy": "electrophile_nucleophile_precedes_other_mechanisms",
+  "routing_status": "electrophile_nucleophile_generation",
+  "rule_score_diagnostics": [
+    {
+      "left": {
+        "hirshfeld_charge": 0.24329446256160736,
+        "input_index": 0,
+        "monomer": "NCO_ph_C_ph_NCO",
+        "orig_atom_index": 1,
+        "role": "electrophile",
+        "site_id": "S1"
+      },
+      "max_reaction_score": 0.058759823010330337,
+      "right": {
+        "hirshfeld_charge": -0.2415173053741455,
+        "input_index": 2,
+        "monomer": "OH_C20_OH",
+        "orig_atom_index": 0,
+        "role": "nucleophile",
+        "site_id": "S1"
+      },
+      "rule_id": 111,
+      "rule_name": "diisocyanate_diol_polyurethane",
+      "valid_site_pair": true
+    }
+  ],
+  "selected_rule_id": 111,
+  "selected_rule_name": "diisocyanate_diol_polyurethane",
+  "selected_rule_official_smarts": "([N&X2:1]=[C&X2]=[O&X1,S&X1:2].[N&X2:3]=[C&X2:4]=[O&X1,S&X1:5]).([O&X2,S&X2;H1;!$([O,S]C=*):6].[O&X2,S&X2;H1;!$([O,S]C=*):7])>>(*-[C&X3](=[O&X1,S&X1:2])[N&X3:1].[N&X3:3][C&X3:4](=[O&X1,S&X1:5])[O&X2,S&X2;!$([O,S]C=*):6].[O&X2,S&X2;!$([O,S]C=*):7]-*)",
+  "smipoly_generated_candidates": [
+    {
+      "mon1": "O=C=Nc1ccc(Cc2ccc(N=C=O)cc2)cc1",
+      "mon2": "OCCCCCCCCCCCCCCCCCCCCCCCCCO",
+      "polymer_class": "polyurethane",
+      "smipoly_cru": "*OCCCCCCCCCCCCCCCCCCCCCCCCCOC(=O)Nc1ccc(Cc2ccc(NC(*)=O)cc2)cc1",
+      "smipoly_rule_id": 111
+    },
+    {
+      "mon1": "O=C=Nc1ccc(Cc2ccc(N=C=O)cc2)cc1",
+      "mon2": "OCCCCO",
+      "polymer_class": "polyurethane",
+      "smipoly_cru": "*OCCCCOC(=O)Nc1ccc(Cc2ccc(NC(*)=O)cc2)cc1",
+      "smipoly_rule_id": 111
+    }
+  ],
+  "smipoly_version": "1.1.2",
+  "whitelist_rule_ids": [
+    6,
+    7,
+    104,
+    105,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115
+  ]
+}
