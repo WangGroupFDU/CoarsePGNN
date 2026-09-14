@@ -42,8 +42,11 @@ The example uses five grouped PU models. Each fold is inverted to the original t
 | [07 — Prediction](docs/07_prediction.md) | New inputs and mean-of-five inference |
 | [08 — Evaluation](docs/08_evaluation.md) | Fold metrics, OOF results, histories, and PNG figures |
 | [09 — Input reference](docs/09_inputs.md) | Schemas, units, missing values, troubleshooting, citation |
+| [10 — Supplementary datasets](docs/10_supplementary_data.md) | COF and dendrimer literature data, completeness flags, and candidate records |
 
 Additional references: [data card](docs/DATA_CARD.md), [model card](docs/MODEL_CARD.md), [release provenance](docs/PROVENANCE.md), [validation record](docs/VALIDATION.md), and [third-party notices](THIRD_PARTY_NOTICES.md).
+
+The same unpublished Zenodo draft also contains [supplementary COF and dendrimer literature datasets](docs/10_supplementary_data.md), with separate scientific scope and eligibility annotations. They do not change the frozen OpenPoly/PU benchmarks.
 
 ## Availability and license
 

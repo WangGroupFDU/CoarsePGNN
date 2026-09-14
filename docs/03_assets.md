@@ -52,3 +52,7 @@ Prediction JSONL paths are resolved relative to the input file. The supplied exa
 
 Read [DATA_CARD.md](DATA_CARD.md) and the dictionaries inside the archives before interpreting raw, standardized, or masked values.
 
+
+## Supplementary literature datasets
+
+COF and dendrimer data are separate additions to the same unpublished Zenodo record. See [Chapter 10](10_supplementary_data.md) for their manifests, counts, scientific boundaries, and extraction commands. The automatic downloader above covers the four core OpenPoly/PU/Hybrid/model archives.
