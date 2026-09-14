@@ -2,7 +2,7 @@
 
 ## Identity and intended use
 
-Version 1.0.0 accompanies the 85 archived property models. The archive author is Jifeng Wang, Fudan University. Data curation and derived assets use CC BY 4.0, subject to third-party rights and attribution.
+Version 1.0.1 accompanies the 85 archived property models. The archive author is Jifeng Wang, Fudan University. Data curation and derived assets use CC BY 4.0, subject to third-party rights and attribution.
 
 The data support reconstruction of the specified cross-validation experiments and inference within a scientifically assessed domain. They do not establish prospective experimental validation or comprehensive chemical coverage.
 

@@ -4,9 +4,9 @@
 
 Configure Python as in Chapter 2. The release-specific Zenodo status, record identifier, archive sizes, and SHA-256 values are recorded in `src/coarsepgnn_release/assets.json`. **Until the deposit is published, its files require owner access and the public downloader cannot retrieve them.** An upload draft or reserved DOI is not a published data record.
 
-The four complete archives are available as assets of [GitHub release v1.0.0](https://github.com/WangGroupFDU/CoarsePGNN/releases/tag/v1.0.0). Zenodo API calls returned HTTP 504 or timed out during deposit preparation, so no draft identifier or DOI is confirmed. The GitHub copies are the same SHA-256-verified files prepared for Zenodo.
+The four complete archives are available as assets of [GitHub release v1.0.1](https://github.com/WangGroupFDU/CoarsePGNN/releases/tag/v1.0.1). The [Zenodo draft 22741277](https://zenodo.org/uploads/22741277) remains unpublished and requires owner access. Final publication and DOI registration await specific-draft approval. The GitHub copies and the Zenodo deposit use the same pinned archive hashes.
 
-The code release is version `1.0.0`. Use the matching code and asset manifests together.
+The code release is version `1.0.1`. Use the matching code and asset manifests together.
 
 ## Archive layout
 
@@ -35,14 +35,14 @@ The command verifies file size and SHA-256 before extraction, rejects unsafe arc
 Download the four ZIP files from the matching GitHub release, or from the matching Zenodo record once published. Run from the repository root:
 
 ```bash
-python -m zipfile -e downloads/CoarsePGNN_openpoly_v1.0.0.zip assets
-python -m zipfile -e downloads/CoarsePGNN_pu_v1.0.0.zip assets
-python -m zipfile -e downloads/CoarsePGNN_hybrid_v1.0.0.zip assets
-python -m zipfile -e downloads/CoarsePGNN_models_v1.0.0.zip assets
+python -m zipfile -e downloads/CoarsePGNN_openpoly_v1.0.1.zip assets
+python -m zipfile -e downloads/CoarsePGNN_pu_v1.0.1.zip assets
+python -m zipfile -e downloads/CoarsePGNN_hybrid_v1.0.1.zip assets
+python -m zipfile -e downloads/CoarsePGNN_models_v1.0.1.zip assets
 python -m coarsepgnn_release verify-assets --assets assets
 ```
 
-Expected output is a JSON status of `passed` and the number of checked files. `MANIFEST.json` inside each part enumerates its data files and hashes. The manifest excludes itself; the ZIP hash protects it.
+Expected output is a JSON status of `passed` and the number of checked files. `RELEASE_MANIFEST.json` inside each part enumerates its data files and hashes. The manifest excludes itself; the ZIP hash protects it.
 
 ## Identity and portability
 

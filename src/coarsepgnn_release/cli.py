@@ -8,7 +8,7 @@ from pathlib import Path
 def parser() -> argparse.ArgumentParser:
     """Define explicit dataset, model, path and device choices without hidden defaults."""
     root = argparse.ArgumentParser(prog="coarsepgnn",description="Frozen CoarsePGNN training, inference and research assets.")
-    root.add_argument("--version",action="version",version="1.0.0")
+    root.add_argument("--version",action="version",version="1.0.1")
     sub = root.add_subparsers(dest="command",required=True)
     train = sub.add_parser("train",help="Train one or all five outer folds.")
     pred = sub.add_parser("predict",help="Predict independently with five models, then average in original units.")

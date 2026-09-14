@@ -21,8 +21,8 @@ def download(args: Any) -> None:
     """
     config = read_json(Path(__file__).with_name("assets.json"))
     if args.source == "github":
-        url = "https://api.github.com/repos/WangGroupFDU/CoarsePGNN/releases/tags/v1.0.0"
-        request = urllib.request.Request(url,headers={"User-Agent":"CoarsePGNN/1.0.0","Accept":"application/vnd.github+json"})
+        url = "https://api.github.com/repos/WangGroupFDU/CoarsePGNN/releases/tags/v1.0.1"
+        request = urllib.request.Request(url,headers={"User-Agent":"CoarsePGNN/1.0.1","Accept":"application/vnd.github+json"})
         with urllib.request.urlopen(request,timeout=60) as response:
             release=json.load(response)
         by_key={entry["name"]:{"links":{"content":entry["browser_download_url"]}} for entry in release["assets"]}
@@ -31,7 +31,7 @@ def download(args: Any) -> None:
         if not record_id:
             raise RuntimeError("The Zenodo deposit is unavailable; use --source github or see docs/03_assets.md.")
         request = urllib.request.Request(f"https://zenodo.org/api/records/{record_id}",
-                                         headers={"User-Agent":"CoarsePGNN/1.0.0"})
+                                         headers={"User-Agent":"CoarsePGNN/1.0.1"})
         try:
             with urllib.request.urlopen(request,timeout=60) as response:
                 record = json.load(response)
@@ -63,6 +63,9 @@ def download(args: Any) -> None:
         if destination.exists():
             raise FileExistsError(f"Asset directory exists; use verify-assets or choose another output: {destination}")
         with zipfile.ZipFile(archive) as handle:
+            names = handle.namelist()
+            if len(names) != len({name.casefold() for name in names}):
+                raise ValueError("Archive filenames conflict on a case-insensitive file system.")
             for info in handle.infolist():
                 path = PurePosixPath(info.filename)
                 if path.is_absolute() or ".." in path.parts or not path.parts or path.parts[0]!=item["part"]:
@@ -79,7 +82,7 @@ def verify_assets(args: Any) -> None:
     checked = 0
     for part in parts:
         root = args.assets/part
-        manifest = read_json(root/"MANIFEST.json")
+        manifest = read_json(root/"RELEASE_MANIFEST.json")
         for relative,expected in manifest["sha256"].items():
             path=root/relative
             if not path.is_file() or sha256(path)!=expected:

@@ -22,3 +22,9 @@ The 20-configuration encoder tuning search, all 7,682 graph rebuilds, and all te
 
 Zenodo draft upload verification is separate from DOI publication. A draft remains unpublished until the record owner explicitly approves that specific record.
 
+
+## Packaging correction in 1.0.1
+
+A real public download test on the release workstation exposed a case-insensitive filename collision between the original manifest.json and the new MANIFEST.json in version 1.0.0. Version 1.0.1 names the integrity file RELEASE_MANIFEST.json. Every ZIP member path is checked for case-folded uniqueness. Original data, cached vectors, and checkpoint bytes are unchanged.
+
+The corrected archives passed full SHA-256 checks. Hybrid archive extraction on the macOS release workstation preserved both the original source manifest and the release integrity manifest; all 127 extracted files matched. In the existing Linux environment, all 9,109 asset files passed integrity checks and the PU Hybrid five-fold loading example passed again. This was an archive portability check, not a cross-platform environment installation trial.

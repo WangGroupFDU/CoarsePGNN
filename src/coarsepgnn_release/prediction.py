@@ -92,7 +92,7 @@ def predict(args: Any) -> None:
         checkpoints = [folder / f"fold_{fold}/best_checkpoint.pt" for fold in range(5)]
         unit = PU_UNITS[args.target]
         condition = _condition_matrix(args,samples) if args.model == "hybrid" else None
-    manifest = read_json(args.assets / "models/MANIFEST.json")["sha256"]
+    manifest = read_json(args.assets / "models/RELEASE_MANIFEST.json")["sha256"]
     for path in checkpoints:
         key = str(path.relative_to(args.assets / "models"))
         if sha256(path) != manifest[key]:
