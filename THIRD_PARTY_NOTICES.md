@@ -1,5 +1,7 @@
 # Third-party sources and rights
 
+These notices describe the repository software and GitHub assets at v1.0.1. For the published v1.1.0 dataset archive, including BCDB phase data, also read its [THIRD_PARTY_NOTICES](https://zenodo.org/records/22741277/files/CoarsePGNN_THIRD_PARTY_NOTICES_v1.1.0.md?download=1). Upstream rights and attribution remain applicable.
+
 Original CoarsePGNN release code is distributed under MIT. Original data curation, derived graph assets, and model weights are offered under CC BY 4.0. These grants do not replace rights held by third parties.
 
 ## External software and base weights

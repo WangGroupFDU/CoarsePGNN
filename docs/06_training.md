@@ -1,5 +1,7 @@
 # 6. Training the five-fold property models
 
+**Scope:** This chapter describes the repository software and GitHub assets at v1.0.1. For the separately packaged Zenodo v1.1.0 archive and its archived-ID interface, see [Chapter 3](03_assets.md).
+
 ## Prerequisites
 
 Install the recorded dependencies, extract and verify the assets, and provide a new output directory. CUDA is the default for training; set `--device cpu` explicitly for CPU execution. Training is performed sequentially across folds. No distributed training configuration is assumed.

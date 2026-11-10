@@ -1,38 +1,125 @@
 # 3. Downloading and verifying the reproducibility assets
 
-## Prerequisites and deposit status
+## Choose the matching interface
 
-Configure Python as in Chapter 2. The release-specific Zenodo status, record identifier, archive sizes, and SHA-256 values are recorded in `src/coarsepgnn_release/assets.json`. **Until the deposit is published, its files require owner access and the public downloader cannot retrieve them.** An upload draft or reserved DOI is not a published data record.
+[Zenodo record 22741277](https://zenodo.org/records/22741277) is **published**, with version **1.1.0**, publication date **7 November 2026**, and DOI [10.5281/zenodo.22741277](https://doi.org/10.5281/zenodo.22741277). No personal token is needed for its public files.
 
-The four complete archives are available as assets of [GitHub release v1.0.1](https://github.com/WangGroupFDU/CoarsePGNN/releases/tag/v1.0.1). The [Zenodo draft 22741277](https://zenodo.org/uploads/22741277) remains unpublished and requires owner access. Final publication and DOI registration await specific-draft approval. The GitHub copies and the Zenodo deposit use the same pinned archive hashes.
-
-The code release is version `1.0.1`. Use the matching code and asset manifests together.
-
-## Archive layout
-
-| Archive part | Extracted directory | Contents |
+| Use | Asset source and layout | Interface |
 |---|---|---|
-| `openpoly` | `assets/openpoly` | Canonical structures, raw member observations, exclusions, fixed folds, graph index, 7,682 graph tensors |
-| `pu` | `assets/pu` | 3,657 observations, fixed folds, conditions, 1,162 graph files, cached vectors, relational provenance |
-| `hybrid` | `assets/hybrid` | Early encoder head, PLE knots, 16-field registry, prompts, head-training records, development folds, tuning logs, prompt cache |
-| `models` | `assets/models` | 80 PU checkpoints and 5 OpenPoly checkpoints |
+| Six-task manuscript archive, including phase classification | Zenodo v1.1.0; one `CoarsePGNN/` root | Bundled `documentation/predict.py` for archived IDs |
+| Existing repository topology/training/new-input prediction | GitHub v1.0.1; `assets/openpoly`, `pu`, `hybrid`, `models` | `python -m coarsepgnn_release` |
 
-Each archive contains a top-level directory named after its part. Shared data are stored once. No Qwen base weights or article full-text PDFs are included.
+**Do not mix these layouts.** The repository software is still v1.0.1. Its `src/coarsepgnn_release/assets.json` pins the four GitHub v1.0.1 files, sizes, and SHA-256 values. `download --source zenodo` cannot retrieve v1.1.0: it expects old filenames absent from the published record, then checks the old hashes and ZIP roots. Setting `--record-id 22741277` does not change that. `verify-assets` likewise expects the old per-part `RELEASE_MANIFEST.json` files.
 
-## Download the available GitHub assets
+## Zenodo v1.1.0 download and extraction
+
+The official [archive manifest](https://zenodo.org/records/22741277/files/archive_manifest_v1.1.0.json?download=1) and [SHA-256 list](https://zenodo.org/records/22741277/files/SHA256SUMS_v1.1.0.csv?download=1) identify these four files:
+
+| Archive | Bytes | SHA-256 |
+|---|---:|---|
+| `CoarsePGNN_datasets_v1.1.0.zip` | 210,473,479 | `330910b95d542d82f2cfcd4c05d580096d791d05fd031c37baebaf63c2aa409c` |
+| `CoarsePGNN_models_v1.1.0.zip` | 927,367,742 | `097a49d0e873d793666474d6f3d6bf4d12ec420eda29afdbe1913421160cde96` |
+| `CoarsePGNN_condition_encoders_v1.1.0.zip` | 6,143,198 | `9d86088a5c7b7b2606c1409b145532485856febbf11dfade0ab8e1c8c8aba5fc` |
+| `CoarsePGNN_supplementary_v1.1.0.zip` | 822,156,436 | `0f18e57c4881ba39247b6a9278717df66809a0e4cf205814572b4b469eef117d` |
+
+Download all four from the record, or use this POSIX-shell example from the repository root. The ZIP files total approximately 1.97 GB; allow additional space for extraction.
 
 ```bash
+mkdir -p downloads/v1.1.0
+for part in datasets models condition_encoders supplementary; do
+  curl --fail --location \
+    "https://zenodo.org/records/22741277/files/CoarsePGNN_${part}_v1.1.0.zip?download=1" \
+    --output "downloads/v1.1.0/CoarsePGNN_${part}_v1.1.0.zip"
+done
+curl --fail --location \
+  "https://zenodo.org/records/22741277/files/archive_manifest_v1.1.0.json?download=1" \
+  --output downloads/v1.1.0/archive_manifest_v1.1.0.json
+```
+
+Verify before extracting. This Python 3.11 standard-library check pins the manifest itself, then checks every ZIP size and SHA-256 without loading large archives into memory:
+
+```bash
+python - <<'PYVERIFY'
+import hashlib
+import json
+from pathlib import Path
+
+root = Path("downloads/v1.1.0")
+manifest_bytes = (root / "archive_manifest_v1.1.0.json").read_bytes()
+expected_manifest = "ad0334e83941942aeb3e8e5143892a578e34bfb7445e7f33169daa8f44572064"
+if hashlib.sha256(manifest_bytes).hexdigest() != expected_manifest:
+    raise SystemExit("Archive manifest SHA-256 mismatch")
+manifest = json.loads(manifest_bytes)
+for item in manifest["archives"]:
+    path = root / item["filename"]
+    with path.open("rb") as handle:
+        actual = hashlib.file_digest(handle, "sha256").hexdigest()
+    if path.stat().st_size != item["size_bytes"] or actual != item["sha256"]:
+        raise SystemExit(f"Archive size/SHA-256 mismatch: {path}")
+    print(f"Verified: {path.name}")
+PYVERIFY
+```
+
+After all four checks pass, extract into a **new** directory, separate from legacy `assets/`. All four ZIPs share the same `CoarsePGNN/` root:
+
+```bash
+mkdir archive_v1.1.0
+python -m zipfile -e downloads/v1.1.0/CoarsePGNN_datasets_v1.1.0.zip archive_v1.1.0
+python -m zipfile -e downloads/v1.1.0/CoarsePGNN_models_v1.1.0.zip archive_v1.1.0
+python -m zipfile -e downloads/v1.1.0/CoarsePGNN_condition_encoders_v1.1.0.zip archive_v1.1.0
+python -m zipfile -e downloads/v1.1.0/CoarsePGNN_supplementary_v1.1.0.zip archive_v1.1.0
+```
+
+| Extracted path under `archive_v1.1.0/CoarsePGNN/` | Contents |
+|---|---|
+| `datasets/homopolymer_tg/` | 7,682 homopolymer Tg task records |
+| `datasets/polyurethane/` | Tg, Tm, tensile-strength and elongation tasks, plus shared graphs/provenance |
+| `datasets/block_copolymer_phase/` | 3,900 BCDB phase task records and 312 approximate graphs |
+| `models/` | 55 manuscript-task checkpoints: 5 homopolymer, 40 PU, 10 phase |
+| `condition_encoders/` | Original PU encoder and five separate phase fold encoders/caches |
+| `supplementary/` | COF and dendrimer literature data, grouped PU splits and 40 additional checkpoints |
+| `documentation/` | Historical source packages, model index, provenance, checksums and validation evidence |
+
+The datasets ZIP contains the shared documentation. Inference also needs the models and condition-encoder ZIPs; grouped PU inference additionally needs the supplementary ZIP. The archive's `documentation/SHA256SUMS.csv` lists extracted-file checksums. Qwen foundation-model weights and article full-text PDFs are not redistributed.
+
+## v1.1.0 archived-ID prediction
+
+Use compatible dependencies from the archive's recorded environments and run from its `CoarsePGNN/` directory. These commands belong to the Zenodo archive, not the repository CLI:
+
+```bash
+cd archive_v1.1.0/CoarsePGNN
+python -B documentation/predict.py --root . \
+  --task homopolymer_tg --mode structure_only --fold 1 \
+  --ids openpoly_00001 --output outputs/homopolymer_example.csv
+python -B documentation/predict.py --root . \
+  --task block_copolymer_phase --mode hybrid --fold 1 \
+  --ids BCDB-diblock-00008 --output outputs/phase_example.csv
+```
+
+The interface selects existing IDs from the archived `data.csv` tables. It does not build new graphs, fit encoders, download foundation-model weights or retrain predictors. Display folds are 1–5; `source_fold` preserves regression folds 0–4 and phase folds 1–5. Each invocation reproduces one fold, not the legacy five-fold ensemble.
+
+Phase Hybrid requires the matching same-fold structure model and encoder; use the pairings in `documentation/model_index.json`. The main PU strategy is `record_random_interpolation`; grouped PU results are retained under `supplementary/grouped_validation`. Homopolymer Tg is in K, PU thermal targets in °C, strength in MPa, and elongation in %. Phase classes are lamellar, cylinder, gyroid, disordered and sphere. Read `documentation/MANUSCRIPT_AUDIT.md` before equating fold means with pooled OOF statistics.
+
+## Legacy GitHub v1.0.1 assets for the repository CLI
+
+Configure Python as in [Chapter 2](02_environment.md), return to the repository root, and use [GitHub release v1.0.1](https://github.com/WangGroupFDU/CoarsePGNN/releases/tag/v1.0.1):
+
+```bash
+export PYTHONPATH="$PWD/src"
 python -m coarsepgnn_release download --source github --download-dir downloads --output assets
 python -m coarsepgnn_release verify-assets --assets assets
 ```
 
-To download a single component, add `--part pu`, `--part openpoly`, `--part hybrid`, or `--part models`. After a Zenodo record is published, select `--source zenodo`. A record can be supplied explicitly with `--record-id RECORD_ID`, but its files must still match the pinned archive hashes. No personal Zenodo token is needed for a published public record.
+| Archive part | Extracted directory | Contents |
+|---|---|---|
+| `openpoly` | `assets/openpoly` | Canonical structures, raw observations, exclusions, fixed folds, graph index, 7,682 graph tensors |
+| `pu` | `assets/pu` | 3,657 observations, fixed folds, conditions, 1,162 graph files, cached vectors, relational provenance |
+| `hybrid` | `assets/hybrid` | Early PU encoder head, PLE knots, 16-field registry, prompts, training records, tuning logs and prompt cache |
+| `models` | `assets/models` | 80 PU checkpoints and 5 OpenPoly checkpoints |
 
-The command verifies file size and SHA-256 before extraction, rejects unsafe archive members, and refuses to overwrite an existing asset part. A complete, matching download can be reused. Inspect an interrupted `.partial` file before removing it and retrying.
+To download one component, add `--part pu`, `--part openpoly`, `--part hybrid`, or `--part models`. The command verifies size and SHA-256 before extraction, rejects unsafe archive members, and refuses to overwrite an existing part. A matching completed download can be reused. Inspect an interrupted `.partial` file before removing it and retrying.
 
-## Manual extraction
-
-Download the four ZIP files from the matching GitHub release, or from the matching Zenodo record once published. Run from the repository root:
+For manual extraction, download the matching **v1.0.1** GitHub ZIPs and verify their sizes and hashes against `src/coarsepgnn_release/assets.json` before running:
 
 ```bash
 python -m zipfile -e downloads/CoarsePGNN_openpoly_v1.0.1.zip assets
@@ -42,17 +129,8 @@ python -m zipfile -e downloads/CoarsePGNN_models_v1.0.1.zip assets
 python -m coarsepgnn_release verify-assets --assets assets
 ```
 
-Expected output is a JSON status of `passed` and the number of checked files. `RELEASE_MANIFEST.json` inside each part enumerates its data files and hashes. The manifest excludes itself; the ZIP hash protects it.
+Expected verification output is JSON with status `passed` and the checked-file count. Each part's `RELEASE_MANIFEST.json` enumerates its files and hashes; the manifest excludes itself and is protected by the ZIP hash.
 
-## Identity and portability
+Original PU dataset/fold manifests retain their checkpoint-pinned bytes. Historical `graph_relpath` values are provenance; repository training resolves graphs inside `assets/pu/graphs/MATERIAL_ID/GRAPH_ID.json`. Prediction JSONL paths are relative to the input file. The supplied examples assume `examples/` and `assets/` are siblings; update `graph_file` paths if assets are elsewhere.
 
-The original PU dataset and fold manifests are retained byte-for-byte because their hashes are stored in checkpoints. Their historical `graph_relpath` values serve as provenance. Training resolves them inside `assets/pu/graphs/MATERIAL_ID/GRAPH_ID.json`; no connection to the original server is made.
-
-Prediction JSONL paths are resolved relative to the input file. The supplied examples assume `examples/` and `assets/` are siblings under the repository. If assets are stored elsewhere, set `--assets` and update each example's `graph_file` accordingly.
-
-Read [DATA_CARD.md](DATA_CARD.md) and the dictionaries inside the archives before interpreting raw, standardized, or masked values.
-
-
-## Supplementary literature datasets
-
-COF and dendrimer data are separate additions to the same unpublished Zenodo record. See [Chapter 10](10_supplementary_data.md) for their manifests, counts, scientific boundaries, and extraction commands. The automatic downloader above covers the four core OpenPoly/PU/Hybrid/model archives.
+See [Chapter 10](10_supplementary_data.md) for the public v1.1.0 literature supplements. The legacy automatic downloader does not download them.

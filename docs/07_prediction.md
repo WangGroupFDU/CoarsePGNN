@@ -1,5 +1,7 @@
 # 7. Prediction with the five trained folds
 
+**Scope:** This chapter describes the repository software and GitHub assets at v1.0.1. For the separately packaged Zenodo v1.1.0 archive and its archived-ID interface, see [Chapter 3](03_assets.md).
+
 ## Prerequisites
 
 Extract the required data and model parts and run `verify-assets`. PU Hybrid also requires its condition cache, or the early encoder and a fixed Qwen snapshot for uncached text. Input is UTF-8 JSON Lines with unique, nonempty `sample_id` strings.

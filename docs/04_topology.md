@@ -1,5 +1,7 @@
 # 4. Generating polymer topology
 
+**Scope:** This chapter describes the repository software and GitHub assets at v1.0.1. For the separately packaged Zenodo v1.1.0 archive and its archived-ID interface, see [Chapter 3](03_assets.md).
+
 ## Prerequisites
 
 Install the pinned RDKit, qmdesc, SMiPoly, PyTorch, PyG, NetworkX, and plotting dependencies. Use neutral, single-fragment **raw monomer SMILES** for qmdesc. Wildcard PSMILES and raw SMILES have different meanings and must remain separate fields.

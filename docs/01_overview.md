@@ -2,11 +2,19 @@
 
 ## Prerequisites
 
-Read this chapter before selecting a checkpoint. The two property tasks use different graph constructions and model architectures; their weights are not interchangeable.
+Read this chapter before selecting a checkpoint. The repository's OpenPoly and PU workflows use different graph constructions and model architectures; their weights are not interchangeable. The separately packaged Zenodo archive also includes block-copolymer phase classification.
 
-## Included experiments
+## Published Zenodo v1.1.0 scope
 
-| Dataset | Target | Independent inputs | Model families | Split strategies | Checkpoints |
+[Zenodo v1.1.0](https://zenodo.org/records/22741277) contains six fixed benchmark tasks, 15,239 task records and 90 full-row fold tables. The new phase task has 3,900 BCDB observations, 312 approximate graphs and five classes: lamellar, cylinder, gyroid, disordered and sphere. It uses 2,496/624/780 train/validation/test records per fold. These are task records, not independent-material counts.
+
+The archive retains the original 85 regression checkpoints and adds 10 phase checkpoints. Its main `models/` contains 55 manuscript-task checkpoints; 40 grouped PU checkpoints are under `supplementary/grouped_validation`. Phase Hybrid requires the structure model and condition encoder from the same fold. The archive provides separate historical regression/classification source packages and an archived-ID prediction interface. See [Chapter 3](03_assets.md) for its layout and commands.
+
+The sections below describe the **v1.0.1 repository workflows**, whose CLI and `results/` remain limited to OpenPoly/PU regression. They do not implement the archive's phase interface.
+
+## Repository v1.0.1 experiments
+
+| Dataset | Target | Task records | Model families | Split strategies | Checkpoints |
 |---|---|---:|---:|---:|---:|
 | OpenPoly | Tg | 7,682 canonical homopolymer structures | 1 | 1 | 5 |
 | PU | Tg | 803 observations | 2 | 2 | 20 |

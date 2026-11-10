@@ -1,5 +1,7 @@
 # 8. Reconstructing prediction results and figures
 
+**Scope:** This chapter describes the repository software and GitHub assets at v1.0.1. For the separately packaged Zenodo v1.1.0 archive and its archived-ID interface, see [Chapter 3](03_assets.md).
+
 ## Prerequisites
 
 The GitHub `results/` directory contains the original per-fold predictions and training histories for all 85 included runs. Metric reconstruction requires NumPy and SciPy but does not require model weights, Qwen, CUDA, or retraining.

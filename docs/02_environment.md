@@ -1,5 +1,7 @@
 # 2. Environment configuration
 
+**Scope:** This chapter describes the repository software and GitHub assets at v1.0.1. For the separately packaged Zenodo v1.1.0 archive and its archived-ID interface, see [Chapter 3](03_assets.md).
+
 ## Prerequisites and recorded platform
 
 The experiments used Python **3.11.8**, PyTorch **2.5.1 + CUDA 12.1**, PyTorch Geometric **2.6.1**, and RDKit **2025.3.2** on Linux with glibc 2.28 and an NVIDIA RTX 4090 (24 GB). Direct dependencies are pinned in `requirements.txt`. This documents an observed training environment; it is not a claim that every supported operating system was tested.

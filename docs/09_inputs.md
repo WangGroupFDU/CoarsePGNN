@@ -1,5 +1,7 @@
 # 9. Input reference, errors, and citation
 
+**Scope:** This chapter describes the repository software and GitHub assets at v1.0.1. For the separately packaged Zenodo v1.1.0 archive and its archived-ID interface, see [Chapter 3](03_assets.md).
+
 ## Prerequisites
 
 Use the archive-specific dictionaries in `assets/*/DATA_DICTIONARY.md`, the JSON registry for numeric conditions, and the model graph schema. This chapter describes the public prediction interface.
@@ -30,6 +32,7 @@ A missing numerical condition is absent from `numeric_tags`; an observed zero is
 
 | Error | Resolution |
 |---|---|
+| Zenodo filename lookup failure | The repository downloader expects v1.0.1 files; use `--source github` or follow the separate v1.1.0 instructions in Chapter 3 |
 | Missing archive or checkpoint | Extract the matching asset part; all five folds are required |
 | SHA-256 mismatch | Use the original release file; investigate accidental editing or an incomplete transfer |
 | Existing output | Choose a new output path; workflows do not replace earlier results |
@@ -54,7 +57,7 @@ Expected output is a passed model-file check and the argument reference.
 
 ## Citation and reuse
 
-Cite `CITATION.cff` for this version of CoarsePGNN. The software/asset archive author is Jifeng Wang, Fudan University. A Zenodo DOI should only be cited once the corresponding record has been published; no manuscript DOI, ORCID, or funding identifier is inferred here.
+Cite the software entry in [`CITATION.cff`](../CITATION.cff) for the repository software v1.0.1. For the published dataset/model archive v1.1.0, cite Jifeng Wang (Fudan University), *CoarsePGNN datasets, cross-validation splits, and reproducibility assets*, Zenodo, 7 November 2026, [doi:10.5281/zenodo.22741277](https://doi.org/10.5281/zenodo.22741277). These versions describe different artifacts; the dataset DOI does not identify a new v1.1.0 repository CLI release.
 
 For OpenPoly context, see [Wang et al., Chinese Journal of Polymer Science (2025)](https://doi.org/10.1007/s10118-025-3402-y) and the [OpenPoly repository](https://github.com/WangGroupFDU/Openpoly_benchmark). The larger dated input snapshot used here is identified by its source hash and member references; it is not asserted to be identical to an earlier public benchmark. Cite source articles listed in the data provenance when reusing individual measurements.
 

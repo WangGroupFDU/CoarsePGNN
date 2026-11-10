@@ -2,9 +2,17 @@
 
 ## Identity and intended use
 
-Version 1.0.1 accompanies the 85 archived property models. The archive author is Jifeng Wang, Fudan University. Data curation and derived assets use CC BY 4.0, subject to third-party rights and attribution.
+This card describes the repository-compatible v1.0.1 OpenPoly/PU assets accompanying 85 regression checkpoints. The archive author is Jifeng Wang, Fudan University. Data curation and derived assets use CC BY 4.0, subject to third-party rights and attribution.
 
 The data support reconstruction of the specified cross-validation experiments and inference within a scientifically assessed domain. They do not establish prospective experimental validation or comprehensive chemical coverage.
+
+## Published v1.1.0 archive
+
+[Zenodo v1.1.0](https://zenodo.org/records/22741277) preserves these regression data and adds 3,900 BCDB phase observations. Its six tasks total 15,239 task records, with 90 full-row train/validation/test tables. Each task has `data.csv`, `splits.csv`, and `folds/fold_1` through `fold_5`. New `archive_graph_file` paths are relative to its `CoarsePGNN/` root; historical provenance paths remain unchanged.
+
+The phase class counts are 2,122 lamellar, 764 cylinder, 559 gyroid, 389 disordered and 66 sphere. Phase splits contain 2,496/624/780 records per fold. Random record splitting permits material overlap; approximately 94–96% of phase test observations have materials also present in training, as documented in the archive README. The task-record total is not an independent-material count, and these evaluations do not demonstrate unseen-material generalization.
+
+COF/dendrimer literature data remain supplementary and outside the six benchmarks. See [Chapter 3](03_assets.md), [Chapter 10](10_supplementary_data.md), and the archive's `documentation/DATA_DICTIONARY.md` for current paths and fields. The remainder of this card retains the original v1.0.1 data definitions.
 
 ## OpenPoly
 

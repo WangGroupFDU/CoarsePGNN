@@ -1,6 +1,14 @@
 # Validation record
 
-## Executed checks
+## Published Zenodo v1.1.0 validation
+
+The published [CoarsePGNN_VALIDATION_v1.1.0.json](https://zenodo.org/records/22741277/files/CoarsePGNN_VALIDATION_v1.1.0.json?download=1) reports checks of all six tasks, 15,239 task records, 90 exported fold tables and 95 property checkpoints (85 regression plus 10 phase). Archive preparation loaded all checkpoints and replayed two held-out samples per checkpoint on CPU. Full-data metrics were recomputed from saved predictions, not from a new full inference or retraining run.
+
+The archive distinguishes five-fold means from pooled OOF metrics. Its [manuscript audit](https://zenodo.org/records/22741277/files/CoarsePGNN_MANUSCRIPT_AUDIT_v1.1.0.md?download=1) records PU R² reporting-convention discrepancies instead of changing data or predictions to force agreement. No new packages, full training run or cross-platform environment validation are claimed by that report.
+
+These are **archived validation results**, not model checks rerun for this GitHub documentation update. The public record is published as v1.1.0; the report's frozen `remote_upload_verified: false` field describes its preparation-time scope, not the record's current publication status.
+
+## Historical repository v1.0.1 checks
 
 - Copied assets were checked by size and SHA-256 while assembling the independent release.
 - All 85 property checkpoints were located, loaded, and used for forward predictions on two archived examples per model/target/strategy group.
@@ -14,13 +22,13 @@
 
 Machine-readable reports in `results/validation/` specify the checks actually completed. The 100-node PU topology tutorial passed. All ten explicit configurations were parsed and validated. Reproducing the selected Hybrid numerical head for 17 epochs produced tensors identical to the archived head; the full tuning search and explicit 3D showcases were not repeated.
 
-## Not performed
+## Historical v1.0.1 checks not performed
 
 No new environment was installed, no Windows/macOS/CentOS 7 installation trial was performed, and the complete set of 85 property models was not retrained. No independent experimental test set was generated. Recomputed metrics are based on the archived predictions, and small-sample checkpoint checks are not a full new evaluation campaign.
 
 The 20-configuration encoder tuning search, all 7,682 graph rebuilds, and all ten explicit 3D showcases were not rerun during release preparation. Commands for these operations preserve the source procedures and are documented for readers.
 
-Zenodo draft upload verification is separate from DOI publication. A draft remains unpublished until the record owner explicitly approves that specific record.
+The v1.0.1 checks below remain historical evidence. They do not imply that the repository CLI supports the reorganized v1.1.0 Zenodo files; see [Chapter 3](03_assets.md).
 
 
 ## Packaging correction in 1.0.1

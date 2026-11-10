@@ -1,5 +1,15 @@
 # Release provenance and source reconciliation
 
+## Published archive and software versions
+
+[Zenodo record 22741277](https://zenodo.org/records/22741277) publishes dataset/archive v1.1.0, DOI [10.5281/zenodo.22741277](https://doi.org/10.5281/zenodo.22741277). The repository software remains v1.0.1; this documentation update does not change code, historical releases, frozen data, or checkpoints.
+
+The v1.1.0 archive supports the manuscript dated 21 October 2026 and adds the frozen phase experiment `BCDB_PHASE_5CLASS_20260920T123153Z`. Its provenance identifies the prior public-release preparation as `COARSEPGNN_PUBLIC_20260914`, archive version 1.0.1. Regression and phase inference use separate historical source packages in the archive. See its `documentation/DATA_PROVENANCE.md`, `documentation/file_provenance.csv`, and `documentation/model_index.json` for the complete mappings.
+
+BCDB source data are identified by [doi:10.18126/w26l-fjts](https://doi.org/10.18126/w26l-fjts); the methods article is [doi:10.1021/acs.jcim.4c00242](https://doi.org/10.1021/acs.jcim.4c00242). Neither DOI is the CoarsePGNN dataset DOI.
+
+The source reconciliation and portability edits below describe the existing v1.0.1 repository release, not a new v1.1.0 code release.
+
 ## Frozen inputs
 
 | Component | Source identity |

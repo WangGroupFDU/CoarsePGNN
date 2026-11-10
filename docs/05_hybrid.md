@@ -1,5 +1,7 @@
 # 5. Constructing, training, and applying the Hybrid encoder
 
+**Scope:** This chapter describes the repository software and GitHub assets at v1.0.1. For the separately packaged Zenodo v1.1.0 archive and its archived-ID interface, see [Chapter 3](03_assets.md).
+
 ## Prerequisites and frozen version
 
 Extract the `hybrid` archive. Extract `pu` as well when reproducing PU cached features. This release uses `PU_CONDITION_ENCODERS_V2_EXT16_20260824T104653Z_0fb2aa90`, the early encoder associated with the property checkpoints.
