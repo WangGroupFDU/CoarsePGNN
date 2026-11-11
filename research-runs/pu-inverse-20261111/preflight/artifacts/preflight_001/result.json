@@ -1,0 +1,51 @@
+{
+  "status": "passed",
+  "kind": "implementation_and_data_preflight",
+  "code_sha": "50c386432395553fd13f2f0037ed25026c385810",
+  "hostname": "cn2",
+  "pid": 217337,
+  "python": "/opt/anaconda2023/bin/python",
+  "started_at": "2026-11-11T09:32:51.285403+00:00",
+  "packages": {
+    "torch": "2.5.1+cu121",
+    "torch-geometric": "2.6.1",
+    "numpy": "1.26.4",
+    "rdkit": "2025.3.2"
+  },
+  "formal_training_started": false,
+  "checks": [
+    {
+      "name": "unit_tests",
+      "argv": [
+        "/opt/anaconda2023/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_inverse.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.7138622109778225
+    },
+    {
+      "name": "data_audit",
+      "argv": [
+        "/opt/anaconda2023/bin/python",
+        "-m",
+        "coarsepgnn_inverse",
+        "audit",
+        "--config",
+        "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/pu_20261111_sources.json",
+        "--output",
+        "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/preflight_001/data"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 52.83337689889595
+    }
+  ],
+  "elapsed_seconds": 55.54749868006911,
+  "completed_at": "2026-11-11T09:33:46.845375+00:00"
+}

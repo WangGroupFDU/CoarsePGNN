@@ -1,0 +1,23 @@
+test_csv_roundtrip (test_inverse.ChemistryAndBoundaryTests.test_csv_roundtrip)
+含逗号、引号和换行的证据必须可无损往返，并具有 BOM/CRLF。 ... ok
+test_reject_bad_ratio (test_inverse.ChemistryAndBoundaryTests.test_reject_bad_ratio)
+非有限、越界、NONE 带正投料及质量缺失均必须显式报错。 ... ok
+test_stoichiometry_and_mass (test_inverse.ChemistryAndBoundaryTests.test_stoichiometry_and_mass)
+已知 2:1:1 配方必须复现质量分数；非化学计量 R 仍保持原值。 ... ok
+test_zero_target_and_hard_constraints (test_inverse.ChemistryAndBoundaryTests.test_zero_target_and_hard_constraints)
+真实 Tg=0 不当成缺失；另一性质失败不能由达标性质抵消。 ... ok
+test_mdn_finite_backward_including_none (test_inverse.NeuralTests.test_mdn_finite_backward_including_none)
+NONE 和极端但有限配比混合训练时仍有有限梯度，原料特征保持冻结。 ... ok
+test_ratio_reads_final_extender_and_proposals_are_legal (test_inverse.NeuralTests.test_ratio_reads_final_extender_and_proposals_are_legal)
+只改变 E 必须改变配比参数；重复束搜索稳定且不产生角色非法原料。 ... ok
+test_set_permutation_and_missingness (test_inverse.NeuralTests.test_set_permutation_and_missingness)
+请求顺序和未启用字段不影响上下文，但真实已启用目标可以影响它。 ... ok
+test_split_ignores_values_and_row_order (test_inverse.SplitTests.test_split_ignores_values_and_row_order)
+固定划分不能随性质值、预测表现或输入排列改变。 ... ok
+test_transitive_closure (test_inverse.SplitTests.test_transitive_closure)
+A 同材料 B、B 同图 C 时，A/C 即使无直接共有字段也必须同组。 ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.743s
+
+OK
