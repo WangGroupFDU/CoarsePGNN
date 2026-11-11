@@ -10,7 +10,7 @@ from pathlib import Path
 
 import torch
 
-from coarsepgnn_inverse.audit import assign_splits, identity_groups
+from coarsepgnn_inverse.audit import assign_splits, identity_groups, label_lineage, verify_graphs
 from coarsepgnn_inverse.chemistry import decode_ratios
 from coarsepgnn_inverse.io import write_csv
 from coarsepgnn_inverse.model import InverseDesigner
@@ -34,7 +34,8 @@ class ChemistryAndBoundaryTests(unittest.TestCase):
         """非有限、越界、NONE 带正投料及质量缺失均必须显式报错。"""
         for r, v, m, e in [(float("nan"), .2, [1, 1, 1], True),
                             (1, 0, [1, 1, 1], True), (1, .1, [1, 1], False),
-                            (1, 1, [1, 1, 1], True), (1, .5, [1, 0, 1], True)]:
+                            (1, 1, [1, 1, 1], True), (1, .5, [1, 0, 1], True),
+                            (1, .5, [1, 1, 1], "false")]:
             with self.assertRaises(ValueError):
                 decode_ratios(r, v, m, e)
 
@@ -76,6 +77,26 @@ class ChemistryAndBoundaryTests(unittest.TestCase):
 
 class SplitTests(unittest.TestCase):
     """验证跨任务和来源的传递闭包，不以记录随机划分替代材料隔离。"""
+
+    def test_derived_label_cannot_inherit_single_measurement_origin(self):
+        """跨测量整理均值必须与原论文重复实验的均值区分，未知整理格式停止。"""
+        row = {"target": "tg", "observation_id": "synthetic",
+               "definition_raw": "Unified Tg assignment=whole_material; unweighted arithmetic mean of 4 original measurements; original definitions: DSC || DMA"}
+        lineage = label_lineage(row, "source_measurement")
+        self.assertEqual(lineage["label_origin"], "derived_cross_measurement_mean")
+        self.assertEqual(lineage["aggregation_member_count"], 4)
+        row["definition_raw"] = "Source reports mean of 4 DSC replicates"
+        self.assertEqual(label_lineage(row, "source_measurement")["label_origin"], "source_measurement")
+        row["definition_raw"] = "Unified Tg assignment=whole_material; missing provenance"
+        with self.assertRaises(ValueError):
+            label_lineage(row, "source_measurement")
+
+    def test_conflicting_graph_versions_are_rejected(self):
+        """同一图路径的矛盾散列不能被字典后写入的记录静默覆盖。"""
+        rows = [{"graph_relpath": "/unused/path", "graph_file_sha256": "a", "graph_input_sha256": "x"},
+                {"graph_relpath": "/unused/path", "graph_file_sha256": "b", "graph_input_sha256": "x"}]
+        with self.assertRaisesRegex(ValueError, "同一路径"):
+            verify_graphs(rows, recompute_tensors=False)
 
     def test_transitive_closure(self):
         """A 同材料 B、B 同图 C 时，A/C 即使无直接共有字段也必须同组。"""

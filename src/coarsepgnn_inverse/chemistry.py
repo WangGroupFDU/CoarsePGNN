@@ -83,6 +83,8 @@ def decode_ratios(nco_oh_ratio: float, extender_oh_fraction: float,
     输入质量为 g/mol；输出比值和分数均无量纲，不包含催化剂、溶剂或实际批量。
     实验投料的 NCO/OH 失衡保留，不以构图的两侧节点数替代。
     """
+    if type(has_extender) is not bool:
+        raise ValueError("has_extender 必须为 JSON 布尔值")
     r = positive(nco_oh_ratio, "NCO/OH")
     if isinstance(extender_oh_fraction, bool):
         raise ValueError("v 不能是布尔值")

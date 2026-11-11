@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "nco_oh_ratio": 1.0,
+  "top_k": 20,
+  "candidate_budget": 512,
+  "seed": 20261111,
+  "constraints": [
+    {
+      "target": "tg",
+      "unit": "degC",
+      "lower": -40,
+      "upper": -20,
+      "protocol_id": "example_dsc_second_heat_10Cmin",
+      "condition": {"method": "DSC", "heating_rate_c_min": 10, "heating_cycle": 2},
+      "assay": {"transition_criterion": "midpoint", "transition_scope": "soft_segment"}
+    },
+    {
+      "target": "tensile_strength_ultimate",
+      "unit": "MPa",
+      "lower": 20,
+      "protocol_id": "example_tensile_23C_100mmmin",
+      "condition": {"temperature_c": 23, "crosshead_speed_mm_min": 100},
+      "assay": {"property_subtype": "ultimate_engineering_stress"}
+    }
+  ]
+}

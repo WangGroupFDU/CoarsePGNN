@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 import random
+import re
 import sqlite3
 import time
 from pathlib import Path
@@ -107,7 +108,13 @@ def verify_graphs(rows: list[dict], recompute_tensors: bool) -> dict:
         from coarsepgnn.data import GraphFeaturizer
         from coarsepgnn.schema import package_schema
         featurizer = GraphFeaturizer.from_sample_schema(package_schema())
-    unique = {row["graph_relpath"]: row for row in rows}
+    unique = {}
+    for row in rows:
+        path = row["graph_relpath"]
+        if path in unique and any(row[key] != unique[path][key]
+                                  for key in ("graph_file_sha256", "graph_input_sha256")):
+            raise ValueError(f"同一路径声明了不同图版本: {path}")
+        unique[path] = row
     manifest = []
     for path, row in sorted(unique.items()):
         file_hash = sha256(Path(path))
@@ -130,12 +137,35 @@ def verify_graphs(rows: list[dict], recompute_tensors: bool) -> dict:
     return {"count": len(manifest), "tensor_recomputed": recompute_tensors, "graphs": manifest}
 
 
-def database_context(database: Path, rows: list[dict]) -> tuple[dict, dict, dict]:
+def label_lineage(row: dict, source_origin: str) -> dict:
+    """识别冻结整理流程明示的跨测量均值，不把论文报告的重复实验均值一并排除。
+
+    输入 definition_raw 和数据库来源；仅匹配已观察到的 Unified Tg 格式。
+    输出派生标签身份及条件核准标记，保留原始来源但不让其冒充派生值来源。
+    未知 Unified 格式直接报错，要求检查生成流程，不能猜测其成员数或协议。
+    """
+    definition = row.get("definition_raw") or ""
+    count = None
+    if definition.startswith("Unified Tg assignment="):
+        match = re.match(r"Unified Tg assignment=[^;]+; unweighted arithmetic mean of (\d+) original measurements;", definition)
+        if row["target"] != "tg" or not match or int(match.group(1)) < 2:
+            raise ValueError(f"无法核准整理均值定义: {row['observation_id']}")
+        count = int(match.group(1))
+    return {"source_measurement_origin": source_origin,
+            "label_origin": "derived_cross_measurement_mean" if count else source_origin,
+            "aggregation_member_count": count,
+            "condition_semantics": "requires_aggregate_protocol_review" if count else "source_protocol_pending_review"}
+
+
+def database_context(database: Path, rows: list[dict], expected_sha256: str) -> tuple[dict, dict, dict]:
     """只读连接来源 SQLite，关联样品、测量来源和合成依据，并核对所属材料。
 
     production_batch 是入库批次，不作为实验材料批次。找不到记录时停止，不将材料 ID
     猜作样品 ID。输出每观察的样品背景、每材料合成信息及数据库散列。
     """
+    database_hash = sha256(database)
+    if database_hash != expected_sha256:
+        raise ValueError(f"数据库版本与冻结配置不符: {database}")
     uri = database.resolve().as_uri() + "?mode=ro"
     with sqlite3.connect(uri, uri=True) as db:
         db.row_factory = sqlite3.Row
@@ -153,10 +183,10 @@ def database_context(database: Path, rows: list[dict]) -> tuple[dict, dict, dict
         contexts[row["observation_id"]] = {
             "specimen": specimen, "campaign_evidence_id": campaign["evidence_id"],
             "measurement_evidence_id": measurement["evidence_id"],
-            "label_origin": measurement.get("observation_origin", "unspecified"),
+            **label_lineage(row, measurement.get("observation_origin", "unspecified")),
             "original_value_raw": measurement["value_raw"],
         }
-    return contexts, materials, {"path": str(database), "sha256": sha256(database)}
+    return contexts, materials, {"path": str(database), "sha256": database_hash}
 
 
 def audit(config: dict, output: Path, recompute_tensors: bool = True) -> dict:
@@ -193,7 +223,7 @@ def audit(config: dict, output: Path, recompute_tensors: bool = True) -> dict:
             if not row.get(field):
                 raise ValueError(f"缺少隔离身份 {field}: {row['observation_id']}")
     graph_audit = verify_graphs(rows, recompute_tensors)
-    contexts, material_metadata, db_manifest = database_context(Path(config["database"]), rows)
+    contexts, material_metadata, db_manifest = database_context(Path(config["database"]), rows, config["database_sha256"])
     groups = identity_groups(rows)
     assignments = assign_splits(rows, groups, config["split_seed"])
     by_material: dict[str, list[dict]] = collections.defaultdict(list)
@@ -268,6 +298,8 @@ def audit(config: dict, output: Path, recompute_tensors: bool = True) -> dict:
         "joint_semantic_review_complete": False,
         "grade_counts": dict(collections.Counter(g["role"] for g in catalog.values())),
         "label_origins": dict(collections.Counter(r["label_origin"] for r in observations)),
+        "derived_label_counts_by_target": dict(collections.Counter(r["target"] for r in observations
+                                             if r["label_origin"] == "derived_cross_measurement_mean")),
         "heldout_unseen_grade_materials": {s: sum(f["split"] == s and bool(set(f["grade_ids"]) - train_grades)
                                                   for f in formulations.values()) for s in SPLITS[1:]},
         "graphs_verified": graph_audit["count"], "tensor_fingerprints_recomputed": recompute_tensors,
