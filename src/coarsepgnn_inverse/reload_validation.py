@@ -56,11 +56,15 @@ def independent_validation(config: dict, training_root: Path, output: Path) -> d
     TargetTransform.fit、fit_ple或监督优化器。缺失/改动资产、身份或输出超差则失败。
     """
     from .training import training_gate, reload_inputs
+    from .runtime_policy import enforce_deterministic_runtime
+    runtime=enforce_deterministic_runtime(config['execution_policy'])
     started=time.monotonic()
     contract,lock,authorization=training_gate(config)
     saved_config=read_json(training_root/'run_config.json')
     if saved_config['config']!=config:
         raise ValueError('独立重载配置不同')
+    if digest(runtime)!=saved_config['identity']['execution_settings_sha256'] or runtime!=read_json(training_root/'execution_settings.json'):
+        raise ValueError('独立重载实际执行设置变化')
     manifest=read_json(training_root/'checkpoint_manifest.json')
     receipt_sha=sha256(training_root/'inputs_ready.json')
     identity={**saved_config['identity'],'preprocessing_receipt_sha256':receipt_sha}
@@ -146,7 +150,18 @@ def main() -> None:
     parser.add_argument('--config',required=True,type=Path)
     parser.add_argument('--training-dir',required=True,type=Path)
     parser.add_argument('--output',required=True,type=Path)
-    args=parser.parse_args();independent_validation(read_json(args.config),args.training_dir,args.output)
+    args=parser.parse_args()
+    from .preprocessing_reuse import prohibit_refitting
+    started=time.monotonic()
+    with prohibit_refitting(enabled=True) as calls:
+        try:
+            independent_validation(read_json(args.config),args.training_dir,args.output)
+        except BaseException as error:
+            write_json(args.output.with_suffix('.failure.json'),{'status':'FAILED','error':repr(error),
+                'elapsed_seconds':time.monotonic()-started,'refit_calls':calls})
+            raise
+        finally:
+            write_json(args.output.with_suffix('.call_audit.json'),{'calls':calls,'zero_calls':not any(calls.values())})
 
 
 if __name__=='__main__':

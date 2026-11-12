@@ -47,9 +47,9 @@ def verify_configuration(config: dict, allowed: dict) -> None:
 
 
 def verify_startup(config: dict, current_code_sha: str) -> tuple[dict,dict,dict]:
-    """绑定C5外部回执与原R4审批，任何不一致均在读取标签或创建优化器之前拒绝。
+    """分别绑定资格、当前评审和实际执行三套身份，任何不一致均在读取标签或创建优化器之前拒绝。
 
-    回执在C5提交后生成，单独作为执行输入锁定，避免把提交SHA写进自身形成循环。
+    回执在实际执行源码提交后生成，单独作为执行输入锁定，避免把提交SHA写进自身形成循环。
     此函数只读取合同、数据锁、回执及评审，不读取标签、训练图、模型或最终面板。
     """
     contract_path=Path(config['contract']);lock_path=Path(config['data_lock'])
@@ -77,9 +77,11 @@ def verify_startup(config: dict, current_code_sha: str) -> tuple[dict,dict,dict]
             raise PermissionError(f'任务身份不一致: {key}')
     if authorization['review_request_id']!=review['request_id']:
         raise PermissionError('授权请求身份错误')
-    if authorization['qualification_code_sha']!=review['code_sha'] or authorization['qualification_artifact_sha']!=review['artifact_sha']:
-        raise PermissionError('资格C/A身份不同')
+    if authorization['review_code_sha']!=review['code_sha'] or authorization['review_artifact_sha']!=review['artifact_sha']:
+        raise PermissionError('当前评审C/A身份不同')
     approval=review['data_lock_approval']
+    if authorization['qualification_code_sha']!=approval['qualification_code_sha'] or authorization['qualification_artifact_sha']!=approval['qualification_artifact_sha']:
+        raise PermissionError('资格C/A身份不同')
     if not approval['approved'] or approval['sha256']!=lock_sha or lock['code_sha']!=approval['qualification_code_sha']:
         raise PermissionError('数据锁没有该原会话核准')
     if not review['contract_freeze_authorization']['authorized']:
@@ -88,6 +90,12 @@ def verify_startup(config: dict, current_code_sha: str) -> tuple[dict,dict,dict]
     if allowed['status']!='PRO_TRAINING_AUTHORIZED' or authorization['allowed_seeds']!=allowed['allowed_seeds']:
         raise PermissionError('阶段授权或种子范围不一致')
     verify_configuration(config,allowed)
+    if config.get('preprocessing_source') is not None:
+        source=config['preprocessing_source']
+        if source!=authorization['preprocessing_source'] or source['code_sha']!=review['code_sha'] or source['artifact_sha']!=review['artifact_sha']:
+            raise PermissionError('预处理复用来源与当前评审不同')
+        if config['execution_policy']!={'cublas_workspace_config':':4096:8','deterministic_algorithms':True,'warn_only':False}:
+            raise PermissionError('严格执行设置不符合第6轮授权')
     # 先核对路径元数据，不能先计算被错误映射成test的开发文件散列。
     manifest=lock['split_labels'];sealed=Path(manifest['test']['path']).resolve()
     paths=[Path(manifest[s]['path']).resolve() for s in ('train','validation')]

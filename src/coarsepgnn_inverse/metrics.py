@@ -42,9 +42,19 @@ def forward_baseline(training: list[dict], requests: list[dict]) -> list[float]:
     不读取请求的value；此处显式实现合同唯一授权的层次规则，不另行选层次。
     """
     def key_for(row: dict) -> tuple:
-        """从冻结规范条件读取method；力学property_task只有目标名，不能拆热端点格式。"""
-        method=json.loads(row['condition_normalized_json'])['fields']['method']
-        identity=method['value'] if method['mask']==1 else '__MISSING_METHOD__'
+        """热端点用冻结property_task中的campaign方法；力学用规范条件method。
+
+        恢复的Tg原子条件仅保留扫描标量，method来自已核准的property_task；
+        力学任务名无冒号。未报告方法保留独立缺失类，不猜测测试协议。
+        """
+        task=row['property_task'].split(':')
+        if row['target'] in ('tg','tm'):
+            if len(task)<4 or task[0]!=row['target']:
+                raise ValueError('热端点任务身份不符合冻结格式')
+            identity=task[1]
+        else:
+            method=json.loads(row['condition_normalized_json'])['fields'].get('method')
+            identity=method['value'] if method is not None and method['mask']==1 else '__MISSING_METHOD__'
         return row['target'],identity,row['transition_criterion'],row['transition_scope']
     grouped=defaultdict(list);targets=defaultdict(list)
     for row in training:

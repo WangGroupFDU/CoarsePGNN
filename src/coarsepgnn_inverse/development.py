@@ -34,7 +34,7 @@ def condition_record(row: dict):
 
 def build_development_loaders(manifest: dict, target: str, *, mode: str = "structure_only",
                               condition_store=None, batch_size: int = 64,
-                              seed: int = 20261111, reader: Callable = read_json) -> dict:
+                              seed: int = 20261111, reader: Callable = read_json, target_transform=None, assay_vocab=None) -> dict:
     """加载并构造真实图批次；目标变换与assay词表仅拟合训练部分。
 
     manifest只由load_development访问train/validation；FULL显式要求新的条件缓存。
@@ -55,8 +55,11 @@ def build_development_loaders(manifest: dict, target: str, *, mode: str = "struc
     split_map = {r["observation_id"]: r["split"] for r in rows}
     if any(not any(r["split"] == s for r in rows) for s in ("train", "validation")):
         raise ValueError(f"任务{target}缺少开发监督")
-    transform = TargetTransform.fit(target, [float(r["value"]) for r in rows if r["split"] == "train"])
-    vocab = build_assay_vocab(rows, split_map) if mode == "full" else {}
+    # 明确传入冻结变换时只使用该对象；旧工程审计入口仍可要求由train拟合。
+    # 调用方必须先核准变换文件SHA，缺失冻结文件不能自动转为重新拟合。
+    transform = (target_transform if target_transform is not None else
+                 TargetTransform.fit(target, [float(r["value"]) for r in rows if r["split"] == "train"]))
+    vocab = (assay_vocab if assay_vocab is not None else build_assay_vocab(rows, split_map)) if mode == "full" else {}
     graph_store = GraphStore(package_schema(), max_cache_size=len({r["graph_relpath"] for r in rows}))
     loaders = {}
     for split in ("train", "validation"):

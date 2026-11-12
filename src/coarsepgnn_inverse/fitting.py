@@ -113,6 +113,7 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
     else:
         write_json(output / "configuration.json", {"identity": identity, "config": config,
                                                     "identity_sha256": identity_sha})
+    actual_updates=history[-1]["optimizer_updates"] if history else 0
     for epoch in range(first_epoch, config["max_epochs"] + 1):
         if stale >= config["patience"] and not config.get("fixed_update_epochs",False):
             break
@@ -144,6 +145,9 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
                         if not torch.isfinite(norm):
                             raise FloatingPointError("梯度范数不是有限数")
                         optimizer.step()
+                        actual_updates+=1
+                        with (output/'update_progress.jsonl').open('a') as stream:
+                            stream.write(json.dumps({'epoch':epoch,'optimizer_updates':actual_updates})+'\n')
                 numerator += float((per_observation.detach() * weights).sum())
                 seen_observations += len(weights)
             if seen_observations != len(loaders[split].dataset):
@@ -174,7 +178,8 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
             if resume_probe_factory is not None:
                 from .resume_probe import verify_next_update
                 verify_next_update(model,optimizer,loaders,config,resume_probe_factory,losses,
-                                   output/'last.pt',output/'resume_transition.json')
+                                   output/'last.pt',output/'resume_transition.json',
+                                   live_training_state={'epoch':epoch,'history':history,'best':best,'stale':stale})
             return {"status": "INTERRUPTED_AT_DECLARED_EPOCH", "history": history, "last": str(output / "last.pt")}
     result = {"status": "FIT_COMPLETED_NOT_SCIENTIFIC_ACCEPTANCE", "history": history,
               "best_validation": best, "best_checkpoint": str(output / "best.pt"),

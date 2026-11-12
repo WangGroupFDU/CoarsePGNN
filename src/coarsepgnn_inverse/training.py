@@ -187,6 +187,8 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
     本函数只接受原会话授权的冻结首轮配置；每个阶段先2epoch再原状态接续。
     模型完成不等同研究PASS，测试评价必须使用另外的最终锁和一次性入口。
     """
+    from .runtime_policy import enforce_deterministic_runtime
+    runtime=enforce_deterministic_runtime(config['execution_policy'])
     contract,lock,authorization=training_gate(config)
     if not torch.cuda.is_available():
         raise RuntimeError('正式训练要求授权cn2 CUDA，不自动降级到CPU')
@@ -200,7 +202,8 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
     seed_everything(config['seed']);torch.set_num_threads(config.get('cpu_threads',8))
     identity={'code_sha':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
               'contract_sha256':sha256(Path(config['contract'])),'data_lock_sha256':sha256(Path(config['data_lock'])),
-              'authorization_review_sha256':authorization['review_sha256'],'seed':config['seed']}
+              'authorization_review_sha256':authorization['review_sha256'],'seed':config['seed'],
+              'execution_settings_sha256':digest(runtime)}
     run_config={'config':config,'identity':identity}
     if resume:
         if read_json(output/'run_config.json')!=run_config:
@@ -208,12 +211,22 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
         prepared=reload_inputs(config,lock,output)
     else:
         write_json(output/'run_config.json',run_config)
-        prepared=prepare_inputs(config,lock,output)
+        write_json(output/'execution_settings.json',runtime)
+        if config.get('preprocessing_source') is not None:
+            from .preprocessing_reuse import import_frozen_assets
+            import_frozen_assets(config['preprocessing_source'],output,identity)
+            prepared=reload_inputs(config,lock,output)
+            write_json(output/'condition_rebuild_receipt.json',{
+                'observations':len(prepared['rows']),'observation_ids_exact':True,
+                'condition_input_sha256_exact':True,
+                'development_identity_sha256':digest(sorted((r['observation_id'],r['condition_input_sha256']) for r in prepared['rows']))})
+        else:
+            prepared=prepare_inputs(config,lock,output)
     # 条件缓存、PLE、候选特征和词表的逐文件散列进入每个checkpoint身份。
     identity={**identity,'preprocessing_receipt_sha256':sha256(output/'inputs_ready.json')}
     verify_preprocessing_assets(output,identity['preprocessing_receipt_sha256'])
     settings=config['optimizer'];stages={};device=torch.device('cuda')
-    def fit_stage(model,loaders,name,objective,factory,validation=None):
+    def _fit_stage(model,loaders,name,objective,factory,validation=None):
         """固定初始化后先验证真实batch，2epoch检查与续跑共享同一身份和优化器状态。"""
         stage_id={**identity,'stage':name}
         stage_started=time.monotonic()
@@ -258,15 +271,28 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
                 'best_epoch':result['best_epoch'],'stop_reason':result['stop_reason']})
         stages[name]=result
         return model
+    def fit_stage(model,loaders,name,objective,factory,validation=None):
+        """为失败/超时阶段落盘真实更新数和耗时，不将缺失completion视为通过。"""
+        started=time.monotonic()
+        try:
+            return _fit_stage(model,loaders,name,objective,factory,validation)
+        except BaseException as error:
+            directory=output/name;progress=directory/'update_progress.jsonl'
+            events=[json.loads(line) for line in progress.read_text().splitlines()] if progress.exists() else []
+            transition=directory/'resume_transition.json'
+            diagnostic=read_json(transition) if transition.exists() else {}
+            write_json(output/(name+'_failure.json'),{'status':'FAILED','error':repr(error),
+                'elapsed_seconds':time.monotonic()-started,
+                'formal_optimizer_updates':events[-1]['optimizer_updates'] if events else 0,
+                'diagnostic_optimizer_updates':diagnostic.get('diagnostic_optimizer_updates',0),
+                'transition_status':diagnostic.get('status','NOT_EXECUTED'),'test_access_guard':authorization['test_access_guard']})
+            raise
+    from pu_v24_benchmark_harness.common import TargetTransform
     for target in TARGET_UNITS:
         seed_everything(config['seed'])
-        development=build_development_loaders(lock['split_labels'],target,batch_size=64,seed=config['seed'])
         transform_path=output/(target+'_transform.json')
-        if transform_path.exists():
-            if read_json(transform_path)!=development['transform'].as_dict():
-                raise ValueError('续跑标签变换不一致')
-        else:
-            write_json(transform_path,development['transform'].as_dict())
+        development=build_development_loaders(lock['split_labels'],target,batch_size=64,seed=config['seed'],
+            target_transform=TargetTransform(**read_json(transform_path)),assay_vocab=prepared['vocab'])
         structure=StructureOnlyRegressor(target=target,schema=package_schema()).to(device)
         validator=physical_validation(development['transform'])
         structure=fit_stage(structure,development['loaders'],target+'_structure',forward_objective,
@@ -349,8 +375,19 @@ def train(config: dict, output: Path, *, resume: bool=False) -> dict:
     original=signal.signal(signal.SIGALRM,timeout_handler)
     signal.setitimer(signal.ITIMER_REAL,limit);started=time.monotonic()
     try:
-        result=_train(config,output,resume=resume)
+        from .preprocessing_reuse import prohibit_refitting
+        with prohibit_refitting(enabled=config.get('preprocessing_source') is not None) as calls:
+            try:
+                result=_train(config,output,resume=resume)
+            finally:
+                if output.is_dir():
+                    write_json(output/'preprocessing_call_audit.json',{'calls':calls,'zero_calls':not any(calls.values())})
         result['whole_call_wall_seconds']=time.monotonic()-started
         return result
+    except BaseException as error:
+        if output.is_dir():
+            write_json(output/'training_failure.json',{'status':'FAILED','error':repr(error),
+                'elapsed_seconds':time.monotonic()-started,'timeout':isinstance(error,TimeoutError)})
+        raise
     finally:
         signal.setitimer(signal.ITIMER_REAL,0);signal.signal(signal.SIGALRM,original)

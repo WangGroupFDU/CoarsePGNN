@@ -39,7 +39,16 @@ def test_training_median_material_weights_and_authorized_missing_class():
                          'condition_normalized_json':json.dumps({'fields':{'method':{'mask':1,'value':'DSC'}}}),
                          'transition_criterion':'dsc_midpoint','transition_scope':'soft_segment'})
     requests=[{**rows[0],'value':999999},{**rows[0],
-              'condition_normalized_json':json.dumps({'fields':{'method':{'mask':1,'value':'DMA'}}})}]
+              'property_task':'tg:DMA:dsc_midpoint:soft_segment'}]
     assert forward_baseline(rows,requests)==[10.,10.]
     mechanical=[{**r,'target':'tensile_strength_ultimate','property_task':'tensile_strength_ultimate'} for r in rows]
     assert forward_baseline(mechanical,[mechanical[0]])==[10.]
+
+
+def test_restored_thermal_method_is_taken_from_qualified_task():
+    """恢复Tg行没有重复method字段时，仍按任务中的DSC/DMA分类选训练中位数。"""
+    base={'split':'train','target':'tg','condition_normalized_json':'{"fields":{}}',
+          'transition_criterion':'dsc_midpoint','transition_scope':'soft_segment'}
+    rows=[{**base,'material_id':'A','observation_id':'A','value':10,'property_task':'tg:DSC:dsc_midpoint:soft_segment'},
+          {**base,'material_id':'B','observation_id':'B','value':80,'property_task':'tg:DMA:dsc_midpoint:soft_segment'}]
+    assert forward_baseline(rows,rows)==[10.,80.]

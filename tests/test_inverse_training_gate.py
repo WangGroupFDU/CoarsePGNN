@@ -28,8 +28,8 @@ def fixture_files(root: Path, *, alias_test: bool=False) -> tuple[dict,str]:
         'next_round':5,'maximum_round_wall_seconds':14400,'starting_cumulative_compute_seconds':69.88726103887893,
         'maximum_total_rounds':10,'maximum_total_compute_seconds':259200}
     review={'type':'REVIEW_CONTROL','run_id':'synthetic','goal_sha256':'goal','request_id':'review4',
-            'code_sha':'qualification','artifact_sha':'artifact4','training_authorization':allowed,
-            'data_lock_approval':{'approved':True,'sha256':lock_sha,'qualification_code_sha':'qualification'},
+            'code_sha':'review_code','artifact_sha':'artifact5','training_authorization':allowed,
+            'data_lock_approval':{'approved':True,'sha256':lock_sha,'qualification_code_sha':'qualification','qualification_artifact_sha':'artifact4'},
             'contract_freeze_authorization':{'authorized':True}}
     review_path=save('review.md',review)
     config={'run_id':'synthetic','goal_sha256':'goal','round':5,'seed':20261111,'timeout_seconds':14400,
@@ -40,7 +40,7 @@ def fixture_files(root: Path, *, alias_test: bool=False) -> tuple[dict,str]:
     authorization={'status':'PRO_TRAINING_AUTHORIZED','run_id':'synthetic','goal_sha256':'goal',
         'contract_sha256':sha256(Path(contract_path)),'data_lock_sha256':lock_sha,'training_code_sha':'code5',
         'config_sha256':digest(config),'review_path':review_path,'review_sha256':sha256(Path(review_path)),
-        'review_request_id':'review4','qualification_code_sha':'qualification','qualification_artifact_sha':'artifact4',
+        'review_request_id':'review4','review_code_sha':'review_code','review_artifact_sha':'artifact5','qualification_code_sha':'qualification','qualification_artifact_sha':'artifact4',
         'allowed_seeds':[20261111]}
     save('authorization.json',authorization)
     return config,'code5'
@@ -101,3 +101,13 @@ def test_actual_open_boundary_is_denied(tmp_path,monkeypatch):
     with pytest.raises(PermissionError,match='禁止打开'):
         Path(lock['split_labels']['test']['path']).open('rb')
     assert guard['blocked_open_attempts']==2 and guard['actual_test_reads']==0
+
+
+@pytest.mark.parametrize('field',['qualification_code_sha','qualification_artifact_sha','review_code_sha','review_artifact_sha','training_code_sha'])
+def test_three_version_identities_are_independently_bound(tmp_path,field):
+    """资格、被评审版本和实际执行版本不同仍可启动，任一身份被替换必须拒绝。"""
+    config,code=fixture_files(tmp_path)
+    verify_startup(config,code)
+    path=Path(config['training_authorization']);value=json.loads(path.read_text())
+    value[field]='wrong_identity';path.write_text(json.dumps(value))
+    with pytest.raises(PermissionError): verify_startup(config,code)
