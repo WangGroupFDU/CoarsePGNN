@@ -1,0 +1,19 @@
+{
+  "alias": "codex-cn2",
+  "command": "/opt/anaconda2023/bin/python -c 'import pathlib,hashlib,subprocess,json\nbase=pathlib.Path('\"'\"'/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111'\"'\"');repo=base/'\"'\"'repository'\"'\"';expected={'\"'\"'round005_source.bundle'\"'\"': '\"'\"'670c616c7c0034307b842089290c771c69334dc832c0bb8c45ac670f9608ace7'\"'\"', '\"'\"'round005_authorization.json'\"'\"': '\"'\"'60c183c2a877f7df73712bc809a4c412436e98ff727a16184f0dd09b1f1b09e1'\"'\"', '\"'\"'round005_review_raw.txt'\"'\"': '\"'\"'58803d43a83e3c7f23d6995b9bda7b347f5cd3d8e4214b85987ea79b68246a90'\"'\"'}\nfor name,wanted in expected.items():\n p=base/name;actual=hashlib.sha256(p.read_bytes()).hexdigest();assert actual==wanted,(name,actual,wanted)\nassert not subprocess.check_output(['\"'\"'git'\"'\"','\"'\"'status'\"'\"','\"'\"'--porcelain'\"'\"'],cwd=repo,text=True).strip()\nhead=subprocess.check_output(['\"'\"'git'\"'\"','\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"'],cwd=repo,text=True).strip();assert head=='\"'\"'93ca43c653a16ff97563c19d3fcc7c629e99d403'\"'\"'\nsubprocess.run(['\"'\"'git'\"'\"','\"'\"'fetch'\"'\"',str(base/'\"'\"'round005_source.bundle'\"'\"'),'\"'\"'HEAD'\"'\"'],cwd=repo,check=True)\nsubprocess.run(['\"'\"'git'\"'\"','\"'\"'merge'\"'\"','\"'\"'--ff-only'\"'\"','\"'\"'FETCH_HEAD'\"'\"'],cwd=repo,check=True,stdout=subprocess.DEVNULL)\nassert subprocess.check_output(['\"'\"'git'\"'\"','\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"'],cwd=repo,text=True).strip()=='\"'\"'f80ce15bca6e01feb2cf0f553d04990bcfe6915d'\"'\"'\nassert not subprocess.check_output(['\"'\"'git'\"'\"','\"'\"'status'\"'\"','\"'\"'--porcelain'\"'\"'],cwd=repo,text=True).strip()\nprint(json.dumps({'\"'\"'head'\"'\"':'\"'\"'f80ce15bca6e01feb2cf0f553d04990bcfe6915d'\"'\"','\"'\"'clean'\"'\"':True,'\"'\"'inputs_verified'\"'\"':expected}))\n'",
+  "exit_code": 0,
+  "stdout": "{\"head\": \"f80ce15bca6e01feb2cf0f553d04990bcfe6915d\", \"clean\": true, \"inputs_verified\": {\"round005_source.bundle\": \"670c616c7c0034307b842089290c771c69334dc832c0bb8c45ac670f9608ace7\", \"round005_authorization.json\": \"60c183c2a877f7df73712bc809a4c412436e98ff727a16184f0dd09b1f1b09e1\", \"round005_review_raw.txt\": \"58803d43a83e3c7f23d6995b9bda7b347f5cd3d8e4214b85987ea79b68246a90\"}}\n",
+  "stderr": "From /home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round005_source.bundle\n * branch            HEAD       -> FETCH_HEAD\n",
+  "output": {
+    "stdout": {
+      "truncated": false,
+      "total_bytes": 377,
+      "total_lines": 1
+    },
+    "stderr": {
+      "truncated": false,
+      "total_bytes": 165,
+      "total_lines": 2
+    }
+  }
+}
