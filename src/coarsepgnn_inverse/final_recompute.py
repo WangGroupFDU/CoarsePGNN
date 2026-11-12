@@ -130,7 +130,7 @@ def recompute(plan_path: Path, output: Path, *, reference: Path, inventory_sha25
         raise PermissionError('R9未完整完成，不能补做新搜索')
     data = read_json(Path(plan['data_lock'])); directory = Path(plan['data_lock']).parent
     test_path = Path(data['split_labels']['test']['path'])
-    panel = read_json(Path(plan['fixed_requests']))['requests']; lookup = {r['request_id']: r for r in panel}
+    panel = read_json(Path(plan['fixed_requests'])); lookup = {r['request_id']: r for r in panel}
     lock = read_json(reference/'final_lock.json')
     if lock['consumer_code_sha'] != auth['consumer_code_sha'] or lock['all_frozen_inputs'] != files:
         raise PermissionError('复算输入与同一最终窗口不同')

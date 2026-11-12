@@ -164,7 +164,7 @@ def evaluate(plan_path: Path, output: Path, *, deadline: float) -> dict:
     plan, review, auth, files = check_inputs(plan_path)
     data = read_json(Path(plan['data_lock'])); directory = Path(plan['data_lock']).parent
     test_path = Path(data['split_labels']['test']['path'])
-    panel = read_json(Path(plan['fixed_requests']))['requests']
+    panel = read_json(Path(plan['fixed_requests']))
     if len(panel) != 96:
         raise ValueError('最终面板不是96请求')
     with test_read_guard(test_path, output/'test_access.jsonl', window=None), no_fitting() as preaudit:
