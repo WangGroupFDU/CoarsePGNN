@@ -53,7 +53,7 @@ def test_epoch_boundary_resume_matches_continuous_training(tmp_path):
     expected = fit_development(full, full_loaders, config, tmp_path / "full", identity, squared_loss)
     paused, paused_loaders = objects()
     interrupted = fit_development(paused, paused_loaders, config, tmp_path / "resumed", identity,
-                                  squared_loss, stop_after_epoch=1)
+                                  squared_loss, stop_after_epoch=1,resume_probe_factory=lambda:objects()[0])
     assert interrupted["status"] == "INTERRUPTED_AT_DECLARED_EPOCH"
     resumed, resumed_loaders = objects()
     actual = fit_development(resumed, resumed_loaders, config, tmp_path / "resumed", identity,

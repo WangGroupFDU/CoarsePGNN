@@ -64,7 +64,8 @@ def replace_checkpoint(path: Path, payload: dict) -> None:
 def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output: Path,
                     identity: dict, losses: Callable, *, resume: bool = False,
                     stop_after_epoch: int | None = None,
-                    validation_losses: Callable | None = None) -> dict:
+                    validation_losses: Callable | None = None,
+                    resume_probe_factory: Callable | None = None) -> dict:
     """按材料等权拟合一个监督阶段，并在验证集上早停、保存完整续跑状态。
 
     loaders严格只有train/validation，Dataset.rows含material_id；losses(model,batch)
@@ -116,8 +117,11 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
         if stale >= config["patience"] and not config.get("fixed_update_epochs",False):
             break
         started = time.monotonic()
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
         record = {"epoch": epoch}
         for split in ("train", "validation"):
+            split_started = time.monotonic()
             training = split == "train"
             model.train(training)
             numerator = 0.0
@@ -145,6 +149,8 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
             if seen_observations != len(loaders[split].dataset):
                 raise ValueError("加载器丢弃或重复观察，材料等权分母不闭合")
             record[split] = numerator / len(counts[split])
+            record[split + "_elapsed_seconds"] = time.monotonic() - split_started
+            record[split + "_observations_per_second"] = seen_observations / record[split + "_elapsed_seconds"]
         improved = record["validation"] < best
         if improved:
             best, stale = record["validation"], 0
@@ -165,9 +171,17 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
                                "config": config, "epoch": epoch, "model": model.state_dict(), "validation": best})
         print(json.dumps({"stage":str(output),**record},ensure_ascii=False),flush=True)
         if stop_after_epoch is not None and epoch >= stop_after_epoch:
+            if resume_probe_factory is not None:
+                from .resume_probe import verify_next_update
+                verify_next_update(model,optimizer,loaders,config,resume_probe_factory,losses,
+                                   output/'last.pt',output/'resume_transition.json')
             return {"status": "INTERRUPTED_AT_DECLARED_EPOCH", "history": history, "last": str(output / "last.pt")}
     result = {"status": "FIT_COMPLETED_NOT_SCIENTIFIC_ACCEPTANCE", "history": history,
               "best_validation": best, "best_checkpoint": str(output / "best.pt"),
-              "material_counts": {s: len(c) for s, c in counts.items()}, "test_access": False}
+              "material_counts": {s: len(c) for s, c in counts.items()}, "test_access": False,
+              "formal_optimizer_updates":history[-1]['optimizer_updates'],
+              "diagnostic_optimizer_updates":2 if (output/'resume_transition.json').exists() else 0,
+              "best_epoch":min(history,key=lambda row:row['validation'])['epoch'],
+              "stop_reason":"PATIENCE_REACHED" if stale>=config['patience'] else "MAX_EPOCHS_REACHED"}
     write_json(output / "completion.json", result)
     return result

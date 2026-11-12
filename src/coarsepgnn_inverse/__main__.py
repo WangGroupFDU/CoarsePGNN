@@ -26,6 +26,7 @@ def main() -> None:
     command = sub.add_parser("train", help="依据冻结合同及授权，在远程训练四任务与逆模型")
     command.add_argument("--config", required=True, type=Path)
     command.add_argument("--output", required=True, type=Path)
+    command.add_argument("--resume", action="store_true", help="仅接续同一代码、合同和配置的未完成轮")
     args = parser.parse_args()
     if args.command == "audit":
         result = audit(read_json(args.config), args.output)
@@ -35,7 +36,7 @@ def main() -> None:
                   "predictions_computed": False}
     elif args.command == "train":
         from .training import train
-        result = train(read_json(args.config), args.output)
+        result = train(read_json(args.config), args.output,resume=args.resume)
     else:
         result = decode_ratios(**read_json(args.input))
         write_json(args.output, result)
