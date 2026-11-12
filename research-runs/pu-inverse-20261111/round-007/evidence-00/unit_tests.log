@@ -1,0 +1,19 @@
+.........................F........                                       [100%]
+=================================== FAILURES ===================================
+____________ test_strict_runtime_rejects_missing_launch_environment ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x14737f8c5310>
+
+    def test_strict_runtime_rejects_missing_launch_environment(monkeypatch):
+        """缺失cuBLAS启动环境时在调用GPU或拟合前拒绝，不能自行降级。"""
+        from coarsepgnn_inverse.runtime_policy import enforce_deterministic_runtime
+        monkeypatch.delenv('CUBLAS_WORKSPACE_CONFIG',raising=False)
+        with pytest.raises(RuntimeError,match='启动Python前'):
+>           enforce_deterministic_runtime({'cublas_workspace_config':':4096:8','deterministic_algorithms':True,'warn_only':False})
+E           TypeError: enforce_deterministic_runtime() missing 1 required positional argument: 'optimizer_config'
+
+tests/test_inverse_preprocessing_reuse.py:49: TypeError
+- generated xml file: /home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/unit_tests.xml -
+=========================== short test summary info ============================
+FAILED tests/test_inverse_preprocessing_reuse.py::test_strict_runtime_rejects_missing_launch_environment
+1 failed, 33 passed in 2.58s

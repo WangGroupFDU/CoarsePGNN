@@ -1,0 +1,12 @@
+--- a/tests/test_inverse_preprocessing_reuse.py
++++ b/tests/test_inverse_preprocessing_reuse.py
+@@ -46,7 +46,8 @@
+     from coarsepgnn_inverse.runtime_policy import enforce_deterministic_runtime
+     monkeypatch.delenv('CUBLAS_WORKSPACE_CONFIG',raising=False)
+     with pytest.raises(RuntimeError,match='启动Python前'):
+-        enforce_deterministic_runtime({'cublas_workspace_config':':4096:8','deterministic_algorithms':True,'warn_only':False})
++        enforce_deterministic_runtime({'cublas_workspace_config':':4096:8','deterministic_algorithms':True,'warn_only':False},
++                                      {'learning_rate':.001,'weight_decay':.0001})
+ 
+ 
+ def test_loader_uses_saved_transform_without_fit(tmp_path,monkeypatch):

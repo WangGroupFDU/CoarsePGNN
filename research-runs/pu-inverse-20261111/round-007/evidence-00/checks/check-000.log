@@ -1,0 +1,18 @@
+{'stage': 'unit_tests', 'command': ['/opt/anaconda2023/bin/python', '-m', 'pytest', '-q', 'tests/test_inverse_training_gate.py', 'tests/test_inverse_fitting.py', 'tests/test_inverse_metrics.py', 'tests/test_inverse_access.py', 'tests/test_inverse_preprocessing_reuse.py', 'tests/test_inverse_search.py', 'tests/test_inverse_request_api.py', 'tests/test_inverse_round007.py', '--junitxml=/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/unit_tests.xml'], 'returncode': 1, 'elapsed_seconds': 3.671172520960681, 'remaining_round_seconds': 14396.325760456966}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/round007.py", line 91, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/round007.py", line 87, in main
+    else:result=run(args.plan,args.output)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/round007.py", line 43, in run
+    execute('unit_tests',['-m','pytest','-q',*plan['tests'],'--junitxml='+str(output/'unit_tests.xml')])
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/round007.py", line 41, in execute
+    print(event,flush=True);process.check_returncode()
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda2023/lib/python3.11/subprocess.py", line 502, in check_returncode
+    raise CalledProcessError(self.returncode, self.args, self.stdout,
+subprocess.CalledProcessError: Command '['/opt/anaconda2023/bin/python', '-m', 'pytest', '-q', 'tests/test_inverse_training_gate.py', 'tests/test_inverse_fitting.py', 'tests/test_inverse_metrics.py', 'tests/test_inverse_access.py', 'tests/test_inverse_preprocessing_reuse.py', 'tests/test_inverse_search.py', 'tests/test_inverse_request_api.py', 'tests/test_inverse_round007.py', '--junitxml=/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/unit_tests.xml']' returned non-zero exit status 1.

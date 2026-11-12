@@ -1,0 +1,653 @@
+{
+  "hypothesis": "四套冻结优化器配置的完整模型比较可检验力学误差能否改善；真实条件逆向提案能否在等额预算上提供开发搜索优势。",
+  "baseline": "材料等权中位数，以及真实train检索、512合法随机、256随机+256比例搜索；统一512提案和排名。",
+  "parameters": {
+    "round": 7,
+    "timeout_seconds": 14400,
+    "authorization": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round007_authorization.json",
+    "configurations": [
+      {
+        "config_id": "D0",
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001,
+        "mode": "READ_ONLY_REEVALUATION",
+        "producer_code_sha": "94f8f785d5c3bfb4197903d5588e7a5490d3e80d",
+        "producer_artifact_sha": "cab04775f48555995ed448deffe0e0c1bfa57029",
+        "action": "保留第六轮整套九阶段权重，执行C7只读兼容重载、源float64单目标重评及全部双目标补充评分，不产生新的正式优化器更新。",
+        "config_path": "configs/inverse/pu_20261112_round007_D1.json",
+        "model_dir": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit",
+        "manifest_sha256": "0a5d20560f7a11317cf179dbe13ebbd70999380e910aa13b828ef341edcaff78"
+      },
+      {
+        "config_id": "D1",
+        "learning_rate": 0.0003,
+        "weight_decay": 0.0001,
+        "mode": "FRESH_NINE_STAGE_TRAINING",
+        "config_path": "configs/inverse/pu_20261112_round007_D1.json",
+        "model_dir": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training"
+      },
+      {
+        "config_id": "D2",
+        "learning_rate": 0.001,
+        "weight_decay": 0.001,
+        "mode": "FRESH_NINE_STAGE_TRAINING",
+        "config_path": "configs/inverse/pu_20261112_round007_D2.json",
+        "model_dir": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training"
+      },
+      {
+        "config_id": "D3",
+        "learning_rate": 0.0003,
+        "weight_decay": 0.001,
+        "mode": "FRESH_NINE_STAGE_TRAINING",
+        "config_path": "configs/inverse/pu_20261112_round007_D3.json",
+        "model_dir": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training"
+      }
+    ],
+    "readonly_producer": "configs/inverse/round007_readonly_producer.json",
+    "development_panel": "configs/inverse/round007_development_panel.json",
+    "interface_cases": "configs/inverse/round007_interface_cases.json",
+    "policies": {
+      "training_authorization": {
+        "status": "PRO_TRAINING_AUTHORIZED",
+        "next_round": 7,
+        "allowed_seeds": [
+          20261111
+        ],
+        "maximum_round_wall_seconds": 14400,
+        "maximum_total_rounds": 10,
+        "maximum_total_compute_seconds": 259200,
+        "starting_cumulative_rounds": 6,
+        "starting_cumulative_compute_seconds": 333.963923143805,
+        "configuration_authorization_mode": "EXACT_ALLOWLIST",
+        "maximum_development_configurations_total": 4,
+        "hyperparameters": {
+          "optimizer": "AdamW",
+          "batch_size": 64,
+          "inverse_hidden": 128,
+          "mdn_components": 3,
+          "max_epochs_per_stage": 300,
+          "early_stopping_patience": 30,
+          "gradient_norm_clip": 1,
+          "distillation": false
+        },
+        "allowed_configurations": [
+          {
+            "config_id": "D0",
+            "learning_rate": 0.001,
+            "weight_decay": 0.0001,
+            "mode": "READ_ONLY_REEVALUATION",
+            "producer_code_sha": "94f8f785d5c3bfb4197903d5588e7a5490d3e80d",
+            "producer_artifact_sha": "cab04775f48555995ed448deffe0e0c1bfa57029",
+            "action": "保留第六轮整套九阶段权重，执行C7只读兼容重载、源float64单目标重评及全部双目标补充评分，不产生新的正式优化器更新。"
+          },
+          {
+            "config_id": "D1",
+            "learning_rate": 0.0003,
+            "weight_decay": 0.0001,
+            "mode": "FRESH_NINE_STAGE_TRAINING"
+          },
+          {
+            "config_id": "D2",
+            "learning_rate": 0.001,
+            "weight_decay": 0.001,
+            "mode": "FRESH_NINE_STAGE_TRAINING"
+          },
+          {
+            "config_id": "D3",
+            "learning_rate": 0.0003,
+            "weight_decay": 0.001,
+            "mode": "FRESH_NINE_STAGE_TRAINING"
+          }
+        ],
+        "execution_order": [
+          "D0",
+          "D1",
+          "D2",
+          "D3"
+        ],
+        "execution_policy": {
+          "cublas_workspace_config": ":4096:8",
+          "deterministic_algorithms": true,
+          "warn_only": false,
+          "cudnn_deterministic": true,
+          "cudnn_benchmark": false,
+          "resume_float_tolerance": 1e-05,
+          "policy": "保持C6已记录的设备、精度、TF32及AdamW实现语义；各配置仅改变授权lr/wd。遇不支持的严格确定性算子直接停止，不静默降级。"
+        },
+        "preprocessing_reuse": {
+          "source_code_sha": "94f8f785d5c3bfb4197903d5588e7a5490d3e80d",
+          "source_artifact_sha": "cab04775f48555995ed448deffe0e0c1bfa57029",
+          "inputs_ready_sha256": "efc85171ce01657bba50e4d362a52707666e6b0197eb462d0876bffb13d88dfd",
+          "asset_count": 14,
+          "policy": "精确复制或只读挂载同一14项资产，分别绑定生产者C6/A6和消费者C7；保留更早C5来源谱系。不得重新拟合变换、PLE、词表或规格标准化，不重新编码已有文本缓存，不导入C6监督权重初始化D1至D3。"
+        },
+        "configuration_selection": {
+          "primary_score": "S_cfg=(MAE_tg/10+MAE_tm/15+MAE_UTS/5+MAE_EAB/100)/4；各MAE使用全部冻结validation合格观察，先材料内平均，再材料等权。",
+          "units": "Tg和Tm误差以K计，UTS以MPa计，EAB以百分点计；分母是冻结设计容差，不是测量噪声。",
+          "primary_order": "S_cfg较小优先。",
+          "first_exact_tie_breaker": "仅当未舍入float64的S_cfg完全相等时，比较采用源float64评分窗口重新计算的四任务材料等权平均单目标窗口NLL，较小优先。",
+          "second_exact_tie_breaker": "前两项均完全相等时，按数值二元组(learning_rate,weight_decay)升序。",
+          "selection_unit": "选择包含四个前向任务及一个逆向模型的完整配置包；不按性质拼接不同配置，也不单独替换逆向模型。",
+          "within_stage_checkpoint_selection": "保持原有阶段内早停和最佳checkpoint规则；前向使用物理单位材料等权验证MAE，逆向保持既有验证损失规则。",
+          "rule_freeze": "在第七轮新增训练或候选性能输出出现之前归档选择规则及SHA；不使用打印舍入后的相等或新增近似平局区间。",
+          "incomplete_grid": "任一配置工程失败或未完成时，记录四配置比较未完成；不得删除失败配置后宣称完成预定比较。",
+          "configuration_limit": "D0至D3用完全部四套开发额度，不追加第五套、不追加定向蒸馏。固定消融是后续对照，不作为再次选择主配置的机会。"
+        },
+        "precise_actions": [
+          "完成限定静态修复，冻结C7、完整R7计划、配置允许列表、评分器、开发请求和基线规则；在C7之后形成外部执行绑定回执，绑定本条完整评审实际SHA，避免提交自引用。",
+          "在一个正式外层任务中执行必要入口负对照、源精度评分回归、测试访问拒绝和预算计数检查；所有实际计算计入同一轮墙钟。",
+          "只读重载D0并用新评分器重算239个单目标及63个双目标状态；保存原结果和修正结果的可解释差异。",
+          "按D1、D2、D3顺序全新训练；每套重置指定随机种子，完成四任务结构阶段、四任务条件阶段和逆向阶段。保持真实材料等权、合格共同状态及目标子集采样，无伪标签或蒸馏。",
+          "每个新增阶段执行真实单batch前向、loss和反向检查但不作预检优化器更新，随后两epoch及F3恢复比较，再按原早停完成。保存完整状态、正式与诊断更新计数、吞吐、峰值显存和失败回执。",
+          "每套新增配置由独立进程执行F4；重建对象并加载最佳权重，核对逐观察前向预测和逆向分布输出，同时完成相同单目标及双目标评分。",
+          "依据冻结排序键选择一个完整配置包，再对该包执行开发生成面板的四方法比较和全部端到端接口用例；比较结果不回流改变配置选择规则。",
+          "归档实际代码、配置、资产、权重、评分器、逐请求结果、调用预算、完整运行日志、失败记录及新增C/A身份；提交第七轮审阅。"
+        ],
+        "not_authorized_in_round007": [
+          "读取最终测试标签或计算正式96面板性能。",
+          "以四套不同超参数配置冒充三个独立初始化种子。",
+          "改变成功合同、数据锁、原划分、测试分母或设计容差。",
+          "重新收集或合成实验作为本次完成条件。",
+          "额外模型体系、架构搜索、第五套开发配置或未授权蒸馏。",
+          "在预算外预扫全规格组合或比例网格，再把结果作为免费初始化。",
+          "为静态准备单独消耗一个新的正式计算轮。"
+        ]
+      },
+      "development_evaluation_plan": {
+        "freeze_before": "在任何R7新增优化器更新或候选性能输出出现前冻结请求清单、构造规则和SHA；允许只读使用既定validation观察及状态身份构造该清单。",
+        "all_configuration_anchor_panels": {
+          "single_target_observations": 239,
+          "two_target_states": 63,
+          "two_target_materials": 63,
+          "two_target_closure_groups": 4,
+          "truth_separation": "真实D/P/E/v仅进入独立锚点评分端；生成请求只包含目标区间、真实协议和明确提供的历史R，不把锚点配方注入候选初始化。",
+          "single_target_request": "每条观察以真实值为中心、相应冻结delta为半宽，使用该观察真实协议及源精度历史R。",
+          "joint_target_request": "只使用获准共同状态内的两个不同目标；每个目标保留自己的实际协议。枚举全部合格观察对并记录请求ID；先状态内平均，再材料内平均，最后材料等权。",
+          "joint_reporting": "按目标对分别报告NLL、逐闭包结果及留一闭包敏感性。观察对数量不作为新增独立状态、材料或来源。没有无目标模型时配对改进为null，不新增双目标优势硬门槛。"
+        },
+        "generation_development_panel": {
+          "total_requests": 24,
+          "single_target_requests": 16,
+          "two_target_requests": 8,
+          "single_target_selection": "对每个目标，将全部validation观察按SHA256('R7_DEV_SINGLE_V1|'加observation_id)升序排列，依次选择此前未入选的材料，取4个。不得按性质值是否容易或模型预测结果选择。",
+          "two_target_selection": "将63个获准validation双目标状态按SHA256('R7_DEV_PAIR_V1|'加state_id)升序排列，取8个不同材料。每状态用于该生成面板的观察对按两项observation_id组成的规范二元组字典序取第一项；完整锚点评分仍包含全部合格观察对。",
+          "bounds_and_R": "各请求边界为所选真实观察值加减对应delta，明确提供该材料源float64历史R。",
+          "methods": [
+            "选定配置的条件逆模型加比例细化",
+            "真实train配方检索",
+            "合法随机",
+            "随机组合加比例搜索"
+          ],
+          "evaluation_scope": "只对选定整套配置运行该面板；报告单模型开发命中、违反量、合法性、多样性和调用成本。该面板不是正式96面板，也不承担最终成功核准。",
+          "three_model_consensus": "第七轮只有一个种子，不计算或声称合同的三模型一致性Hit@20；其他三套超参数模型不得充当两个独立复核种子。"
+        },
+        "interface_cases": [
+          {
+            "id": "E2E01",
+            "case": "单性质双侧区间",
+            "expected": "返回逐约束物理单位预测、合法候选及完整预算记录。"
+          },
+          {
+            "id": "E2E02",
+            "case": "四性质联合计算请求",
+            "expected": "由固定开发观察构造四项请求并标明没有对应共同状态实测真值；执行计算筛选，不能输出四性质联合实验验证成功。"
+          },
+          {
+            "id": "E2E03",
+            "case": "同一性质两个不同注册协议",
+            "expected": "保留两个条件输入并分别预测和判断，不能合并或覆盖。"
+          },
+          {
+            "id": "E2E04",
+            "case": "E=NONE",
+            "expected": "v精确为0，无连续比值损失或虚构E用量，计量和图合法。"
+          },
+          {
+            "id": "E2E05",
+            "case": "给定非1的R",
+            "expected": "原float64值保留；细化不改变R，不强制替换为1。"
+          },
+          {
+            "id": "E2E06",
+            "case": "未给R",
+            "expected": "执行锁定训练支持范围中的外层R搜索，记录32层规则、实际R值及外推标志。"
+          },
+          {
+            "id": "E2E07",
+            "case": "空合法原料集合",
+            "expected": "模型调用前返回INFEASIBLE_DOMAIN。"
+          },
+          {
+            "id": "E2E08",
+            "case": "同协议互不相交约束",
+            "expected": "模型调用前返回INFEASIBLE_CONSTRAINTS。"
+          },
+          {
+            "id": "E2E09",
+            "case": "上下界颠倒、非有限值、不支持单位",
+            "expected": "三个子用例均返回INVALID_REQUEST，不产生候选前向调用。"
+          },
+          {
+            "id": "E2E10",
+            "case": "未知规格、未知协议或协议内容与SHA不符",
+            "expected": "明确拒绝或返回对应不支持状态，不能进入已支持协议路径。"
+          },
+          {
+            "id": "E2E11",
+            "case": "固定无命中工程夹具",
+            "expected": "达到候选预算后返回NO_SUPPORTED_CANDIDATE；若使用受控预测桩，必须单列为工程夹具，不计入真实模型性能。"
+          },
+          {
+            "id": "E2E12",
+            "case": "来源不完整的合成信息",
+            "expected": "缺失温度、时间、溶剂或催化剂保持null；同时完成至少一个真实train配方的具体来源回读。"
+          },
+          {
+            "id": "E2E13",
+            "case": "仅下界",
+            "expected": "缺失上界使用mask表达，不填成真实0；按下界违反量评分。"
+          },
+          {
+            "id": "E2E14",
+            "case": "仅上界",
+            "expected": "缺失下界使用mask表达，不填成真实0；按上界违反量评分。"
+          }
+        ],
+        "interface_success_rule": "合同12类用例全部通过；每个包含多个子用例的类别须所有子用例通过。额外两个单侧用例是用户要求的功能检查，不新增科学性能门槛。",
+        "protocol_cache_rule": "开发用例采用冻结注册协议及对应已有文本缓存，用保存的变换构造新请求输入；不得隐含重拟合。协议或所需缓存无法匹配时显式报告不支持，不能以另一协议替代。"
+      },
+      "retrieval_preselection_policy": {
+        "status": "AUTHORIZED_TO_FREEZE_BEFORE_COMPARISON",
+        "missing_distance_penalty": 10,
+        "unit": "dimensionless",
+        "eligible_pool": "核准主标签关联的真实train配方，保留来源D/P/E/R/v，并按规范配方身份去重。",
+        "matching_measurements": "每个请求约束仅使用同一配方、同一目标端点且完整协议身份一致的合格train测量；协议比较包含方法、判据、相域、扫描或峰身份、热历史、已报告条件及缺失mask。",
+        "distance_definition": "对约束j，d_j(y)=max(0,L_j-y,y-U_j)/delta_j；缺失某侧边界时省略该项。y为匹配的真实train测量，L_j和U_j为请求边界，delta_j为该目标冻结设计容差。",
+        "multiple_measurement_aggregation": "对每个配方和约束，先在每个合格状态内平均匹配观察的距离，再在材料内平均这些状态距离，最后对有匹配测量的材料等权平均。若该配方对该约束完全没有匹配测量，距离为10。不得选择最有利观察或最小距离。",
+        "ordering": [
+          "各约束聚合距离的最大值升序",
+          "各约束聚合距离的平均值升序",
+          "规范配方ID字典序"
+        ],
+        "R_filter": "用户指定R时，用源float64历史R比较，绝对差不超过1e-8；不从float32网络输入回读。",
+        "limit": 512,
+        "pool_exhaustion": "候选不足512时穷尽后停止并报告实际用量；不重复评分凑数，不使用validation或test配方补足。",
+        "interpretation": "10是预选排序的固定缺失罚分，不是测量误差、成功概率、物理不可行判据或有效距离的截断上限。不同状态的单性质记录只服务检索排序，不能被包装成联合实测标签。",
+        "prohibited": [
+          "模型预扫",
+          "未计费的性质补全",
+          "伪标签填补检索缺失",
+          "依据候选最终表现重新选择缺失罚分"
+        ]
+      },
+      "shared_candidate_search_rules": {
+        "candidate_budget": 512,
+        "top_k": 20,
+        "logical_score_definition": "一个候选在当前请求全部约束上的单个搜索前向模型预测向量计一个逻辑评分；同时记录实际逐性质、逐协议前向调用数。",
+        "main_initial_proposals": {
+          "inverse_samples": 192,
+          "legal_random_samples": 64,
+          "sampling_method": "使用现有sample_proposals逐步采样D、P、E，并在最终原料条件下采MDN分量与z后转换v；不得用beam分量均值替代主方法。"
+        },
+        "refinement": {
+          "proposal_slots": 256,
+          "distinct_parents": 16,
+          "proposals_per_parent": 16,
+          "selection": "按共同排名选择初始评分最好的16个不同配方；不足16时按固定顺序轮转。",
+          "variables": "保持D/P/E；有E时v加Uniform(-0.1,0.1)后限制在[0.000001,0.999999]，NONE保持0。未指定R时log(R)加Uniform(-0.1,0.1)后限制在冻结范围，指定R时不改变。",
+          "no_parent": "没有合法已评分父项时不得免费重采补足；返回相应未找到支持候选状态并记录未使用的细化额度。"
+        },
+        "random_baseline": "512个合法随机提案，角色库均匀抽样，NONE概率0.1，有E时v服从Uniform(0.000001,0.999999)。",
+        "combination_ratio_baseline": "256个合法随机初始提案，加与主方法完全相同的256个细化提案。",
+        "R_search": "未给R时沿用data_lock范围和合同32层规则，包含合法端点及范围内的1；主方法每层6个逆向提案和2个随机提案。随机基线和组合搜索使用相同层值及均衡配额。退化范围只使用唯一值。",
+        "ranking": {
+          "primary": "各约束归一化区间违反量的最大值升序。",
+          "secondary": "平均归一化参考距离升序：双侧约束参考点为区间中点，单侧约束参考点为唯一有限边界。",
+          "final": "规范配方身份升序。",
+          "one_sided_extension": "单侧参考点规则在开发输出出现前固定，仅补足接口定义；正式96请求均为双侧，因此不改变其冻结排名。"
+        },
+        "deduplication": {
+          "R_tolerance": 1e-06,
+          "v_tolerance": 1e-06,
+          "policy": "相同D/P/E且R和v差均在固定容差内视为重复；采用确定的规范顺序保留代表，重复提案仍占预算。"
+        },
+        "diversity": "所有方法每个D/P/E组合最多返回5项，总数最多20；不足如实返回。",
+        "accounting": "非法、重复、失败和缓存命中的提案占提案名额。缓存只减少实际计算，不产生额外候选探索。不得预算外枚举组合或比例网格。",
+        "final_three_seed_recheck": "本轮不执行正式三种子复核。最终阶段每个种子的top20冻结后再由另外两个种子复核，最多40个额外完整目标向量，独立记账且不得回流搜索。"
+      },
+      "round007_completion_and_stop_rules": {
+        "stage_completion_requires": [
+          "D1至D3各自九阶段训练、全部F3及独立F4完成；D0只读兼容重载通过。",
+          "四套配置全部使用同一源float64评分器完成239个单目标和63个双目标状态评分。",
+          "四配置完整选择依据和选定整套模型身份归档，没有跨配置拼接。",
+          "开发请求和接口夹具在运行前冻结；选定配置完成四方法开发比较及统一预算核对。",
+          "实际候选图、逐协议前向、计量、错误状态和来源支持的合成用例通过。",
+          "原合同与数据锁未变；最终测试内容读取为0；正式96面板性能未计算。"
+        ],
+        "immediate_stop_conditions": [
+          "合同、锁、实际源码、授权、配置、资产或checkpoint身份不一致。",
+          "实际读取最终测试标签或以正式96性能参与开发。",
+          "F3或F4失败、非有限训练或预测、评分公式偏离冻结定义。",
+          "新候选图与对应已核准真实配方的接线回放不一致且原因未解决。",
+          "候选或计算预算违规、隐含重新拟合、未授权超参数或架构变化。",
+          "14400秒本轮上限或259200秒累计上限先到。"
+        ],
+        "failure_recording": "停止后保存真实已完成阶段、逐次更新数、完整状态、失败差异和实际单调时钟耗时；不覆盖历史输出，不把未完成配置从比较分母中删除。",
+        "performance_failure_handling": "四套配置均表现不足时如实报告。最低S的配置只是开发选择结果，不自动满足科学门槛；不得增加第五套、放宽阈值、删困难样本或重划分。",
+        "no_new_audit_loop": "没有新的具体矛盾时，不重复已核准数据资格工作，也不为静态修复单独占用正式轮。",
+        "final_failure_policy": "最终锁定并打开测试后，若冻结门槛不满足，记录有效负结果并停止针对该测试的迭代；不得调整阈值、分母、协议、面板或模型。"
+      }
+    },
+    "tests": [
+      "tests/test_inverse_training_gate.py",
+      "tests/test_inverse_fitting.py",
+      "tests/test_inverse_metrics.py",
+      "tests/test_inverse_access.py",
+      "tests/test_inverse_preprocessing_reuse.py",
+      "tests/test_inverse_search.py",
+      "tests/test_inverse_request_api.py",
+      "tests/test_inverse_round007.py"
+    ]
+  },
+  "metrics": [
+    {
+      "name": "four_configuration_normalized_validation_MAE",
+      "unit": "normalized delta",
+      "sample_size": "239 observations; material equal; full suite selection",
+      "uncertainty": "closure groups"
+    },
+    {
+      "name": "single_and_joint_anchor_window_NLL",
+      "unit": "nat",
+      "sample_size": "239 single observations, 63 qualified two-target states",
+      "uncertainty": "state then material then closure"
+    },
+    {
+      "name": "single_model_development_design_comparison",
+      "unit": "boolean hit at top20; violations; logical vectors",
+      "sample_size": "24 fixed requests x four methods; 512 budget",
+      "uncertainty": "development only, no final confidence claim"
+    }
+  ],
+  "stop_conditions": "任一配置、F3/F4、图回放、测试访问、有限性或计费检查失败即停止；同一外层14400秒，不增加开发配置。",
+  "environment": {
+    "host": "codex-cn2",
+    "python": "/opt/anaconda2023/bin/python",
+    "torch": "2.5.1+cu121",
+    "pyg": "2.6.1",
+    "rdkit": "2025.3.2",
+    "gpu": "RTX4090 24564 MiB, 4 MiB used, no compute processes",
+    "cpu_threads": 8,
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "deterministic_algorithms": true,
+    "clock_evidence": "round007_resource_check.json; monotonic budget",
+    "numpy": "2.1.3"
+  },
+  "inputs": [
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/success_contract.json",
+      "sha256": "e0d18e2181c800ec077a5c58800e66fefb67d99609bcf83a844eb204a2c292ef"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_004_qualification/data_lock.json",
+      "sha256": "d6ea2d43d60ba12784e91f03d37515210e300b0144597fa12d0412162b06f52d"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_004_qualification/train_labels.json",
+      "sha256": "3301d5f5372ed26eaab27a472ab1f054607ff96193ade35922e8039344099f79"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_004_qualification/validation_labels.json",
+      "sha256": "5613a496a3ab26bba29d55678346bcefd30205dc50bfb7e2e06e7c78fb2a3254"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/pu_20261112_round007_D1.json",
+      "sha256": "8771bc7200343e7061a063da1762abe9a0fbadde4dd984ea3bc3d5111dff0245"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/pu_20261112_round007_D2.json",
+      "sha256": "54700c8c1c1493c29407e1f3bbeba8df3c91a837252cfe2bce3050b0f1e065b1"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/pu_20261112_round007_D3.json",
+      "sha256": "3bea0ff8560ff8eb849bbbb8ad1c712ad3914a3f2130938111fd7038f5980ecb"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/round007_development_panel.json",
+      "sha256": "eacfb3e60d304a4edc86c154ccf87dee0c9fe0ac81415d97726de7373f67df50"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/round007_interface_cases.json",
+      "sha256": "4e077a4d7831236e7761cd2255f661dba0095ae1cb899f2bc2bd63b841490772"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/round007_plan.json",
+      "sha256": "70a6631c1eccaa0a5d0946fde2d1839ebbee9f2d3fa6a1e1a884fd9beea5e752"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/round007_readonly_producer.json",
+      "sha256": "b624cfc3990f5ff7c28992280428e337f888cfd08f2cb644a2b28c4165a5a4da"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round007_authorization.json",
+      "sha256": "ebad4eccee828b9fb54f15874eb25528ea0f39d24f7a8b15e87472eee69d8e48"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round007_review_raw.txt",
+      "sha256": "d75a8395008c907fe32aece59154efcfc479f203643128c4582958d6454da0e4"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/checkpoint_manifest.json",
+      "sha256": "0a5d20560f7a11317cf179dbe13ebbd70999380e910aa13b828ef341edcaff78"
+    }
+  ],
+  "outputs": [
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/unit_tests.xml",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/progress.jsonl",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/configuration_selection.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/round007_result.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/search/development_search_summary.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/search/adapter/graph_tensor_replay.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/search/adapter/adapter_replay.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/search/adapter/synthesis_source_readback.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/search/interfaces/interface_summary.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D0/evaluation/evaluation_summary.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D0/evaluation/forward_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D0/evaluation/inverse_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D0/evaluation/joint_anchor.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D0/evaluation/preprocessing_call_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D0/evaluation/readonly_compatibility.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D0/evaluation/source_precision_changes.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/evaluation/evaluation_summary.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/evaluation/forward_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/evaluation/inverse_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/evaluation/joint_anchor.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/evaluation/preprocessing_call_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/checkpoint_manifest.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/training_result.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/independent_validation.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/preprocessing_call_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/execution_settings.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tg_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tm_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/tensile_strength_ultimate_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/elongation_at_break_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/inverse_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/inverse_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/inverse_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/inverse_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D1/training/inverse_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/evaluation/evaluation_summary.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/evaluation/forward_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/evaluation/inverse_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/evaluation/joint_anchor.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/evaluation/preprocessing_call_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/checkpoint_manifest.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/training_result.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/independent_validation.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/preprocessing_call_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/execution_settings.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tg_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tm_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/tensile_strength_ultimate_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/elongation_at_break_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/inverse_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/inverse_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/inverse_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/inverse_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D2/training/inverse_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/evaluation/evaluation_summary.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/evaluation/forward_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/evaluation/inverse_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/evaluation/joint_anchor.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/evaluation/preprocessing_call_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/checkpoint_manifest.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/training_result.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/independent_validation.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/preprocessing_call_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/execution_settings.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tg_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tm_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/tensile_strength_ultimate_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_structure/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_structure/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_structure/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_structure/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_structure/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/elongation_at_break_full/actual_optimizer_groups.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/inverse_full/best.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/inverse_full/last.pt",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/inverse_full/completion.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/inverse_full/resume_transition.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development/D3/training/inverse_full/actual_optimizer_groups.json"
+  ],
+  "timeout_seconds": 14400,
+  "checks": [
+    {
+      "id": "four_configuration_and_fixed_development_design",
+      "argv": [
+        "/usr/bin/env",
+        "PYTHONPATH=src",
+        "OMP_NUM_THREADS=8",
+        "MKL_NUM_THREADS=8",
+        "CUBLAS_WORKSPACE_CONFIG=:4096:8",
+        "/opt/anaconda2023/bin/python",
+        "-m",
+        "coarsepgnn_inverse.round007",
+        "--plan",
+        "configs/inverse/round007_plan.json",
+        "--output",
+        "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_007_development"
+      ],
+      "expected_exit": 0
+    }
+  ],
+  "job_id": "round-007-a84b929e",
+  "cwd": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository",
+  "code_sha": "0b52b3d3a04f5b47b572dbc0918f38836002f12c",
+  "evidence_prefix": "research-runs/pu-inverse-20261111",
+  "spec_sha256": "d2c63600bace9889dce363ca270d185564b23b9a692794f8f559c5ba16ca156f"
+}
