@@ -1,0 +1,22 @@
+.......................F.........                                        [100%]
+=================================== FAILURES ===================================
+_______ test_phase_peak_condition_and_history_distinguish_thermal_events _______
+
+    def test_phase_peak_condition_and_history_distinguish_thermal_events():
+        """硬相1/2峰、软相1峰分开；未知同事件重复仍隔离，不使用标签值。"""
+        base={'target':'tm','material_id':'m','campaign_id':'c','split':'train',
+              'transition_criterion':'dsc_peak','transition_scope':'hard_segment',
+              'condition_raw':'10 C/min','condition_normalized_json':'{}','property_task':'tm:DSC:dsc_peak',
+              'original_value_raw':'170','definition_raw':'Melting peak','thermal_history_stage':'same'}
+        rows=[{**base,'observation_id':'a','source_transition_assignment':'hard_peak_1'},
+              {**base,'observation_id':'b','source_transition_assignment':'hard_peak_2'},
+              {**base,'observation_id':'c','transition_scope':'soft_segment','source_transition_assignment':'soft_peak_1'}]
+        review=identify_thermal_protocols(rows)
+>       assert all(r['decision']=='UNIQUE_ENDPOINT' for r in review)
+E       assert False
+E        +  where False = all(<generator object test_phase_peak_condition_and_history_distinguish_thermal_events.<locals>.<genexpr> at 0x1537e202c450>)
+
+tests/test_inverse_qualification.py:54: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_inverse_qualification.py::test_phase_peak_condition_and_history_distinguish_thermal_events
+1 failed, 32 passed in 0.19s

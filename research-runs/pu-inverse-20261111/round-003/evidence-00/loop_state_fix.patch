@@ -1,0 +1,88 @@
+--- loopctl.py.before
++++ loopctl.py
+@@ -388,7 +388,9 @@
+     for snap in state["archives"]:
+         zenodo_store.verify(Path(snap["receipt"]))
+     state["remote_verified"] = {"artifact_sha": artifact, "code_sha": state["code_sha"], "head": head, "at": now()}
+-    state["phase"] = "REVIEWING"
++    # 推送R是证据确认，不得撤回已接受的REVISE/PASS/NEED_EVIDENCE决定。
++    if state["phase"] not in {"ACTION_READY", "NEED_EVIDENCE", "READY_TO_FINALIZE", "BLOCKED"}:
++        state["phase"] = "REVIEWING"
+     save(root, state, "remote_verified")
+     return state["remote_verified"]
+ 
+@@ -526,13 +528,18 @@
+     """从已完成回复消费方案或评审；结构/版本错误留为 invalid，不能启动下一轮。"""
+     active(state)
+     request = state["request"]
+-    require(request and request["status"] == "captured", "先 capture-reply")
++    require(request and request["status"] in {"captured", "accepted"}, "先 capture-reply")
++    already_accepted = request["status"] == "accepted"
+     reply = root / "messages" / request["id"] / "reply.md"
+     require(hashes(reply)["sha256"] == request["reply_sha256"], "原始回复被修改")
+     review_kind = request.get("review_kind", request["kind"])
+     is_review = review_kind in {"review", "evidence"}
+     try:
+         value = control(reply.read_text(encoding="utf-8"), "REVIEW_CONTROL" if is_review else "PLAN_CONTROL")
++        if already_accepted:
++            require(value == request.get("control") and
++                    digest({"request_id": request["id"], "control": value}) == state.get("next_action_id"),
++                    "已接受的控制对象与原始回复不一致")
+         expected = {"run_id": state["run_id"], "request_id": request["id"], "round": request["round"], "goal_sha256": state["goal_sha256"]}
+         if is_review:
+             expected.update(code_sha=request["code_sha"], artifact_sha=request["artifact_sha"])
+@@ -566,7 +573,7 @@
+         request["validation_error"] = str(exc)
+         save(root, state, "reply_invalid", request_id=request["id"])
+         raise
+-    if is_review:
++    if is_review and not already_accepted:
+         archive_review(root, state, reply)
+     return value
+ 
+--- test_loopctl.py.before
++++ test_loopctl.py
+@@ -217,6 +217,43 @@
+         self.assertNotEqual(self.state["review_sha"], self.state["artifact_sha"])
+         self.assertEqual(self.state["phase"], "READY_TO_FINALIZE")
+ 
++    def test_accepted_review_revalidation_restores_action_without_recommit(self):
++        """已接受回复可按原字节重新校验，恢复决定但不改R或重复发送。"""
++        self.reviewed(decision="REVISE")
++        review_sha = self.state["review_sha"]
++        self.state["phase"] = "REVIEWING"
++        with patch.object(loop, "archive_review") as export:
++            loop.accept_review(self.root, self.state)
++        export.assert_not_called()
++        self.assertEqual(self.state["phase"], "ACTION_READY")
++        self.assertEqual(self.state["review_sha"], review_sha)
++        self.state["request"]["control"]["decision"] = "PASS"
++        with self.assertRaisesRegex(ValueError, "控制对象"):
++            loop.accept_review(self.root, self.state)
++
++    def test_remote_verification_preserves_accepted_revise(self):
++        """真实Git对象配合假GitHub，确认推送R核验不会清除下一轮授权。"""
++        import base64
++        self.reviewed(decision="REVISE")
++        head = git(self.project, "rev-parse", "HEAD")
++        artifact = self.state["artifact_sha"]
++        def remote(argv):
++            """仅响应本测试三个GitHub只读端点，其他调用立即失败。"""
++            endpoint = argv[-1]
++            if "/git/ref/" in endpoint:
++                return json.dumps({"object":{"sha":head}})
++            if "/git/commits/" in endpoint:
++                sha = endpoint.rsplit("/",1)[1]
++                return json.dumps({"sha":sha,"tree":{"sha":git(self.project,"rev-parse",sha+"^{tree}")}})
++            if "/contents/" in endpoint:
++                path = self.state["manifest_path"]
++                return json.dumps({"sha":git(self.project,"rev-parse",artifact+":"+path),"encoding":"base64",
++                    "content":base64.b64encode((self.project/path).read_bytes()).decode()})
++            raise AssertionError(argv)
++        with patch.object(loop, "execute", side_effect=remote):
++            loop.verify_remote(self.root,self.state)
++        self.assertEqual(self.state["phase"],"ACTION_READY")
++
+     def test_new_code_after_A_blocks_remote(self):
+         self.archived()
+         (self.project / "evaluate.py").write_text("print('different')", encoding="utf-8")
