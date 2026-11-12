@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/__main__.py", line 91, in <module>
+    main()
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/__main__.py", line 74, in main
+    result=run_combined(args.final_plan,args.output)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_round.py", line 197, in run_combined
+    return supervise_phases(output, command_for, seal_final_evaluation, started=started,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_round.py", line 156, in supervise_phases
+    raise error
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_round.py", line 118, in supervise_phases
+    raise subprocess.CalledProcessError(record['returncode'], command)
+subprocess.CalledProcessError: Command '['/opt/anaconda2023/bin/python', '-m', 'coarsepgnn_inverse.final_round', '--worker', '--plan', 'configs/inverse/round010_plan.json', '--output', '/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute', '--phase', 'recompute', '--deadline', '643405.463542237', '--reference', '/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/evaluation', '--reference-sha256', '918a11cf3474946d8b6cfedaed33825282600a6439ddb7d49fb3bbe1f3d77075']' returned non-zero exit status 1.

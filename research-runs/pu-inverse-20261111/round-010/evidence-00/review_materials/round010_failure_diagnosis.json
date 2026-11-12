@@ -1,0 +1,131 @@
+{
+  "status": "ENGINEERING_FAILED_AT_AGGREGATE_RECOMPUTATION",
+  "failure": {
+    "error": "KeyError('main_20261111_D0')",
+    "traceback": "Traceback (most recent call last):\n  File \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_round.py\", line 222, in main\n    result = recompute(args.plan, args.output, reference=args.reference, inventory_sha256=args.reference_sha256)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_recompute.py\", line 194, in recompute\n    actual_anchor = anchor_report(anchors, contract)\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_metrics.py\", line 63, in anchor_report\n    a, b = anchors[main_name(seed)], anchors[f'no_target_values_{seed}']\n           ~~~~~~~^^^^^^^^^^^^^^^^^\nKeyError: 'main_20261111_D0'\n",
+    "at": "2026-11-12T17:22:52.805067+00:00",
+    "test_window_exists": true,
+    "window_source_directory": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/evaluation",
+    "status": "ENGINEERING_FAILED_OR_INCOMPLETE_NO_RESEARCH_PASS"
+  },
+  "consumer_code_sha": "3d9348a92865528d31a3dc769c93ad0dc7441dae",
+  "cause_supported_by_frozen_source": {
+    "path": "src/coarsepgnn_inverse/final_recompute.py",
+    "lines": [
+      147,
+      148,
+      149,
+      150,
+      163,
+      194
+    ],
+    "finding": "anchors初始化为空；循环仅保存各模型result至文件和anchor_differences，未向anchors赋值；194行调用anchor_report(anchors,contract)时字典为空，final_metrics.py:63读取main_20261111_D0触发KeyError。",
+    "source_sha256": "c880e7a04d38f9b79ac53fd42a59234de5549a7490809c84d344e131c57568ab"
+  },
+  "coverage": {
+    "evaluation": {
+      "completed_task_ids": 1440,
+      "generated_result_task_ids": 1440,
+      "missing_task_ids": 0,
+      "task_manifest_created": true
+    },
+    "recompute": {
+      "completed_task_ids": 1440,
+      "generated_result_task_ids": 1440,
+      "missing_task_ids": 0,
+      "task_manifest_created": true
+    }
+  },
+  "phases": [
+    {
+      "phase": "evaluation",
+      "started_at": "2026-11-12T13:40:58.526595+00:00",
+      "deadline_monotonic": 643405.463542237,
+      "remaining_seconds_at_start": 14389.998406098923,
+      "command": [
+        "/opt/anaconda2023/bin/python",
+        "-m",
+        "coarsepgnn_inverse.final_round",
+        "--worker",
+        "--plan",
+        "configs/inverse/round010_plan.json",
+        "--output",
+        "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/evaluation",
+        "--phase",
+        "evaluate",
+        "--deadline",
+        "643405.463542237"
+      ],
+      "pid": 267376,
+      "returncode": 0,
+      "ended_at": "2026-11-12T15:32:28.441028+00:00"
+    },
+    {
+      "phase": "recompute",
+      "started_at": "2026-11-12T15:32:45.665960+00:00",
+      "deadline_monotonic": 643405.463542237,
+      "remaining_seconds_at_start": 7682.859040591982,
+      "command": [
+        "/opt/anaconda2023/bin/python",
+        "-m",
+        "coarsepgnn_inverse.final_round",
+        "--worker",
+        "--plan",
+        "configs/inverse/round010_plan.json",
+        "--output",
+        "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute",
+        "--phase",
+        "recompute",
+        "--deadline",
+        "643405.463542237",
+        "--reference",
+        "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/evaluation",
+        "--reference-sha256",
+        "918a11cf3474946d8b6cfedaed33825282600a6439ddb7d49fb3bbe1f3d77075"
+      ],
+      "pid": 275752,
+      "returncode": 1,
+      "ended_at": "2026-11-12T17:22:53.965005+00:00"
+    }
+  ],
+  "outer_status": "failed",
+  "provenance_valid": true,
+  "formal_elapsed_seconds": 13329.730552949943,
+  "cumulative_compute_seconds": 15177.788050504634,
+  "formal_rounds": 10,
+  "missing_declared_outputs": [
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/evaluation/failure.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/zero_fit_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/anchor_summary.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/panel_rows.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/panel_summary.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/acceptance.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/scientific_inventory.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/recompute_result.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/candidate_differences_index.json"
+  ],
+  "interpretation": [
+    "evaluation/failure.json缺失符合评价成功退出，不是缺少科学结果。",
+    "其余8项为复算成功路径末尾产物，因汇总异常未生成；原始failed audits仍存在。",
+    "未重建缺失汇总、未补算门槛、未修改C10、未启动R11。",
+    "原评价54/71门槛失败；逐候选一致不能替代未执行的完整独立汇总核验。"
+  ],
+  "evaluation_source_comparison": {
+    "path": "src/coarsepgnn_inverse/final_evaluation.py",
+    "lines": [
+      202,
+      203,
+      223,
+      224,
+      225
+    ],
+    "finding": "原评价在202行明确写入anchors[name]并随后产生实际汇总。复算遗漏未改变已封存评价原件；未执行的独立汇总不能据此推定通过。"
+  },
+  "existing_receipt_inventory_counts": {
+    "unit_receipts": 1440,
+    "raw_slot_entries": 709344,
+    "top20_entries": 28800,
+    "scientific_summary_recomputed": false,
+    "original_recompute_result_exists": false
+  }
+}

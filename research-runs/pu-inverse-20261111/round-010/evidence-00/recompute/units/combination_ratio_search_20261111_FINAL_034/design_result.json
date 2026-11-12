@@ -1,0 +1,5237 @@
+{
+  "task": {
+    "id": "combination_ratio_search_20261111_FINAL_034",
+    "method": "combination_ratio_search",
+    "seed": 20261111,
+    "request_id": "FINAL_034",
+    "model": "main_20261111_D0"
+  },
+  "request": {
+    "schema_version": 1,
+    "request_id": "FINAL_034",
+    "constraints": [
+      {
+        "target": "tg",
+        "unit": "degC",
+        "lower": -60,
+        "upper": -40,
+        "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+        "condition": {
+          "raw": "Netzsch 204; first and second scans; -100 to 200 °C; 10 °C/min; Tg inflection and Tm peak maximum. Assigned measurement scan: second_heating; source endpoint: not_resolved; phase: soft_segment; criterion: dsc_inflection.",
+          "normalized": {
+            "endpoint_identity": {
+              "basis": "atomic_measurement_definition_and_assignment",
+              "criterion": "dsc_inflection",
+              "peak": "not_resolved",
+              "phase": "soft_segment",
+              "scan": "second_heating"
+            },
+            "fields": {
+              "heating_rate_c_min": {
+                "mask": 1,
+                "origin": "pre_aggregation_campaign",
+                "unit": "degC/min",
+                "value": 10.0
+              },
+              "scan_index": {
+                "mask": 1,
+                "origin": "atomic_measurement_definition",
+                "unit": "",
+                "value": 2
+              },
+              "transition_criterion": {
+                "mask": 1,
+                "origin": "atomic_measurement",
+                "unit": null,
+                "value": "dsc_inflection"
+              }
+            },
+            "recovery": "original_campaign_before_tg_unification"
+          },
+          "input_sha256": "2660bdd582e4a4d0336816842c821ba779301a30de67c8aedb126d7f381b48ef"
+        },
+        "assay": {
+          "property_subtype": "tg_dsc_midpoint",
+          "property_task": "tg:DSC:dsc_inflection:soft_segment:second_heating:not_resolved",
+          "transition_kind": "glass_transition",
+          "transition_criterion": "dsc_inflection",
+          "transition_scope": "soft_segment",
+          "statistic_type": "unknown",
+          "definition_status": "specified"
+        },
+        "scan_identity": "second_heating",
+        "peak_identity": "not_resolved",
+        "phase": "soft_segment",
+        "criterion": "dsc_inflection",
+        "thermal_history_stage": "{\"annealing_text\":null,\"conditioning_text\":null,\"cure_temperature_c\":null,\"cure_time_h\":null,\"preparation_raw\":\"Approximately 10-15 mg neat NCO/OH=1 polymer for DSC.\"}"
+      },
+      {
+        "target": "tensile_strength_ultimate",
+        "unit": "MPa",
+        "lower": 10,
+        "upper": 20,
+        "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+        "condition": {
+          "raw": "25 °C; ASTM D638-14 equivalent to GB/T 1040.2-2006; 50 mm/min; gauge length 50 mm; mean of five tests.",
+          "normalized": {
+            "conflict_fields": [],
+            "fields": {
+              "atmosphere": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": null,
+                "value": null
+              },
+              "conditioning": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": null,
+                "value": null
+              },
+              "cooling_rate_c_min": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": "°C/min",
+                "value": null
+              },
+              "crosshead_speed_mm_min": {
+                "mask": 1,
+                "source": "structured_column",
+                "status": "reported",
+                "unit": "mm/min",
+                "value": 50.0
+              },
+              "frequency_hz": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": "Hz",
+                "value": null
+              },
+              "heating_rate_c_min": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": "°C/min",
+                "value": null
+              },
+              "instrument": {
+                "mask": 1,
+                "source": "structured_column",
+                "status": "reported",
+                "unit": null,
+                "value": "Instron 5900 universal testing machine"
+              },
+              "load_mode": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": null,
+                "value": null
+              },
+              "method": {
+                "mask": 1,
+                "source": "structured_column",
+                "status": "reported",
+                "unit": null,
+                "value": "tensile"
+              },
+              "relative_humidity_percent": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": "%RH",
+                "value": null
+              },
+              "replicate_count": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": null,
+                "value": null
+              },
+              "specimen_geometry": {
+                "mask": 1,
+                "source": "structured_column",
+                "status": "reported",
+                "unit": null,
+                "value": "dumbbell; 50 mm gauge length"
+              },
+              "specimen_preparation": {
+                "mask": 1,
+                "source": "structured_column",
+                "status": "reported",
+                "unit": null,
+                "value": "casting/molding followed by cure"
+              },
+              "specimen_thickness_mm": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": "mm",
+                "value": null
+              },
+              "standard": {
+                "mask": 1,
+                "source": "structured_column",
+                "status": "reported",
+                "unit": null,
+                "value": "ASTM D638-14 / GB/T 1040.2-2006"
+              },
+              "strain_rate_s_inv": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": "s^-1",
+                "value": null
+              },
+              "temperature_c": {
+                "mask": 1,
+                "source": "structured_column",
+                "status": "reported",
+                "unit": "°C",
+                "value": 25.0
+              },
+              "temperature_context": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": null,
+                "value": null
+              },
+              "temperature_range_c": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": "°C",
+                "value": null
+              },
+              "transition_criterion": {
+                "mask": 0,
+                "status": "unspecified",
+                "unit": null,
+                "value": null
+              }
+            },
+            "raw_present": true,
+            "schema_version": "pu_v2_3_b0024_layered_structure_v1",
+            "status": "normalized"
+          },
+          "input_sha256": "ef1c4f9f7318b6bce453d27d48463589c87e55e753ea6aa7ec54ad868a0eb06a"
+        },
+        "assay": {
+          "property_subtype": "tensile_strength_ultimate",
+          "property_task": "tensile_strength_ultimate",
+          "transition_kind": "",
+          "transition_criterion": "",
+          "transition_scope": "",
+          "statistic_type": "mean",
+          "definition_status": "specified"
+        },
+        "scan_identity": null,
+        "peak_identity": null,
+        "phase": "",
+        "criterion": "",
+        "thermal_history_stage": null
+      }
+    ],
+    "nco_oh_ratio": null,
+    "top_k": 20,
+    "candidate_budget": 512,
+    "protocol_set": "B",
+    "target_count": 2,
+    "nco_oh_ratio_origin": "outer_search_over_frozen_training_range",
+    "seed": 20261111,
+    "resolved_protocols": [
+      {
+        "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+        "used_default": false,
+        "default_name": null,
+        "definition_sha256": "ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73"
+      },
+      {
+        "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+        "used_default": false,
+        "default_name": null,
+        "definition_sha256": "d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293"
+      }
+    ]
+  },
+  "seed": 20261111,
+  "method": "combination_ratio_search",
+  "status": "NO_SUPPORTED_CANDIDATE",
+  "reason": "固定预算内没有三代理共同支持的候选；不代表物理无解。",
+  "qualification_scope": "three_proxy_models",
+  "experimental_validation": false,
+  "search_sha256": "4ef42add12b212027b2e049bdb89ab3b6c8d6bbb09cff790a3dc347fd20457a4",
+  "top20_lock_sha256": "09b3b1b876f15d5b9e8d5f6a8d8cd9b5a1c6d78ade562ff2ff6e22e3f0fa7a95",
+  "recheck_receipts": {
+    "recheck_20261112.json": "7633e0341da859575b2df7af3b0381c654d821027620e9cc43318e4cd6738297",
+    "recheck_20261113.json": "80ea4b057edf262f8c211af79a044a61c86308f1fd6b5493b74301184ec573f6"
+  },
+  "top_candidates": [
+    {
+      "slot": 290,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_d1572dedc5d7e6f59bbc",
+          "GRADE_0a8e18f21212e213291b"
+        ],
+        "nco_oh_ratio": 1.0501211428244885,
+        "extender_oh_fraction": 0.050252949165088906
+      },
+      "score": [
+        0,
+        0.26099738323125493,
+        "72cdc7ce5160b8a4c9ca848a059921dc5469be8bbe819f5debdae97106dcaf94"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.0501211428244885,
+          0.9497470508349111,
+          0.050252949165088906
+        ],
+        "mass_fractions": [
+          0.22319952748106092,
+          0.7646415527842819,
+          0.012158919734657062
+        ],
+        "nco_oh_ratio": 1.0501211428244885,
+        "extender_oh_fraction": 0.050252949165088906
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.067194464002014,
+          15.076376600311542
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.067194464002014,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.076376600311542,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "72cdc7ce5160b8a4c9ca848a059921dc5469be8bbe819f5debdae97106dcaf94",
+          "prediction": {
+            "predictions": [
+              -56.24120686202353,
+              15.106758061416752
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 2,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.24120686202353,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 15.106758061416752,
+              "unit": "MPa",
+              "model_constraint_passed": true
+            }
+          ],
+          "all_constraints_passed": true
+        },
+        {
+          "seed": 20261113,
+          "identity": "72cdc7ce5160b8a4c9ca848a059921dc5469be8bbe819f5debdae97106dcaf94",
+          "prediction": {
+            "predictions": [
+              -60.529688724358365,
+              6.294819058460655
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 2,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.529688724358365,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 6.294819058460655,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_d1572dedc5d7e6f59bbc",
+          "role": "polyol",
+          "structure": "*OCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1000.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(ethylene adipate) diol"
+          ],
+          "source_component_ids": [
+            "CMP_1006b5200cd4578f5b7f"
+          ],
+          "source_material_ids": [
+            "MAT_48d551078635c835257b"
+          ]
+        },
+        {
+          "grade_id": "GRADE_0a8e18f21212e213291b",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCCCCCCCCCCO",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 300.527,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "1,19-nonadecanediol"
+          ],
+          "source_component_ids": [
+            "CMP_7f1bbdb6a91b84bc9703"
+          ],
+          "source_material_ids": [
+            "MAT_3acc38268bf471693ddf",
+            "MAT_48656b0f0395586e6d84"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_01.json",
+      "graph_sha256": "5408fb735196bccda7c4d438085f692fbf2c83b4f52452a633631b83794c19eb"
+    },
+    {
+      "slot": 303,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_d1572dedc5d7e6f59bbc",
+          "GRADE_0a8e18f21212e213291b"
+        ],
+        "nco_oh_ratio": 1.0934678090076138,
+        "extender_oh_fraction": 0.05529772280674691
+      },
+      "score": [
+        0,
+        0.2614726234513366,
+        "b79de5b599e32ce6bc5e080c0dde646fec91441bfb7b7941e63b1057b0ce0850"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.0934678090076138,
+          0.9447022771932531,
+          0.05529772280674691
+        ],
+        "mass_fractions": [
+          0.23094109639266827,
+          0.7557640965965485,
+          0.013294807010783226
+        ],
+        "nco_oh_ratio": 1.0934678090076138,
+        "extender_oh_fraction": 0.05529772280674691
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.06713857751511,
+          15.081156945755811
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.06713857751511,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.081156945755811,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "b79de5b599e32ce6bc5e080c0dde646fec91441bfb7b7941e63b1057b0ce0850",
+          "prediction": {
+            "predictions": [
+              -56.24104665409441,
+              15.109158334228406
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.24104665409441,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 15.109158334228406,
+              "unit": "MPa",
+              "model_constraint_passed": true
+            }
+          ],
+          "all_constraints_passed": true
+        },
+        {
+          "seed": 20261113,
+          "identity": "b79de5b599e32ce6bc5e080c0dde646fec91441bfb7b7941e63b1057b0ce0850",
+          "prediction": {
+            "predictions": [
+              -60.529778142737406,
+              6.295940072130762
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.529778142737406,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 6.295940072130762,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_d1572dedc5d7e6f59bbc",
+          "role": "polyol",
+          "structure": "*OCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1000.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(ethylene adipate) diol"
+          ],
+          "source_component_ids": [
+            "CMP_1006b5200cd4578f5b7f"
+          ],
+          "source_material_ids": [
+            "MAT_48d551078635c835257b"
+          ]
+        },
+        {
+          "grade_id": "GRADE_0a8e18f21212e213291b",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCCCCCCCCCCO",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 300.527,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "1,19-nonadecanediol"
+          ],
+          "source_component_ids": [
+            "CMP_7f1bbdb6a91b84bc9703"
+          ],
+          "source_material_ids": [
+            "MAT_3acc38268bf471693ddf",
+            "MAT_48656b0f0395586e6d84"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_02.json",
+      "graph_sha256": "5165bfb71ddef63be76cabc937af2ac8c835402f44e57727f7c7d1ccc12bf980"
+    },
+    {
+      "slot": 373,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_3d595103cf57b16a4b4c",
+          "GRADE_3aafdd2d31379094a65c",
+          "GRADE_8a7c514ed1b0633d9786"
+        ],
+        "nco_oh_ratio": 0.880069061010357,
+        "extender_oh_fraction": 0.14644288000842853
+      },
+      "score": [
+        0,
+        0.26462023017283726,
+        "73f0cd9a954ee6c2f7e71815c6bba93682f63547c4e78963e7003a9d58b9faca"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.880069061010357,
+          0.8535571199915715,
+          0.14644288000842853
+        ],
+        "mass_fractions": [
+          0.23040015777621417,
+          0.7178637116332816,
+          0.051736130590504206
+        ],
+        "nco_oh_ratio": 0.880069061010357,
+        "extender_oh_fraction": 0.14644288000842853
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.250315852748315,
+          15.021044375354215
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.250315852748315,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.021044375354215,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "73f0cd9a954ee6c2f7e71815c6bba93682f63547c4e78963e7003a9d58b9faca",
+          "prediction": {
+            "predictions": [
+              -56.25821498287046,
+              3.0005341085102355
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.25821498287046,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 3.0005341085102355,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "73f0cd9a954ee6c2f7e71815c6bba93682f63547c4e78963e7003a9d58b9faca",
+          "prediction": {
+            "predictions": [
+              -60.51571958647692,
+              5.882456117926775
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.51571958647692,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 5.882456117926775,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": false,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_3d595103cf57b16a4b4c",
+          "role": "diisocyanate",
+          "structure": "Cc1cc(-c2ccc(N=C=O)c(C)c2)ccc1N=C=O",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.28,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "3,3'-dimethyl-4,4'-biphenyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_edc25b65ac0b6e95894e"
+          ],
+          "source_material_ids": [
+            "MAT_6dd3349f4375063225f0",
+            "MAT_7d7f3839b720f57a2870",
+            "MAT_a49d0da20ae39fb4d6b8",
+            "MAT_c442344cc2495b11bb66"
+          ]
+        },
+        {
+          "grade_id": "GRADE_3aafdd2d31379094a65c",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 849.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "hydroxyl poly(tetramethylene adipate), Mn 849"
+          ],
+          "source_component_ids": [
+            "CMP_eb64bd3779f6831c9a1a"
+          ],
+          "source_material_ids": [
+            "MAT_fc953c521579ba646811"
+          ]
+        },
+        {
+          "grade_id": "GRADE_8a7c514ed1b0633d9786",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCCCCCCCCCCCCCCO",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 356.635,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "1,23-tricosanediol"
+          ],
+          "source_component_ids": [
+            "CMP_38408c17cecec6dba3dc"
+          ],
+          "source_material_ids": [
+            "MAT_1542248b8fb86eed9017",
+            "MAT_2cd7dd4154cf05b67e0f"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_03.json",
+      "graph_sha256": "22ce3332d113f1b561a7cd2e5f00a0e3846aeed084c6f59330b2570ccc1c7dc7"
+    },
+    {
+      "slot": 376,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_3d595103cf57b16a4b4c",
+          "GRADE_3aafdd2d31379094a65c",
+          "GRADE_8a7c514ed1b0633d9786"
+        ],
+        "nco_oh_ratio": 0.9844674442541045,
+        "extender_oh_fraction": 0.14163952146936648
+      },
+      "score": [
+        0,
+        0.2647008452084851,
+        "31982db99326375d2844bbdfc57b348a693c97bf4570d7ae02facaed7d2f8fe0"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.9844674442541045,
+          0.8583604785306336,
+          0.14163952146936648
+        ],
+        "mass_fractions": [
+          0.25030389331901315,
+          0.7010990058678674,
+          0.04859710081311937
+        ],
+        "nco_oh_ratio": 0.9844674442541045,
+        "extender_oh_fraction": 0.14163952146936648
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.250201595930655,
+          15.021907654119524
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.250201595930655,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.021907654119524,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "31982db99326375d2844bbdfc57b348a693c97bf4570d7ae02facaed7d2f8fe0",
+          "prediction": {
+            "predictions": [
+              -56.25833420737585,
+              2.999100324711832
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.25833420737585,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 2.999100324711832,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "31982db99326375d2844bbdfc57b348a693c97bf4570d7ae02facaed7d2f8fe0",
+          "prediction": {
+            "predictions": [
+              -60.51625361290731,
+              5.878376395825206
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.51625361290731,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 5.878376395825206,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": false,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_3d595103cf57b16a4b4c",
+          "role": "diisocyanate",
+          "structure": "Cc1cc(-c2ccc(N=C=O)c(C)c2)ccc1N=C=O",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.28,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "3,3'-dimethyl-4,4'-biphenyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_edc25b65ac0b6e95894e"
+          ],
+          "source_material_ids": [
+            "MAT_6dd3349f4375063225f0",
+            "MAT_7d7f3839b720f57a2870",
+            "MAT_a49d0da20ae39fb4d6b8",
+            "MAT_c442344cc2495b11bb66"
+          ]
+        },
+        {
+          "grade_id": "GRADE_3aafdd2d31379094a65c",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 849.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "hydroxyl poly(tetramethylene adipate), Mn 849"
+          ],
+          "source_component_ids": [
+            "CMP_eb64bd3779f6831c9a1a"
+          ],
+          "source_material_ids": [
+            "MAT_fc953c521579ba646811"
+          ]
+        },
+        {
+          "grade_id": "GRADE_8a7c514ed1b0633d9786",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCCCCCCCCCCCCCCO",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 356.635,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "1,23-tricosanediol"
+          ],
+          "source_component_ids": [
+            "CMP_38408c17cecec6dba3dc"
+          ],
+          "source_material_ids": [
+            "MAT_1542248b8fb86eed9017",
+            "MAT_2cd7dd4154cf05b67e0f"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_04.json",
+      "graph_sha256": "8a7e255e840f333e07c4c6f00ac7fb32e1986c0fb5b4b0d53367d743c73992fd"
+    },
+    {
+      "slot": 403,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_3aafdd2d31379094a65c",
+          "GRADE_f74d8ec89c534732914c"
+        ],
+        "nco_oh_ratio": 0.8271980557590596,
+        "extender_oh_fraction": 0.1657428940535634
+      },
+      "score": [
+        0,
+        0.2700750121533069,
+        "52569405b32c423ea764f23fbe83c34169b22de448b2275cb6bcf7cb8c121470"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.8271980557590596,
+          0.8342571059464365,
+          0.1657428940535634
+        ],
+        "mass_fractions": [
+          0.22641761842670372,
+          0.7343521840851938,
+          0.03923019748810246
+        ],
+        "nco_oh_ratio": 0.8271980557590596,
+        "extender_oh_fraction": 0.1657428940535634
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.05812595006084,
+          14.828312853497351
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.05812595006084,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 14.828312853497351,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "52569405b32c423ea764f23fbe83c34169b22de448b2275cb6bcf7cb8c121470",
+          "prediction": {
+            "predictions": [
+              -56.23466938497802,
+              4.310258634217581
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.23466938497802,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 4.310258634217581,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "52569405b32c423ea764f23fbe83c34169b22de448b2275cb6bcf7cb8c121470",
+          "prediction": {
+            "predictions": [
+              -60.52973343354789,
+              7.460081527777285
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52973343354789,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 7.460081527777285,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": false,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_3aafdd2d31379094a65c",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 849.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "hydroxyl poly(tetramethylene adipate), Mn 849"
+          ],
+          "source_component_ids": [
+            "CMP_eb64bd3779f6831c9a1a"
+          ],
+          "source_material_ids": [
+            "MAT_fc953c521579ba646811"
+          ]
+        },
+        {
+          "grade_id": "GRADE_f74d8ec89c534732914c",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCc1ccc(Cc2ccc(CO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 228.291,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "[methylenedi(4,1-phenylene)]dimethanol"
+          ],
+          "source_component_ids": [
+            "CMP_034c9ddead04e6077167"
+          ],
+          "source_material_ids": [
+            "MAT_004fdfef512787fe59dc",
+            "MAT_4afbe0979365a62186dd",
+            "MAT_e12d2ba8265982e22761"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_05.json",
+      "graph_sha256": "2036d9590abc6cea377b0018743bd818336b7f716cfd4ccd74cf7f14e1c9c2c3"
+    },
+    {
+      "slot": 410,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_3aafdd2d31379094a65c",
+          "GRADE_f74d8ec89c534732914c"
+        ],
+        "nco_oh_ratio": 0.854365316979779,
+        "extender_oh_fraction": 0.16134982206043935
+      },
+      "score": [
+        0,
+        0.27040347712771046,
+        "d99c523e03597e783e4d8ab15235544a5b8b5c3d4c592ae314add1edd86107e2"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.854365316979779,
+          0.8386501779395606,
+          0.16134982206043935
+        ],
+        "mass_fractions": [
+          0.23147801299971069,
+          0.7307195768080519,
+          0.037802410192237526
+        ],
+        "nco_oh_ratio": 0.854365316979779,
+        "extender_oh_fraction": 0.16134982206043935
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.05813712735822,
+          14.825033792402007
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.05813712735822,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 14.825033792402007,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "d99c523e03597e783e4d8ab15235544a5b8b5c3d4c592ae314add1edd86107e2",
+          "prediction": {
+            "predictions": [
+              -56.23457375698932,
+              4.305368814409522
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.23457375698932,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 4.305368814409522,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "d99c523e03597e783e4d8ab15235544a5b8b5c3d4c592ae314add1edd86107e2",
+          "prediction": {
+            "predictions": [
+              -60.52993462490073,
+              7.455935508517569
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52993462490073,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 7.455935508517569,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": false,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_3aafdd2d31379094a65c",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 849.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "hydroxyl poly(tetramethylene adipate), Mn 849"
+          ],
+          "source_component_ids": [
+            "CMP_eb64bd3779f6831c9a1a"
+          ],
+          "source_material_ids": [
+            "MAT_fc953c521579ba646811"
+          ]
+        },
+        {
+          "grade_id": "GRADE_f74d8ec89c534732914c",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCc1ccc(Cc2ccc(CO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 228.291,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "[methylenedi(4,1-phenylene)]dimethanol"
+          ],
+          "source_component_ids": [
+            "CMP_034c9ddead04e6077167"
+          ],
+          "source_material_ids": [
+            "MAT_004fdfef512787fe59dc",
+            "MAT_4afbe0979365a62186dd",
+            "MAT_e12d2ba8265982e22761"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_06.json",
+      "graph_sha256": "b83b9467931a35b689511ffafddc60946f1531d85d4b7e5598cf179808891148"
+    },
+    {
+      "slot": 400,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_3aafdd2d31379094a65c",
+          "GRADE_f74d8ec89c534732914c"
+        ],
+        "nco_oh_ratio": 0.8046836040124663,
+        "extender_oh_fraction": 0.1623402642535668
+      },
+      "score": [
+        0,
+        0.2706009593771318,
+        "110d37a1f12ed91ed583e9cef1d94c693ec7d7f68184ebdee773ab0674c07455"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.8046836040124663,
+          0.8376597357464333,
+          0.1623402642535668
+        ],
+        "mass_fractions": [
+          0.2211335642353075,
+          0.7402883543086278,
+          0.03857808145606468
+        ],
+        "nco_oh_ratio": 0.8046836040124663,
+        "extender_oh_fraction": 0.1623402642535668
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.058170659250365,
+          14.823075735853864
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 2,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.058170659250365,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 14.823075735853864,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "110d37a1f12ed91ed583e9cef1d94c693ec7d7f68184ebdee773ab0674c07455",
+          "prediction": {
+            "predictions": [
+              -56.234772464498306,
+              4.307412018816486
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.234772464498306,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 4.307412018816486,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "110d37a1f12ed91ed583e9cef1d94c693ec7d7f68184ebdee773ab0674c07455",
+          "prediction": {
+            "predictions": [
+              -60.529653950544294,
+              7.457685622849962
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.529653950544294,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 7.457685622849962,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": false,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_3aafdd2d31379094a65c",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 849.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "hydroxyl poly(tetramethylene adipate), Mn 849"
+          ],
+          "source_component_ids": [
+            "CMP_eb64bd3779f6831c9a1a"
+          ],
+          "source_material_ids": [
+            "MAT_fc953c521579ba646811"
+          ]
+        },
+        {
+          "grade_id": "GRADE_f74d8ec89c534732914c",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCc1ccc(Cc2ccc(CO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 228.291,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "[methylenedi(4,1-phenylene)]dimethanol"
+          ],
+          "source_component_ids": [
+            "CMP_034c9ddead04e6077167"
+          ],
+          "source_material_ids": [
+            "MAT_004fdfef512787fe59dc",
+            "MAT_4afbe0979365a62186dd",
+            "MAT_e12d2ba8265982e22761"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_07.json",
+      "graph_sha256": "2fd4a8861e21588348f8bd61a32d50b4828c4a768977170cafcb88e6ae303e7b"
+    },
+    {
+      "slot": 413,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_3aafdd2d31379094a65c",
+          "GRADE_f74d8ec89c534732914c"
+        ],
+        "nco_oh_ratio": 0.8075995570225672,
+        "extender_oh_fraction": 0.1530821572962625
+      },
+      "score": [
+        0,
+        0.27164116141800193,
+        "ae11f6b87912c9bdca3d5b04acfc92536f1f2d7026d77401aa2235568607b860"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.8075995570225672,
+          0.8469178427037375,
+          0.1530821572962625
+        ],
+        "mass_fractions": [
+          0.22043960979168947,
+          0.7434274752431274,
+          0.036132914965183074
+        ],
+        "nco_oh_ratio": 0.8075995570225672,
+        "extender_oh_fraction": 0.1530821572962625
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.05824020687851,
+          14.812708489259235
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.05824020687851,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 14.812708489259235,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "ae11f6b87912c9bdca3d5b04acfc92536f1f2d7026d77401aa2235568607b860",
+          "prediction": {
+            "predictions": [
+              -56.234792335249196,
+              4.298163158273738
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.234792335249196,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 4.298163158273738,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "ae11f6b87912c9bdca3d5b04acfc92536f1f2d7026d77401aa2235568607b860",
+          "prediction": {
+            "predictions": [
+              -60.5297980134883,
+              7.449853251690579
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.5297980134883,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 7.449853251690579,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": false,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_3aafdd2d31379094a65c",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 849.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "hydroxyl poly(tetramethylene adipate), Mn 849"
+          ],
+          "source_component_ids": [
+            "CMP_eb64bd3779f6831c9a1a"
+          ],
+          "source_material_ids": [
+            "MAT_fc953c521579ba646811"
+          ]
+        },
+        {
+          "grade_id": "GRADE_f74d8ec89c534732914c",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCc1ccc(Cc2ccc(CO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 228.291,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "[methylenedi(4,1-phenylene)]dimethanol"
+          ],
+          "source_component_ids": [
+            "CMP_034c9ddead04e6077167"
+          ],
+          "source_material_ids": [
+            "MAT_004fdfef512787fe59dc",
+            "MAT_4afbe0979365a62186dd",
+            "MAT_e12d2ba8265982e22761"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_08.json",
+      "graph_sha256": "72a0cb88157e179035345c6b8cf43cf88f8a3b5474d438fa35dff9ed1e42ee49"
+    },
+    {
+      "slot": 263,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_3d595103cf57b16a4b4c",
+          "GRADE_2069b1e8a49691800ec4",
+          "GRADE_5724335acb38dfcbcf71"
+        ],
+        "nco_oh_ratio": 1.1302407400296315,
+        "extender_oh_fraction": 0.07002282478323141
+      },
+      "score": [
+        0,
+        0.27749427875750643,
+        "6cabd5e7d75d66098dbc29042a958c585efbf198bb4e8910a129f3589d529ac7"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.1302407400296315,
+          0.9299771752167686,
+          0.07002282478323141
+        ],
+        "mass_fractions": [
+          0.172379558069351,
+          0.8050336906026373,
+          0.02258675132801169
+        ],
+        "nco_oh_ratio": 1.1302407400296315,
+        "extender_oh_fraction": 0.07002282478323141
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.27743073427086,
+          15.136227420439635
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.27743073427086,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.136227420439635,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "6cabd5e7d75d66098dbc29042a958c585efbf198bb4e8910a129f3589d529ac7",
+          "prediction": {
+            "predictions": [
+              -56.266179428214855,
+              2.956802723129025
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.266179428214855,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 2.956802723129025,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "6cabd5e7d75d66098dbc29042a958c585efbf198bb4e8910a129f3589d529ac7",
+          "prediction": {
+            "predictions": [
+              -60.52866538068711,
+              6.172279643777478
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52866538068711,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 6.172279643777478,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_3d595103cf57b16a4b4c",
+          "role": "diisocyanate",
+          "structure": "Cc1cc(-c2ccc(N=C=O)c(C)c2)ccc1N=C=O",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.28,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "3,3'-dimethyl-4,4'-biphenyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_edc25b65ac0b6e95894e"
+          ],
+          "source_material_ids": [
+            "MAT_6dd3349f4375063225f0",
+            "MAT_7d7f3839b720f57a2870",
+            "MAT_a49d0da20ae39fb4d6b8",
+            "MAT_c442344cc2495b11bb66"
+          ]
+        },
+        {
+          "grade_id": "GRADE_2069b1e8a49691800ec4",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1500.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn 1500",
+            "poly(1,4-butylene adipate) diol, Mn 1500"
+          ],
+          "source_component_ids": [
+            "CMP_d353352920415a44ca4e",
+            "CMP_0de70448461f92406d65"
+          ],
+          "source_material_ids": [
+            "MAT_09a4b55e9eb701de8c13",
+            "MAT_927b366d9ae9ff3989bc"
+          ]
+        },
+        {
+          "grade_id": "GRADE_5724335acb38dfcbcf71",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCSc1ccc(CCc2ccc(SCCCCCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 558.938000000001,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-(ethane-1,2-diyl)bis(benzenethiodecanol)"
+          ],
+          "source_component_ids": [
+            "CMP_edff6c13d0cab8728405"
+          ],
+          "source_material_ids": [
+            "MAT_00ed73ac1e4bd85a0778",
+            "MAT_143cf96217686c1b6da5",
+            "MAT_15afb901734581b526f2",
+            "MAT_1f7e0cbd7770c8975e4f",
+            "MAT_2aed2b54814962e3e6e1",
+            "MAT_2ef21421582005761dea",
+            "MAT_379d2a0123deed1e2f7c",
+            "MAT_5187b8ae136141120eb2",
+            "MAT_590b588a777ead54a645",
+            "MAT_66ef97e3780cb08ac65a",
+            "MAT_8003f9e433a2c1209343",
+            "MAT_91bbbc58bb9ec94ae0e5",
+            "MAT_96f15d5a101a1e56b5ef",
+            "MAT_9e65ce284e01576e7051",
+            "MAT_a36df2f5d8ec056bc7f2",
+            "MAT_b9825ff290e78fe8b673",
+            "MAT_bbb2672b0d28b14aee88",
+            "MAT_bf9aa41bc497472b9dd0",
+            "MAT_d7a117e500e32b98f225",
+            "MAT_dce0459c573903d5266a",
+            "MAT_e423a2c20248011f84ab",
+            "MAT_e9cc0fc502f69f18b883",
+            "MAT_ede95c0515fac10fd38d"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_09.json",
+      "graph_sha256": "196ea0a81b88be99f808c851d5079491985a151552ea1b295add56e24fbf0c65"
+    },
+    {
+      "slot": 271,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_3d595103cf57b16a4b4c",
+          "GRADE_2069b1e8a49691800ec4",
+          "GRADE_5724335acb38dfcbcf71"
+        ],
+        "nco_oh_ratio": 1.2460401990572643,
+        "extender_oh_fraction": 0.0744745641026279
+      },
+      "score": [
+        0,
+        0.2786011680799401,
+        "2530d873becb2173d5f7e6f912cd7c6fd7352f86880a1ceb38a9bac581b07db9"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.2460401990572643,
+          0.9255254358973721,
+          0.0744745641026279
+        ],
+        "mass_fractions": [
+          0.18718740009154888,
+          0.789150577179286,
+          0.023662022729165143
+        ],
+        "nco_oh_ratio": 1.2460401990572643,
+        "extender_oh_fraction": 0.0744745641026279
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.277354977033056,
+          15.147334192282873
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.277354977033056,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.147334192282873,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "2530d873becb2173d5f7e6f912cd7c6fd7352f86880a1ceb38a9bac581b07db9",
+          "prediction": {
+            "predictions": [
+              -56.26628002389128,
+              2.9586852044796688
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.26628002389128,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 2.9586852044796688,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "2530d873becb2173d5f7e6f912cd7c6fd7352f86880a1ceb38a9bac581b07db9",
+          "prediction": {
+            "predictions": [
+              -60.52901063498396,
+              6.1737991439085125
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52901063498396,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 6.1737991439085125,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_3d595103cf57b16a4b4c",
+          "role": "diisocyanate",
+          "structure": "Cc1cc(-c2ccc(N=C=O)c(C)c2)ccc1N=C=O",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.28,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "3,3'-dimethyl-4,4'-biphenyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_edc25b65ac0b6e95894e"
+          ],
+          "source_material_ids": [
+            "MAT_6dd3349f4375063225f0",
+            "MAT_7d7f3839b720f57a2870",
+            "MAT_a49d0da20ae39fb4d6b8",
+            "MAT_c442344cc2495b11bb66"
+          ]
+        },
+        {
+          "grade_id": "GRADE_2069b1e8a49691800ec4",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1500.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn 1500",
+            "poly(1,4-butylene adipate) diol, Mn 1500"
+          ],
+          "source_component_ids": [
+            "CMP_d353352920415a44ca4e",
+            "CMP_0de70448461f92406d65"
+          ],
+          "source_material_ids": [
+            "MAT_09a4b55e9eb701de8c13",
+            "MAT_927b366d9ae9ff3989bc"
+          ]
+        },
+        {
+          "grade_id": "GRADE_5724335acb38dfcbcf71",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCSc1ccc(CCc2ccc(SCCCCCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 558.938000000001,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-(ethane-1,2-diyl)bis(benzenethiodecanol)"
+          ],
+          "source_component_ids": [
+            "CMP_edff6c13d0cab8728405"
+          ],
+          "source_material_ids": [
+            "MAT_00ed73ac1e4bd85a0778",
+            "MAT_143cf96217686c1b6da5",
+            "MAT_15afb901734581b526f2",
+            "MAT_1f7e0cbd7770c8975e4f",
+            "MAT_2aed2b54814962e3e6e1",
+            "MAT_2ef21421582005761dea",
+            "MAT_379d2a0123deed1e2f7c",
+            "MAT_5187b8ae136141120eb2",
+            "MAT_590b588a777ead54a645",
+            "MAT_66ef97e3780cb08ac65a",
+            "MAT_8003f9e433a2c1209343",
+            "MAT_91bbbc58bb9ec94ae0e5",
+            "MAT_96f15d5a101a1e56b5ef",
+            "MAT_9e65ce284e01576e7051",
+            "MAT_a36df2f5d8ec056bc7f2",
+            "MAT_b9825ff290e78fe8b673",
+            "MAT_bbb2672b0d28b14aee88",
+            "MAT_bf9aa41bc497472b9dd0",
+            "MAT_d7a117e500e32b98f225",
+            "MAT_dce0459c573903d5266a",
+            "MAT_e423a2c20248011f84ab",
+            "MAT_e9cc0fc502f69f18b883",
+            "MAT_ede95c0515fac10fd38d"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_10.json",
+      "graph_sha256": "edb088ba0ae6dc26913c35664b046e32c13655c52bc68a5289fb92eaeb03ee00"
+    },
+    {
+      "slot": 320,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f22f7302b3d2b562691c",
+          "GRADE_baa1f6cdb24be9032635",
+          "GRADE_55e2c6e6058556d24dec"
+        ],
+        "nco_oh_ratio": 1.020551391363338,
+        "extender_oh_fraction": 0.6256142784011816
+      },
+      "score": [
+        0,
+        0.27961263740735415,
+        "98426db00b05cda440befd4f418e17e64b7b9c4b3f6cda66b6d4d7da7810b8e0"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.020551391363338,
+          0.37438572159881844,
+          0.6256142784011816
+        ],
+        "mass_fractions": [
+          0.2247105191567576,
+          0.43803746693386236,
+          0.33725201390938
+        ],
+        "nco_oh_ratio": 1.020551391363338,
+        "extender_oh_fraction": 0.6256142784011816
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.52656275750102,
+          14.967155004676968
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 2,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.52656275750102,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 14.967155004676968,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "98426db00b05cda440befd4f418e17e64b7b9c4b3f6cda66b6d4d7da7810b8e0",
+          "prediction": {
+            "predictions": [
+              -56.237175583435054,
+              14.678401271336046
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.237175583435054,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 14.678401271336046,
+              "unit": "MPa",
+              "model_constraint_passed": true
+            }
+          ],
+          "all_constraints_passed": true
+        },
+        {
+          "seed": 20261113,
+          "identity": "98426db00b05cda440befd4f418e17e64b7b9c4b3f6cda66b6d4d7da7810b8e0",
+          "prediction": {
+            "predictions": [
+              -60.52083630483321,
+              9.65122567655795
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52083630483321,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 9.65122567655795,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f22f7302b3d2b562691c",
+          "role": "diisocyanate",
+          "structure": "O=C=NCc1cccc(CN=C=O)c1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 188.19,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "m-xylylene diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_1df8fd6049ead611f689"
+          ],
+          "source_material_ids": [
+            "MAT_122aad08449a2ebb9247"
+          ]
+        },
+        {
+          "grade_id": "GRADE_baa1f6cdb24be9032635",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1000.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn1000",
+            "poly(butylene adipate) diol, Mn 1000 g/mol",
+            "adipic-acid/1,4-butanediol polyester diol, Mn 1000"
+          ],
+          "source_component_ids": [
+            "CMP_7d1272c54646e79e3bef",
+            "CMP_3c7343052b7a2aeac0fd",
+            "CMP_f2abb43efff8cb00d4b4"
+          ],
+          "source_material_ids": [
+            "MAT_141cdf7af1d138045b38",
+            "MAT_421878ea009128725ffe",
+            "MAT_46faa2823c6246c16acf",
+            "MAT_667c4f004238a594def0",
+            "MAT_841cabf61c5b9beed3ea",
+            "MAT_a1147b99cc52638c4367",
+            "MAT_b11190161a8bf9fadb6c",
+            "MAT_b6f16ceb61123e07e781",
+            "MAT_b73e271f62d8de54ae6c",
+            "MAT_bcd9132a21f97245ee1a",
+            "MAT_c5e7b78cb63a8ca472e7",
+            "MAT_c6c3c12d2ae080d860d3",
+            "MAT_e555004dd99ca1654cf1",
+            "MAT_fe18981a49918510a786"
+          ]
+        },
+        {
+          "grade_id": "GRADE_55e2c6e6058556d24dec",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCSCc1ccc(Cc2ccc(CSCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 460.74,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "6,6'-[methylenebis(1,4-phenylenemethylenethio)]dihexan-1-ol"
+          ],
+          "source_component_ids": [
+            "CMP_f891f1010cb01c7efbcf"
+          ],
+          "source_material_ids": [
+            "MAT_1627899473741f47a783",
+            "MAT_1a52dfeed9928cdbf78c",
+            "MAT_218474f4fd64a3cbe446",
+            "MAT_227d4ad200bac569ed76",
+            "MAT_2930d750e1c7bc243b04",
+            "MAT_29f09d8883b8a8050dd4",
+            "MAT_42a1d210b4c135b02e44",
+            "MAT_46e4a7efc861362c2a1f",
+            "MAT_4754ff2e0076ae4dab43",
+            "MAT_49083a4be17e59eeb64f",
+            "MAT_5ea00ca52ff2ccaadef2",
+            "MAT_63b36e45074df35421b5",
+            "MAT_6b0eb0d97519882ec3c4",
+            "MAT_7d8d13ef7c388be09f72",
+            "MAT_83438e88e74aad29e763",
+            "MAT_9062de73243e6af184e8",
+            "MAT_9893b0b0a86b20942185",
+            "MAT_9ea60b967cc6a5224f2f",
+            "MAT_acce9e298b7e46be5f40",
+            "MAT_c25e9c2a969f82e7ed46",
+            "MAT_cedeb4a45a7d3bcb5842",
+            "MAT_d083a0072b4433f35d7b",
+            "MAT_d241a7648811806658ac",
+            "MAT_d468ccf86accf66c3784",
+            "MAT_ea76452efb9709faa8d2",
+            "MAT_ebb687a79e939413150a",
+            "MAT_ed9085f9a25e725335ef",
+            "MAT_f1c2ca0678c083a198b2",
+            "MAT_f3a52c550c223131d3f8",
+            "MAT_f97823656fdd35c86e7b"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_11.json",
+      "graph_sha256": "7f357cea6222d06fee3a68190de57fa750657a0e932c56ff123d1648ba4e3e8b"
+    },
+    {
+      "slot": 264,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_3d595103cf57b16a4b4c",
+          "GRADE_2069b1e8a49691800ec4",
+          "GRADE_5724335acb38dfcbcf71"
+        ],
+        "nco_oh_ratio": 1.2233461993841288,
+        "extender_oh_fraction": 0.08478311972497252
+      },
+      "score": [
+        0,
+        0.27979398243026243,
+        "c7aa41f5ae516cd182bcdd3bd46115c3f4ed652e7c79a9a5cb8f4bc12e18f940"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.2233461993841288,
+          0.9152168802750275,
+          0.08478311972497252
+        ],
+        "mass_fractions": [
+          0.18543290459828543,
+          0.7873873017319772,
+          0.027179793669737294
+        ],
+        "nco_oh_ratio": 1.2233461993841288,
+        "extender_oh_fraction": 0.08478311972497252
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.27745681463141,
+          15.15921141698692
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.27745681463141,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.15921141698692,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "c7aa41f5ae516cd182bcdd3bd46115c3f4ed652e7c79a9a5cb8f4bc12e18f940",
+          "prediction": {
+            "predictions": [
+              -56.26626387890617,
+              2.9628080859616945
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.26626387890617,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 2.9628080859616945,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "c7aa41f5ae516cd182bcdd3bd46115c3f4ed652e7c79a9a5cb8f4bc12e18f940",
+          "prediction": {
+            "predictions": [
+              -60.52886408819609,
+              6.180938345056812
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52886408819609,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 6.180938345056812,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_3d595103cf57b16a4b4c",
+          "role": "diisocyanate",
+          "structure": "Cc1cc(-c2ccc(N=C=O)c(C)c2)ccc1N=C=O",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.28,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "3,3'-dimethyl-4,4'-biphenyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_edc25b65ac0b6e95894e"
+          ],
+          "source_material_ids": [
+            "MAT_6dd3349f4375063225f0",
+            "MAT_7d7f3839b720f57a2870",
+            "MAT_a49d0da20ae39fb4d6b8",
+            "MAT_c442344cc2495b11bb66"
+          ]
+        },
+        {
+          "grade_id": "GRADE_2069b1e8a49691800ec4",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1500.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn 1500",
+            "poly(1,4-butylene adipate) diol, Mn 1500"
+          ],
+          "source_component_ids": [
+            "CMP_d353352920415a44ca4e",
+            "CMP_0de70448461f92406d65"
+          ],
+          "source_material_ids": [
+            "MAT_09a4b55e9eb701de8c13",
+            "MAT_927b366d9ae9ff3989bc"
+          ]
+        },
+        {
+          "grade_id": "GRADE_5724335acb38dfcbcf71",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCSc1ccc(CCc2ccc(SCCCCCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 558.938000000001,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-(ethane-1,2-diyl)bis(benzenethiodecanol)"
+          ],
+          "source_component_ids": [
+            "CMP_edff6c13d0cab8728405"
+          ],
+          "source_material_ids": [
+            "MAT_00ed73ac1e4bd85a0778",
+            "MAT_143cf96217686c1b6da5",
+            "MAT_15afb901734581b526f2",
+            "MAT_1f7e0cbd7770c8975e4f",
+            "MAT_2aed2b54814962e3e6e1",
+            "MAT_2ef21421582005761dea",
+            "MAT_379d2a0123deed1e2f7c",
+            "MAT_5187b8ae136141120eb2",
+            "MAT_590b588a777ead54a645",
+            "MAT_66ef97e3780cb08ac65a",
+            "MAT_8003f9e433a2c1209343",
+            "MAT_91bbbc58bb9ec94ae0e5",
+            "MAT_96f15d5a101a1e56b5ef",
+            "MAT_9e65ce284e01576e7051",
+            "MAT_a36df2f5d8ec056bc7f2",
+            "MAT_b9825ff290e78fe8b673",
+            "MAT_bbb2672b0d28b14aee88",
+            "MAT_bf9aa41bc497472b9dd0",
+            "MAT_d7a117e500e32b98f225",
+            "MAT_dce0459c573903d5266a",
+            "MAT_e423a2c20248011f84ab",
+            "MAT_e9cc0fc502f69f18b883",
+            "MAT_ede95c0515fac10fd38d"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_12.json",
+      "graph_sha256": "775ce7196db6eef49a4e0335b83cbbf6db951a6f60aa0a7d38db90fa575a025c"
+    },
+    {
+      "slot": 266,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_3d595103cf57b16a4b4c",
+          "GRADE_2069b1e8a49691800ec4",
+          "GRADE_5724335acb38dfcbcf71"
+        ],
+        "nco_oh_ratio": 1.0987299353694215,
+        "extender_oh_fraction": 0.08884774463086967
+      },
+      "score": [
+        0,
+        0.2798297194940188,
+        "dcd8123b797d45ea7bf5245a8ec1c6dfb2baba79231f49c42861d919295afb9d"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.0987299353694215,
+          0.9111522553691304,
+          0.08884774463086967
+        ],
+        "mass_fractions": [
+          0.1701306324813186,
+          0.8007730983532796,
+          0.029096269165401874
+        ],
+        "nco_oh_ratio": 1.0987299353694215,
+        "extender_oh_fraction": 0.08884774463086967
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.277624474092114,
+          15.159484957894131
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.277624474092114,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.159484957894131,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "dcd8123b797d45ea7bf5245a8ec1c6dfb2baba79231f49c42861d919295afb9d",
+          "prediction": {
+            "predictions": [
+              -56.266154589776235,
+              2.964753448659708
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.266154589776235,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 2.964753448659708,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "dcd8123b797d45ea7bf5245a8ec1c6dfb2baba79231f49c42861d919295afb9d",
+          "prediction": {
+            "predictions": [
+              -60.52840954476929,
+              6.185937614212371
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52840954476929,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 6.185937614212371,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_3d595103cf57b16a4b4c",
+          "role": "diisocyanate",
+          "structure": "Cc1cc(-c2ccc(N=C=O)c(C)c2)ccc1N=C=O",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.28,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "3,3'-dimethyl-4,4'-biphenyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_edc25b65ac0b6e95894e"
+          ],
+          "source_material_ids": [
+            "MAT_6dd3349f4375063225f0",
+            "MAT_7d7f3839b720f57a2870",
+            "MAT_a49d0da20ae39fb4d6b8",
+            "MAT_c442344cc2495b11bb66"
+          ]
+        },
+        {
+          "grade_id": "GRADE_2069b1e8a49691800ec4",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1500.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn 1500",
+            "poly(1,4-butylene adipate) diol, Mn 1500"
+          ],
+          "source_component_ids": [
+            "CMP_d353352920415a44ca4e",
+            "CMP_0de70448461f92406d65"
+          ],
+          "source_material_ids": [
+            "MAT_09a4b55e9eb701de8c13",
+            "MAT_927b366d9ae9ff3989bc"
+          ]
+        },
+        {
+          "grade_id": "GRADE_5724335acb38dfcbcf71",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCSc1ccc(CCc2ccc(SCCCCCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 558.938000000001,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-(ethane-1,2-diyl)bis(benzenethiodecanol)"
+          ],
+          "source_component_ids": [
+            "CMP_edff6c13d0cab8728405"
+          ],
+          "source_material_ids": [
+            "MAT_00ed73ac1e4bd85a0778",
+            "MAT_143cf96217686c1b6da5",
+            "MAT_15afb901734581b526f2",
+            "MAT_1f7e0cbd7770c8975e4f",
+            "MAT_2aed2b54814962e3e6e1",
+            "MAT_2ef21421582005761dea",
+            "MAT_379d2a0123deed1e2f7c",
+            "MAT_5187b8ae136141120eb2",
+            "MAT_590b588a777ead54a645",
+            "MAT_66ef97e3780cb08ac65a",
+            "MAT_8003f9e433a2c1209343",
+            "MAT_91bbbc58bb9ec94ae0e5",
+            "MAT_96f15d5a101a1e56b5ef",
+            "MAT_9e65ce284e01576e7051",
+            "MAT_a36df2f5d8ec056bc7f2",
+            "MAT_b9825ff290e78fe8b673",
+            "MAT_bbb2672b0d28b14aee88",
+            "MAT_bf9aa41bc497472b9dd0",
+            "MAT_d7a117e500e32b98f225",
+            "MAT_dce0459c573903d5266a",
+            "MAT_e423a2c20248011f84ab",
+            "MAT_e9cc0fc502f69f18b883",
+            "MAT_ede95c0515fac10fd38d"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_13.json",
+      "graph_sha256": "711023164f7bda54f690bb450165f9bf9119452114b0095b79654dc466f6e65d"
+    },
+    {
+      "slot": 353,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_7ce80e636c6d7ca77e40",
+          "GRADE_13e70d1bc580c89009b8"
+        ],
+        "nco_oh_ratio": 1.0959827803021183,
+        "extender_oh_fraction": 0.12863633069440794
+      },
+      "score": [
+        0,
+        0.2801005242124246,
+        "a11b8ac42ec74de6679339689360a5531e19e23567264642b8cea846b0bc3315"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.0959827803021183,
+          0.8713636693055921,
+          0.12863633069440794
+        ],
+        "mass_fractions": [
+          0.43785882939655923,
+          0.527455583324844,
+          0.03468558727859673
+        ],
+        "nco_oh_ratio": 1.0959827803021183,
+        "extender_oh_fraction": 0.12863633069440794
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.12429679247381,
+          14.761143154112657
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.12429679247381,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 14.761143154112657,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "a11b8ac42ec74de6679339689360a5531e19e23567264642b8cea846b0bc3315",
+          "prediction": {
+            "predictions": [
+              -56.261009307215524,
+              26.081614510481934
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.261009307215524,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 26.081614510481934,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "a11b8ac42ec74de6679339689360a5531e19e23567264642b8cea846b0bc3315",
+          "prediction": {
+            "predictions": [
+              -60.534489994544145,
+              19.870974286956685
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.534489994544145,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 19.870974286956685,
+              "unit": "MPa",
+              "model_constraint_passed": true
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": false,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_7ce80e636c6d7ca77e40",
+          "role": "polyol",
+          "structure": "*OCCCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 400.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "CAPA 2047A polycaprolactone diol"
+          ],
+          "source_component_ids": [
+            "CMP_816d8237ab61a3b016f0"
+          ],
+          "source_material_ids": [
+            "MAT_28f2158aca2692307887"
+          ]
+        },
+        {
+          "grade_id": "GRADE_13e70d1bc580c89009b8",
+          "role": "hydroxyl_chain_extender",
+          "structure": "O=C(OCCCO)OCCCO",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 178.18,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "bis(3-hydroxypropyl) carbonate"
+          ],
+          "source_component_ids": [
+            "CMP_2109443ab133c9b9d47e",
+            "CMP_87c19fb5d69e441d51f1"
+          ],
+          "source_material_ids": [
+            "MAT_998f2c847d63ee46d1b6",
+            "MAT_cf0a1880d19981b57279",
+            "MAT_e92b27d160dc978c061c"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_14.json",
+      "graph_sha256": "f96f3da3181fe613c10dba79819f14d3c355d0ebe7b2c92ffff4cea26e52490f"
+    },
+    {
+      "slot": 323,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f22f7302b3d2b562691c",
+          "GRADE_baa1f6cdb24be9032635",
+          "GRADE_55e2c6e6058556d24dec"
+        ],
+        "nco_oh_ratio": 0.9817214189623247,
+        "extender_oh_fraction": 0.6391511408554897
+      },
+      "score": [
+        0,
+        0.28070615429785023,
+        "071a988701c1293dd8feed1639165defc27cb2fe9e6dbe0c6e2b4965fba197da"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.9817214189623247,
+          0.36084885914451026,
+          0.6391511408554897
+        ],
+        "mass_fractions": [
+          0.21991931939889442,
+          0.42954029461869125,
+          0.3505403859824143
+        ],
+        "nco_oh_ratio": 0.9817214189623247,
+        "extender_oh_fraction": 0.6391511408554897
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.52460424661561,
+          15.044759419670697
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.52460424661561,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.044759419670697,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "071a988701c1293dd8feed1639165defc27cb2fe9e6dbe0c6e2b4965fba197da",
+          "prediction": {
+            "predictions": [
+              -56.23683529682592,
+              15.208260674058657
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.23683529682592,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 15.208260674058657,
+              "unit": "MPa",
+              "model_constraint_passed": true
+            }
+          ],
+          "all_constraints_passed": true
+        },
+        {
+          "seed": 20261113,
+          "identity": "071a988701c1293dd8feed1639165defc27cb2fe9e6dbe0c6e2b4965fba197da",
+          "prediction": {
+            "predictions": [
+              -60.519795574254914,
+              9.814767295479308
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.519795574254914,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 9.814767295479308,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f22f7302b3d2b562691c",
+          "role": "diisocyanate",
+          "structure": "O=C=NCc1cccc(CN=C=O)c1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 188.19,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "m-xylylene diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_1df8fd6049ead611f689"
+          ],
+          "source_material_ids": [
+            "MAT_122aad08449a2ebb9247"
+          ]
+        },
+        {
+          "grade_id": "GRADE_baa1f6cdb24be9032635",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1000.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn1000",
+            "poly(butylene adipate) diol, Mn 1000 g/mol",
+            "adipic-acid/1,4-butanediol polyester diol, Mn 1000"
+          ],
+          "source_component_ids": [
+            "CMP_7d1272c54646e79e3bef",
+            "CMP_3c7343052b7a2aeac0fd",
+            "CMP_f2abb43efff8cb00d4b4"
+          ],
+          "source_material_ids": [
+            "MAT_141cdf7af1d138045b38",
+            "MAT_421878ea009128725ffe",
+            "MAT_46faa2823c6246c16acf",
+            "MAT_667c4f004238a594def0",
+            "MAT_841cabf61c5b9beed3ea",
+            "MAT_a1147b99cc52638c4367",
+            "MAT_b11190161a8bf9fadb6c",
+            "MAT_b6f16ceb61123e07e781",
+            "MAT_b73e271f62d8de54ae6c",
+            "MAT_bcd9132a21f97245ee1a",
+            "MAT_c5e7b78cb63a8ca472e7",
+            "MAT_c6c3c12d2ae080d860d3",
+            "MAT_e555004dd99ca1654cf1",
+            "MAT_fe18981a49918510a786"
+          ]
+        },
+        {
+          "grade_id": "GRADE_55e2c6e6058556d24dec",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCSCc1ccc(Cc2ccc(CSCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 460.74,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "6,6'-[methylenebis(1,4-phenylenemethylenethio)]dihexan-1-ol"
+          ],
+          "source_component_ids": [
+            "CMP_f891f1010cb01c7efbcf"
+          ],
+          "source_material_ids": [
+            "MAT_1627899473741f47a783",
+            "MAT_1a52dfeed9928cdbf78c",
+            "MAT_218474f4fd64a3cbe446",
+            "MAT_227d4ad200bac569ed76",
+            "MAT_2930d750e1c7bc243b04",
+            "MAT_29f09d8883b8a8050dd4",
+            "MAT_42a1d210b4c135b02e44",
+            "MAT_46e4a7efc861362c2a1f",
+            "MAT_4754ff2e0076ae4dab43",
+            "MAT_49083a4be17e59eeb64f",
+            "MAT_5ea00ca52ff2ccaadef2",
+            "MAT_63b36e45074df35421b5",
+            "MAT_6b0eb0d97519882ec3c4",
+            "MAT_7d8d13ef7c388be09f72",
+            "MAT_83438e88e74aad29e763",
+            "MAT_9062de73243e6af184e8",
+            "MAT_9893b0b0a86b20942185",
+            "MAT_9ea60b967cc6a5224f2f",
+            "MAT_acce9e298b7e46be5f40",
+            "MAT_c25e9c2a969f82e7ed46",
+            "MAT_cedeb4a45a7d3bcb5842",
+            "MAT_d083a0072b4433f35d7b",
+            "MAT_d241a7648811806658ac",
+            "MAT_d468ccf86accf66c3784",
+            "MAT_ea76452efb9709faa8d2",
+            "MAT_ebb687a79e939413150a",
+            "MAT_ed9085f9a25e725335ef",
+            "MAT_f1c2ca0678c083a198b2",
+            "MAT_f3a52c550c223131d3f8",
+            "MAT_f97823656fdd35c86e7b"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_15.json",
+      "graph_sha256": "21c424d9030d0a84ba535b2caa17bc27a4327729b8b912bd741b9aa65c6e0401"
+    },
+    {
+      "slot": 329,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f22f7302b3d2b562691c",
+          "GRADE_baa1f6cdb24be9032635",
+          "GRADE_55e2c6e6058556d24dec"
+        ],
+        "nco_oh_ratio": 0.9945963043651633,
+        "extender_oh_fraction": 0.6405614864422174
+      },
+      "score": [
+        0,
+        0.28088017384182096,
+        "483514b92c55c758b588925b6971b3a3daaa2e1de6a745a69dd1eb53d0c9e20a"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.9945963043651633,
+          0.35943851355778256,
+          0.6405614864422174
+        ],
+        "mass_fractions": [
+          0.22236345335466692,
+          0.4270164800195104,
+          0.3506200666258226
+        ],
+        "nco_oh_ratio": 0.9945963043651633,
+        "extender_oh_fraction": 0.6405614864422174
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.52454215051905,
+          15.046530663158682
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.52454215051905,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.046530663158682,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "483514b92c55c758b588925b6971b3a3daaa2e1de6a745a69dd1eb53d0c9e20a",
+          "prediction": {
+            "predictions": [
+              -56.23678561994868,
+              15.210351422502251
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.23678561994868,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 15.210351422502251,
+              "unit": "MPa",
+              "model_constraint_passed": true
+            }
+          ],
+          "all_constraints_passed": true
+        },
+        {
+          "seed": 20261113,
+          "identity": "483514b92c55c758b588925b6971b3a3daaa2e1de6a745a69dd1eb53d0c9e20a",
+          "prediction": {
+            "predictions": [
+              -60.519865121883065,
+              9.815700731565597
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.519865121883065,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 9.815700731565597,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f22f7302b3d2b562691c",
+          "role": "diisocyanate",
+          "structure": "O=C=NCc1cccc(CN=C=O)c1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 188.19,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "m-xylylene diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_1df8fd6049ead611f689"
+          ],
+          "source_material_ids": [
+            "MAT_122aad08449a2ebb9247"
+          ]
+        },
+        {
+          "grade_id": "GRADE_baa1f6cdb24be9032635",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1000.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn1000",
+            "poly(butylene adipate) diol, Mn 1000 g/mol",
+            "adipic-acid/1,4-butanediol polyester diol, Mn 1000"
+          ],
+          "source_component_ids": [
+            "CMP_7d1272c54646e79e3bef",
+            "CMP_3c7343052b7a2aeac0fd",
+            "CMP_f2abb43efff8cb00d4b4"
+          ],
+          "source_material_ids": [
+            "MAT_141cdf7af1d138045b38",
+            "MAT_421878ea009128725ffe",
+            "MAT_46faa2823c6246c16acf",
+            "MAT_667c4f004238a594def0",
+            "MAT_841cabf61c5b9beed3ea",
+            "MAT_a1147b99cc52638c4367",
+            "MAT_b11190161a8bf9fadb6c",
+            "MAT_b6f16ceb61123e07e781",
+            "MAT_b73e271f62d8de54ae6c",
+            "MAT_bcd9132a21f97245ee1a",
+            "MAT_c5e7b78cb63a8ca472e7",
+            "MAT_c6c3c12d2ae080d860d3",
+            "MAT_e555004dd99ca1654cf1",
+            "MAT_fe18981a49918510a786"
+          ]
+        },
+        {
+          "grade_id": "GRADE_55e2c6e6058556d24dec",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCSCc1ccc(Cc2ccc(CSCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 460.74,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "6,6'-[methylenebis(1,4-phenylenemethylenethio)]dihexan-1-ol"
+          ],
+          "source_component_ids": [
+            "CMP_f891f1010cb01c7efbcf"
+          ],
+          "source_material_ids": [
+            "MAT_1627899473741f47a783",
+            "MAT_1a52dfeed9928cdbf78c",
+            "MAT_218474f4fd64a3cbe446",
+            "MAT_227d4ad200bac569ed76",
+            "MAT_2930d750e1c7bc243b04",
+            "MAT_29f09d8883b8a8050dd4",
+            "MAT_42a1d210b4c135b02e44",
+            "MAT_46e4a7efc861362c2a1f",
+            "MAT_4754ff2e0076ae4dab43",
+            "MAT_49083a4be17e59eeb64f",
+            "MAT_5ea00ca52ff2ccaadef2",
+            "MAT_63b36e45074df35421b5",
+            "MAT_6b0eb0d97519882ec3c4",
+            "MAT_7d8d13ef7c388be09f72",
+            "MAT_83438e88e74aad29e763",
+            "MAT_9062de73243e6af184e8",
+            "MAT_9893b0b0a86b20942185",
+            "MAT_9ea60b967cc6a5224f2f",
+            "MAT_acce9e298b7e46be5f40",
+            "MAT_c25e9c2a969f82e7ed46",
+            "MAT_cedeb4a45a7d3bcb5842",
+            "MAT_d083a0072b4433f35d7b",
+            "MAT_d241a7648811806658ac",
+            "MAT_d468ccf86accf66c3784",
+            "MAT_ea76452efb9709faa8d2",
+            "MAT_ebb687a79e939413150a",
+            "MAT_ed9085f9a25e725335ef",
+            "MAT_f1c2ca0678c083a198b2",
+            "MAT_f3a52c550c223131d3f8",
+            "MAT_f97823656fdd35c86e7b"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_16.json",
+      "graph_sha256": "bbcfde14cb29596193a22e0f1aab02c03ee6073eaa5c2cfe1197c39f5fad0d97"
+    },
+    {
+      "slot": 325,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f22f7302b3d2b562691c",
+          "GRADE_baa1f6cdb24be9032635",
+          "GRADE_55e2c6e6058556d24dec"
+        ],
+        "nco_oh_ratio": 0.8917680778228403,
+        "extender_oh_fraction": 0.6199745665417925
+      },
+      "score": [
+        0,
+        0.28097018462665807,
+        "040245a4b311f55bd1e8d9e387258fc80b1538081ad45947c9fef252431987dc"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.8917680778228403,
+          0.3800254334582075,
+          0.6199745665417925
+        ],
+        "mass_fractions": [
+          0.20134729719919847,
+          0.45594242305764254,
+          0.342710279743159
+        ],
+        "nco_oh_ratio": 0.8917680778228403,
+        "extender_oh_fraction": 0.6199745665417925
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.52714521888672,
+          14.95387076317678
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.52714521888672,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 14.95387076317678,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "040245a4b311f55bd1e8d9e387258fc80b1538081ad45947c9fef252431987dc",
+          "prediction": {
+            "predictions": [
+              -56.23766117491013,
+              14.67380791510645
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 2,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.23766117491013,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 14.67380791510645,
+              "unit": "MPa",
+              "model_constraint_passed": true
+            }
+          ],
+          "all_constraints_passed": true
+        },
+        {
+          "seed": 20261113,
+          "identity": "040245a4b311f55bd1e8d9e387258fc80b1538081ad45947c9fef252431987dc",
+          "prediction": {
+            "predictions": [
+              -60.519996765607765,
+              9.647427336646254
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 2,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.519996765607765,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 9.647427336646254,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f22f7302b3d2b562691c",
+          "role": "diisocyanate",
+          "structure": "O=C=NCc1cccc(CN=C=O)c1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 188.19,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "m-xylylene diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_1df8fd6049ead611f689"
+          ],
+          "source_material_ids": [
+            "MAT_122aad08449a2ebb9247"
+          ]
+        },
+        {
+          "grade_id": "GRADE_baa1f6cdb24be9032635",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1000.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn1000",
+            "poly(butylene adipate) diol, Mn 1000 g/mol",
+            "adipic-acid/1,4-butanediol polyester diol, Mn 1000"
+          ],
+          "source_component_ids": [
+            "CMP_7d1272c54646e79e3bef",
+            "CMP_3c7343052b7a2aeac0fd",
+            "CMP_f2abb43efff8cb00d4b4"
+          ],
+          "source_material_ids": [
+            "MAT_141cdf7af1d138045b38",
+            "MAT_421878ea009128725ffe",
+            "MAT_46faa2823c6246c16acf",
+            "MAT_667c4f004238a594def0",
+            "MAT_841cabf61c5b9beed3ea",
+            "MAT_a1147b99cc52638c4367",
+            "MAT_b11190161a8bf9fadb6c",
+            "MAT_b6f16ceb61123e07e781",
+            "MAT_b73e271f62d8de54ae6c",
+            "MAT_bcd9132a21f97245ee1a",
+            "MAT_c5e7b78cb63a8ca472e7",
+            "MAT_c6c3c12d2ae080d860d3",
+            "MAT_e555004dd99ca1654cf1",
+            "MAT_fe18981a49918510a786"
+          ]
+        },
+        {
+          "grade_id": "GRADE_55e2c6e6058556d24dec",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCSCc1ccc(Cc2ccc(CSCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 460.74,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "6,6'-[methylenebis(1,4-phenylenemethylenethio)]dihexan-1-ol"
+          ],
+          "source_component_ids": [
+            "CMP_f891f1010cb01c7efbcf"
+          ],
+          "source_material_ids": [
+            "MAT_1627899473741f47a783",
+            "MAT_1a52dfeed9928cdbf78c",
+            "MAT_218474f4fd64a3cbe446",
+            "MAT_227d4ad200bac569ed76",
+            "MAT_2930d750e1c7bc243b04",
+            "MAT_29f09d8883b8a8050dd4",
+            "MAT_42a1d210b4c135b02e44",
+            "MAT_46e4a7efc861362c2a1f",
+            "MAT_4754ff2e0076ae4dab43",
+            "MAT_49083a4be17e59eeb64f",
+            "MAT_5ea00ca52ff2ccaadef2",
+            "MAT_63b36e45074df35421b5",
+            "MAT_6b0eb0d97519882ec3c4",
+            "MAT_7d8d13ef7c388be09f72",
+            "MAT_83438e88e74aad29e763",
+            "MAT_9062de73243e6af184e8",
+            "MAT_9893b0b0a86b20942185",
+            "MAT_9ea60b967cc6a5224f2f",
+            "MAT_acce9e298b7e46be5f40",
+            "MAT_c25e9c2a969f82e7ed46",
+            "MAT_cedeb4a45a7d3bcb5842",
+            "MAT_d083a0072b4433f35d7b",
+            "MAT_d241a7648811806658ac",
+            "MAT_d468ccf86accf66c3784",
+            "MAT_ea76452efb9709faa8d2",
+            "MAT_ebb687a79e939413150a",
+            "MAT_ed9085f9a25e725335ef",
+            "MAT_f1c2ca0678c083a198b2",
+            "MAT_f3a52c550c223131d3f8",
+            "MAT_f97823656fdd35c86e7b"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_17.json",
+      "graph_sha256": "8caafee08c831949ffce2e054fd0bfe13c497395c13ee40df7f1a368bfca5f2e"
+    },
+    {
+      "slot": 291,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_d1572dedc5d7e6f59bbc",
+          "GRADE_0a8e18f21212e213291b"
+        ],
+        "nco_oh_ratio": 1.0716071731618555,
+        "extender_oh_fraction": 0.07077667083844791
+      },
+      "score": [
+        0,
+        0.2822818923256301,
+        "707ac7738317ae24980964b09e7d2a697e035293273169678a94ea9bddc0312a"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.0716071731618555,
+          0.9292233291615521,
+          0.07077667083844791
+        ],
+        "mass_fractions": [
+          0.22936984758918946,
+          0.7533848659116593,
+          0.017245286499151188
+        ],
+        "nco_oh_ratio": 1.0716071731618555,
+        "extender_oh_fraction": 0.07077667083844791
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.066383488980975,
+          15.289627178765814
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.066383488980975,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.289627178765814,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "707ac7738317ae24980964b09e7d2a697e035293273169678a94ea9bddc0312a",
+          "prediction": {
+            "predictions": [
+              -56.24052628880526,
+              15.403956321636318
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.24052628880526,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 15.403956321636318,
+              "unit": "MPa",
+              "model_constraint_passed": true
+            }
+          ],
+          "all_constraints_passed": true
+        },
+        {
+          "seed": 20261113,
+          "identity": "707ac7738317ae24980964b09e7d2a697e035293273169678a94ea9bddc0312a",
+          "prediction": {
+            "predictions": [
+              -60.52896095810672,
+              6.489332761321798
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52896095810672,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 6.489332761321798,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_d1572dedc5d7e6f59bbc",
+          "role": "polyol",
+          "structure": "*OCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1000.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(ethylene adipate) diol"
+          ],
+          "source_component_ids": [
+            "CMP_1006b5200cd4578f5b7f"
+          ],
+          "source_material_ids": [
+            "MAT_48d551078635c835257b"
+          ]
+        },
+        {
+          "grade_id": "GRADE_0a8e18f21212e213291b",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCCCCCCCCCCO",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 300.527,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "1,19-nonadecanediol"
+          ],
+          "source_component_ids": [
+            "CMP_7f1bbdb6a91b84bc9703"
+          ],
+          "source_material_ids": [
+            "MAT_3acc38268bf471693ddf",
+            "MAT_48656b0f0395586e6d84"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_18.json",
+      "graph_sha256": "d059a0a4cafe2fdfe83972917f4fa5c3e3d2b37eea4e6b1668efea6c6f1362e1"
+    },
+    {
+      "slot": 414,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_f493ea7859d55aeff473",
+          "GRADE_3aafdd2d31379094a65c",
+          "GRADE_f74d8ec89c534732914c"
+        ],
+        "nco_oh_ratio": 0.8131738687449376,
+        "extender_oh_fraction": 0.2022827791662748
+      },
+      "score": [
+        0,
+        0.2829879331403641,
+        "2e59f858c70be993a22d12d7d446b13d6441d147d3286c1c05c93145c9f9b574"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          0.8131738687449376,
+          0.7977172208337252,
+          0.2022827791662748
+        ],
+        "mass_fractions": [
+          0.22883862792027312,
+          0.7219359219250614,
+          0.04922545015466549
+        ],
+        "nco_oh_ratio": 0.8131738687449376,
+        "extender_oh_fraction": 0.2022827791662748
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.053889754353726,
+          15.302934454226778
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.053889754353726,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 15.302934454226778,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "2e59f858c70be993a22d12d7d446b13d6441d147d3286c1c05c93145c9f9b574",
+          "prediction": {
+            "predictions": [
+              -56.233448575719706,
+              5.066050845801436
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.233448575719706,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 5.066050845801436,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "2e59f858c70be993a22d12d7d446b13d6441d147d3286c1c05c93145c9f9b574",
+          "prediction": {
+            "predictions": [
+              -60.52804938740926,
+              7.990990501471636
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52804938740926,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 7.990990501471636,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": false,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_f493ea7859d55aeff473",
+          "role": "diisocyanate",
+          "structure": "O=C=Nc1ccc(CCc2ccc(N=C=O)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-dibenzyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_9d794ab367348727580a"
+          ],
+          "source_material_ids": [
+            "MAT_218a4cd84877017c7b3f"
+          ]
+        },
+        {
+          "grade_id": "GRADE_3aafdd2d31379094a65c",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 849.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "hydroxyl poly(tetramethylene adipate), Mn 849"
+          ],
+          "source_component_ids": [
+            "CMP_eb64bd3779f6831c9a1a"
+          ],
+          "source_material_ids": [
+            "MAT_fc953c521579ba646811"
+          ]
+        },
+        {
+          "grade_id": "GRADE_f74d8ec89c534732914c",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCc1ccc(Cc2ccc(CO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 228.291,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "[methylenedi(4,1-phenylene)]dimethanol"
+          ],
+          "source_component_ids": [
+            "CMP_034c9ddead04e6077167"
+          ],
+          "source_material_ids": [
+            "MAT_004fdfef512787fe59dc",
+            "MAT_4afbe0979365a62186dd",
+            "MAT_e12d2ba8265982e22761"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_19.json",
+      "graph_sha256": "dfe0a718b480119912a48c34e241102d8ca8e70f5985af808fb56e743cfa7c9f"
+    },
+    {
+      "slot": 258,
+      "origin": "ratio_refinement",
+      "recipe": {
+        "grade_ids": [
+          "GRADE_3d595103cf57b16a4b4c",
+          "GRADE_2069b1e8a49691800ec4",
+          "GRADE_5724335acb38dfcbcf71"
+        ],
+        "nco_oh_ratio": 1.1111635953321897,
+        "extender_oh_fraction": 0.061939523199267175
+      },
+      "score": [
+        0,
+        0.2842824498313018,
+        "ae1d5a4fb3cd33436dc2cc2039805e2b46a6aeba79fb2823a8f28e5d68b9b638"
+      ],
+      "stoichiometry": {
+        "molecule_ratios": [
+          1.1111635953321897,
+          0.9380604768007328,
+          0.061939523199267175
+        ],
+        "mass_fractions": [
+          0.16921948594031,
+          0.8108306673300828,
+          0.01994984672960716
+        ],
+        "nco_oh_ratio": 1.1111635953321897,
+        "extender_oh_fraction": 0.061939523199267175
+      },
+      "legal": true,
+      "duplicate": false,
+      "scoring": {
+        "predictions": [
+          -55.27563988284616,
+          14.79499544311006
+        ],
+        "actual_task_calls": 2,
+        "model_forward_batches": 0,
+        "cache_hit": false,
+        "graph_constructions": 1
+      },
+      "constraints": [
+        {
+          "target": "tg",
+          "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+          "prediction": -55.27563988284616,
+          "unit": "degC",
+          "model_constraint_passed": true
+        },
+        {
+          "target": "tensile_strength_ultimate",
+          "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+          "prediction": 14.79499544311006,
+          "unit": "MPa",
+          "model_constraint_passed": true
+        }
+      ],
+      "independent_proxy_checks": [
+        {
+          "seed": 20261112,
+          "identity": "ae1d5a4fb3cd33436dc2cc2039805e2b46a6aeba79fb2823a8f28e5d68b9b638",
+          "prediction": {
+            "predictions": [
+              -56.266138444791125,
+              2.7978716866600513
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -56.266138444791125,
+              "unit": "degC",
+              "model_constraint_passed": true
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 2.7978716866600513,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        },
+        {
+          "seed": 20261113,
+          "identity": "ae1d5a4fb3cd33436dc2cc2039805e2b46a6aeba79fb2823a8f28e5d68b9b638",
+          "prediction": {
+            "predictions": [
+              -60.52906527954893,
+              5.901321160628011
+            ],
+            "actual_task_calls": 2,
+            "model_forward_batches": 0,
+            "cache_hit": false,
+            "graph_constructions": 1
+          },
+          "constraints": [
+            {
+              "target": "tg",
+              "protocol_id": "PROTOCOL_ddb68f4e9fcfb698d813a67525607c458b37b21f795231fd2ab448653d980f73",
+              "prediction": -60.52906527954893,
+              "unit": "degC",
+              "model_constraint_passed": false
+            },
+            {
+              "target": "tensile_strength_ultimate",
+              "protocol_id": "PROTOCOL_d09c124ad281ab23eb7b93338ebfe4e13f30fd371576e444049649de8cfd8293",
+              "prediction": 5.901321160628011,
+              "unit": "MPa",
+              "model_constraint_passed": false
+            }
+          ],
+          "all_constraints_passed": false
+        }
+      ],
+      "all_three_proxy_models_passed": false,
+      "experimentally_validated": false,
+      "property_success_probability": null,
+      "report_strata": {
+        "has_NONE": false,
+        "catalog_known": true,
+        "inverse_supervised_seen": true,
+        "forward_supervised_seen_by_target": {
+          "tensile_strength_ultimate": false,
+          "tg": false
+        },
+        "all_requested_forward_seen": false,
+        "R_extrapolated": false,
+        "v_extrapolated": false
+      },
+      "raw_material_specifications": [
+        {
+          "grade_id": "GRADE_3d595103cf57b16a4b4c",
+          "role": "diisocyanate",
+          "structure": "Cc1cc(-c2ccc(N=C=O)c(C)c2)ccc1N=C=O",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 264.28,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "3,3'-dimethyl-4,4'-biphenyl diisocyanate"
+          ],
+          "source_component_ids": [
+            "CMP_edc25b65ac0b6e95894e"
+          ],
+          "source_material_ids": [
+            "MAT_6dd3349f4375063225f0",
+            "MAT_7d7f3839b720f57a2870",
+            "MAT_a49d0da20ae39fb4d6b8",
+            "MAT_c442344cc2495b11bb66"
+          ]
+        },
+        {
+          "grade_id": "GRADE_2069b1e8a49691800ec4",
+          "role": "polyol",
+          "structure": "*OCCCCOC(=O)CCCCC(*)=O",
+          "structure_kind": "repeat_unit",
+          "molar_mass_g_mol": 1500.0,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "repeat_unit_family",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "poly(butylene adipate) diol, Mn 1500",
+            "poly(1,4-butylene adipate) diol, Mn 1500"
+          ],
+          "source_component_ids": [
+            "CMP_d353352920415a44ca4e",
+            "CMP_0de70448461f92406d65"
+          ],
+          "source_material_ids": [
+            "MAT_09a4b55e9eb701de8c13",
+            "MAT_927b366d9ae9ff3989bc"
+          ]
+        },
+        {
+          "grade_id": "GRADE_5724335acb38dfcbcf71",
+          "role": "hydroxyl_chain_extender",
+          "structure": "OCCCCCCCCCCSc1ccc(CCc2ccc(SCCCCCCCCCCO)cc2)cc1",
+          "structure_kind": "exact_smiles",
+          "molar_mass_g_mol": 558.938000000001,
+          "functionality": 2,
+          "stereo_status": "not_applicable",
+          "representation_level": "exact_structure",
+          "end_group_basis": "source_component_role_and_functionality",
+          "names": [
+            "4,4'-(ethane-1,2-diyl)bis(benzenethiodecanol)"
+          ],
+          "source_component_ids": [
+            "CMP_edff6c13d0cab8728405"
+          ],
+          "source_material_ids": [
+            "MAT_00ed73ac1e4bd85a0778",
+            "MAT_143cf96217686c1b6da5",
+            "MAT_15afb901734581b526f2",
+            "MAT_1f7e0cbd7770c8975e4f",
+            "MAT_2aed2b54814962e3e6e1",
+            "MAT_2ef21421582005761dea",
+            "MAT_379d2a0123deed1e2f7c",
+            "MAT_5187b8ae136141120eb2",
+            "MAT_590b588a777ead54a645",
+            "MAT_66ef97e3780cb08ac65a",
+            "MAT_8003f9e433a2c1209343",
+            "MAT_91bbbc58bb9ec94ae0e5",
+            "MAT_96f15d5a101a1e56b5ef",
+            "MAT_9e65ce284e01576e7051",
+            "MAT_a36df2f5d8ec056bc7f2",
+            "MAT_b9825ff290e78fe8b673",
+            "MAT_bbb2672b0d28b14aee88",
+            "MAT_bf9aa41bc497472b9dd0",
+            "MAT_d7a117e500e32b98f225",
+            "MAT_dce0459c573903d5266a",
+            "MAT_e423a2c20248011f84ab",
+            "MAT_e9cc0fc502f69f18b883",
+            "MAT_ede95c0515fac10fd38d"
+          ]
+        }
+      ],
+      "synthesis_basis": {
+        "status": "SUGGESTED_ANALOGUE_ONLY",
+        "source_material_id": "MAT_004fdfef512787fe59dc",
+        "source_id": "SRC_c6a36ab53f5659794237",
+        "evidence_id": "EVI_ccc309538192b8ddd2d0",
+        "locator": "PDF page 2; Polymer synthesis",
+        "source_route": "one-step HMDI/soft-segment-diol/DMD melt polyaddition catalyzed by DBTDL",
+        "quoted_source_evidence": "For every TPU, HMDI is 0.0105 mol and DMD plus oligomer diol total 0.01 mol, giving NCO/OH=1.05. All reactants were heated at 90 °C until melted, DBTDL was added, temperature was gradually raised to 140 °C, and the reaction was maintained for 2 h.",
+        "source_recipe": {
+          "grade_ids": [
+            "GRADE_aef2855ee870f37a09d0",
+            "GRADE_fd5831042f2c17ec3b3f",
+            "GRADE_f74d8ec89c534732914c"
+          ],
+          "nco_oh_ratio": 1.0499999999999998,
+          "extender_oh_fraction": 0.7699999999999992
+        },
+        "matches_source_recipe": false,
+        "temperature_c": null,
+        "time_h": null,
+        "solvent": null,
+        "catalyst": null,
+        "reason": "来源工艺作为类似反应依据，不能据此断言新组合已合成或已验证",
+        "experimental_validation_of_new_recipe": false
+      },
+      "graph_path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_010_final_bundle/recompute/units/combination_ratio_search_20261111_FINAL_034/graphs/candidate_20.json",
+      "graph_sha256": "1e49e030f48654eba57b883150e00691cb13dd14fd856e4f495fd25d9d2571a5"
+    }
+  ],
+  "qualified_candidate_indices": [],
+  "accounting": {
+    "proposal_slots": 512,
+    "proposal_limit": 512,
+    "logical_search_vectors": 512,
+    "actual_search_task_calls": 1020,
+    "independent_recheck_vectors": 40,
+    "legal_proposals": 512,
+    "illegal_proposals": 0,
+    "duplicate_proposals": 2,
+    "failed_proposals": 0,
+    "graph_constructions": 510,
+    "cache_hits": 2,
+    "model_forward_batches": 64,
+    "R_strata": [
+      0.72997743529365,
+      0.7389542464215201,
+      0.7669036012753023,
+      0.7833740310689086,
+      0.8000412475989002,
+      0.8074770368342614,
+      0.845205172790592,
+      0.8553401625383628,
+      0.8717014970275246,
+      0.8963815528576541,
+      0.9189409259429028,
+      0.9367925981587825,
+      0.9772136581961168,
+      1.0,
+      1.0002925631502884,
+      1.0307070218396845,
+      1.0530958974160514,
+      1.0609218499165374,
+      1.1084648903466983,
+      1.1402976372136158,
+      1.1538458162339784,
+      1.1866816136080423,
+      1.2126683194862984,
+      1.2553578987631413,
+      1.271370253460947,
+      1.292823974986709,
+      1.3447718879032673,
+      1.37046299295363,
+      1.39763446722645,
+      1.4556131172222275,
+      1.492562492346157,
+      1.4999999999999998
+    ],
+    "wall_seconds": 0.0,
+    "actual_recheck_task_calls": 80,
+    "actual_recheck_forward_batches": 8,
+    "recheck_cache_hits": 0
+  },
+  "elapsed_seconds_this_invocation": 0.4951628769049421,
+  "model_identity": {
+    "code_sha": "94f8f785d5c3bfb4197903d5588e7a5490d3e80d",
+    "contract_sha256": "e0d18e2181c800ec077a5c58800e66fefb67d99609bcf83a844eb204a2c292ef",
+    "data_lock_sha256": "d6ea2d43d60ba12784e91f03d37515210e300b0144597fa12d0412162b06f52d",
+    "authorization_review_sha256": "00d1a0d4fd8c3e8db50a414328f7a5c5d4b2653817cd9f66e37661a4ce60aa15",
+    "seed": 20261111,
+    "execution_settings_sha256": "b5df6f512fc6bf882b67783a18e213e6edb5eea20d49870c3ee242e566b393a3",
+    "preprocessing_receipt_sha256": "efc85171ce01657bba50e4d362a52707666e6b0197eb462d0876bffb13d88dfd"
+  },
+  "source_pool_sha256": null
+}

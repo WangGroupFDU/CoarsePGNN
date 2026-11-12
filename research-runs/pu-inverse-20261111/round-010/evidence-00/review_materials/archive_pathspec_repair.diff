@@ -1,0 +1,14 @@
+--- loopctl.py.before
++++ loopctl.py.after
+@@ -438,7 +438,10 @@
+     for item in manifest["files"]:
+         if item["storage"] == "github":
+             require(hashes(project / item["path"])["sha256"] == item["sha256"], "证据文件已改变")
+-    git(project, "add", "--", *paths, timeout=1800)
++    # 大量小证据的路径总长会超过系统 ARG_MAX；NUL 清单保留逐文件边界及原归档范围。
++    pathspec = root / "evidence-pathspec.nul"
++    pathspec.write_bytes(b"\0".join(path.encode("utf-8") for path in paths) + b"\0")
++    git(project, "add", "--pathspec-from-file", str(pathspec), "--pathspec-file-nul", timeout=1800)
+     git(project, "commit", "-m", f"research: {state['run_id']} round {state['round']} evidence", timeout=1800)
+     state["artifact_sha"] = git(project, "rev-parse", "HEAD")
+     if "progress" in manifest:
