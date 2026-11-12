@@ -1,0 +1,22 @@
+{
+  "local_utc": "2026-11-12T08:54:21.007231+00:00",
+  "remote": {
+    "alias": "codex-cn2",
+    "command": "cd /home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository && /opt/anaconda2023/bin/python -c 'import json,subprocess,platform,shutil,os\nfrom pathlib import Path\nimport torch,numpy,torch_geometric,rdkit\nout={'\"'\"'host'\"'\"':platform.node(),'\"'\"'python'\"'\"':platform.python_version(),'\"'\"'torch'\"'\"':str(torch.__version__),'\"'\"'pyg'\"'\"':torch_geometric.__version__,'\"'\"'rdkit'\"'\"':rdkit.__version__,'\"'\"'numpy'\"'\"':numpy.__version__,'\"'\"'cpu_count'\"'\"':os.cpu_count(),'\"'\"'disk_free'\"'\"':shutil.disk_usage('\"'\"'/home/jifengwang/data'\"'\"').free}\nfor k,args in {'\"'\"'gpu'\"'\"':['\"'\"'nvidia-smi'\"'\"','\"'\"'--query-gpu=name,memory.total,memory.used,utilization.gpu'\"'\"','\"'\"'--format=csv,noheader'\"'\"'],'\"'\"'processes'\"'\"':['\"'\"'nvidia-smi'\"'\"','\"'\"'--query-compute-apps=pid,process_name,used_memory'\"'\"','\"'\"'--format=csv,noheader'\"'\"'],'\"'\"'memory'\"'\"':['\"'\"'free'\"'\"','\"'\"'-h'\"'\"'],'\"'\"'head'\"'\"':['\"'\"'git'\"'\"','\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"'],'\"'\"'worktree'\"'\"':['\"'\"'git'\"'\"','\"'\"'status'\"'\"','\"'\"'--short'\"'\"']}.items():out[k]=subprocess.check_output(args,text=True).strip()\nout['\"'\"'output_exists'\"'\"']=Path('\"'\"'/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_008_integrated'\"'\"').exists()\nprint(json.dumps(out))'",
+    "exit_code": 0,
+    "stdout": "{\"host\": \"cn2\", \"python\": \"3.11.8\", \"torch\": \"2.5.1+cu121\", \"pyg\": \"2.6.1\", \"rdkit\": \"2025.03.2\", \"numpy\": \"2.1.3\", \"cpu_count\": 384, \"disk_free\": 20886368288768, \"gpu\": \"NVIDIA GeForce RTX 4090, 24564 MiB, 4 MiB, 0 %\", \"processes\": \"\", \"memory\": \"total        used        free      shared  buff/cache   available\\nMem:          755Gi        10Gi       702Gi        59Mi        42Gi       741Gi\\nSwap:         4.0Gi          0B       4.0Gi\", \"head\": \"0b52b3d3a04f5b47b572dbc0918f38836002f12c\", \"worktree\": \"\", \"output_exists\": false}\n",
+    "stderr": "",
+    "output": {
+      "stdout": {
+        "truncated": false,
+        "total_bytes": 534,
+        "total_lines": 1
+      },
+      "stderr": {
+        "truncated": false,
+        "total_bytes": 0,
+        "total_lines": 0
+      }
+    }
+  }
+}
