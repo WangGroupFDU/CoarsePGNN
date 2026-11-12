@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import math
 import random
+import json
+import time
 from collections import Counter
 from pathlib import Path
 from typing import Callable
@@ -61,13 +63,15 @@ def replace_checkpoint(path: Path, payload: dict) -> None:
 
 def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output: Path,
                     identity: dict, losses: Callable, *, resume: bool = False,
-                    stop_after_epoch: int | None = None) -> dict:
+                    stop_after_epoch: int | None = None,
+                    validation_losses: Callable | None = None) -> dict:
     """按材料等权拟合一个监督阶段，并在验证集上早停、保存完整续跑状态。
 
     loaders严格只有train/validation，Dataset.rows含material_id；losses(model,batch)
     返回与batch['audit']同序的逐观察损失向量，负责模型对应的设备移动和前向。
     identity绑定合同、数据、源码及阶段。config含lr/epochs/patience等固定超参数。
-    stop_after_epoch仅用于预先声明的中断恢复验证，不改变调度器总训练步数。
+    validation_losses可指定原物理单位逐观察误差，供前向模型按合同选择checkpoint。
+    stop_after_epoch仅用于预先声明的中断恢复验证；不改变AdamW固定学习率。
     续跑核验相同身份、配置与完成标记；非法权重、loss或梯度立即失败。
     返回每epoch记录及最佳checkpoint路径；不读取测试，不把拟合完成当作科学通过。
     """
@@ -93,16 +97,6 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
         raise ValueError("拟合模型没有可训练参数")
     optimizer = torch.optim.AdamW(parameters, lr=config["learning_rate"],
                                  weight_decay=config["weight_decay"])
-    total_steps = config["max_epochs"] * len(loaders["train"])
-    warmup = max(1, int(total_steps * config.get("warmup_fraction", 0.0)))
-
-    def multiplier(step: int) -> float:
-        """按冻结总步数执行warmup及余弦衰减；续跑不重置进度。"""
-        if step < warmup:
-            return (step + 1) / warmup
-        return 0.5 * (1 + math.cos(math.pi * min(1.0, (step - warmup) / max(1, total_steps - warmup))))
-
-    scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, multiplier)
     counts = {s: Counter(r["material_id"] for r in loader.dataset.rows) for s, loader in loaders.items()}
     history, first_epoch, best, stale = [], 1, math.inf, 0
     generator = loaders["train"].generator
@@ -112,7 +106,6 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
             raise ValueError("续跑合同、数据、源码或配置与checkpoint不一致")
         model.load_state_dict(checkpoint["model"], strict=True)
         optimizer.load_state_dict(checkpoint["optimizer"])
-        scheduler.load_state_dict(checkpoint["scheduler"])
         history, best, stale = checkpoint["history"], checkpoint["best"], checkpoint["stale"]
         first_epoch = checkpoint["epoch"] + 1
         restore_random_state(checkpoint["random"], generator)
@@ -120,8 +113,9 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
         write_json(output / "configuration.json", {"identity": identity, "config": config,
                                                     "identity_sha256": identity_sha})
     for epoch in range(first_epoch, config["max_epochs"] + 1):
-        if stale >= config["patience"]:
+        if stale >= config["patience"] and not config.get("fixed_update_epochs",False):
             break
+        started = time.monotonic()
         record = {"epoch": epoch}
         for split in ("train", "validation"):
             training = split == "train"
@@ -132,7 +126,8 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
                 if training:
                     optimizer.zero_grad(set_to_none=True)
                 with torch.set_grad_enabled(training):
-                    per_observation = losses(model, batch)
+                    objective = losses if training or validation_losses is None else validation_losses
+                    per_observation = objective(model, batch)
                     if per_observation.shape != (len(batch["audit"]),) or not torch.isfinite(per_observation).all():
                         raise FloatingPointError(f"{split}逐观察损失形状或有限性错误")
                     weights = per_observation.new_tensor([1.0 / counts[split][r["material_id"]] for r in batch["audit"]])
@@ -145,7 +140,6 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
                         if not torch.isfinite(norm):
                             raise FloatingPointError("梯度范数不是有限数")
                         optimizer.step()
-                        scheduler.step()
                 numerator += float((per_observation.detach() * weights).sum())
                 seen_observations += len(weights)
             if seen_observations != len(loaders[split].dataset):
@@ -157,15 +151,19 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
         else:
             stale += 1
         record["learning_rate"] = optimizer.param_groups[0]["lr"]
+        record["optimizer_updates"] = epoch * len(loaders["train"])
+        record["elapsed_seconds"] = time.monotonic()-started
+        record["cuda_peak_allocated_bytes"] = torch.cuda.max_memory_allocated() if torch.cuda.is_available() else 0
         history.append(record)
         payload = {"identity": identity, "identity_sha256": identity_sha, "config": config,
                    "epoch": epoch, "model": model.state_dict(), "optimizer": optimizer.state_dict(),
-                   "scheduler": scheduler.state_dict(), "random": random_state(generator),
+                   "random": random_state(generator),
                    "history": history, "best": best, "stale": stale}
         replace_checkpoint(output / "last.pt", payload)
         if improved:
             replace_checkpoint(output / "best.pt", {"identity": identity, "identity_sha256": identity_sha,
                                "config": config, "epoch": epoch, "model": model.state_dict(), "validation": best})
+        print(json.dumps({"stage":str(output),**record},ensure_ascii=False),flush=True)
         if stop_after_epoch is not None and epoch >= stop_after_epoch:
             return {"status": "INTERRUPTED_AT_DECLARED_EPOCH", "history": history, "last": str(output / "last.pt")}
     result = {"status": "FIT_COMPLETED_NOT_SCIENTIFIC_ACCEPTANCE", "history": history,

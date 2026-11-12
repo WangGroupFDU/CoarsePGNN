@@ -2,7 +2,7 @@
 import copy
 import pytest
 
-from coarsepgnn_inverse.adjudication import grade_decisions, identify_thermal_protocols, uncertainty_review
+from coarsepgnn_inverse.adjudication import grade_decisions, identify_thermal_protocols, uncertainty_review, endpoint_decision
 
 
 @pytest.mark.parametrize('structure,sites,mass,counts', [
@@ -54,12 +54,46 @@ def test_phase_peak_condition_and_history_distinguish_thermal_events():
     assert all(r['decision']=='UNIQUE_ENDPOINT' for r in review)
     assert [r['peak_identity'] for r in rows]==['source_peak_1','source_peak_2','source_peak_1']
     assert len({r['condition_input_sha256'] for r in rows})==3
+    for value in ('1','170','-40.5'):
+        repeated={**base,'observation_id':'different_value','original_value_raw':value,
+                  'source_transition_assignment':'hard_peak_1'}
+        identify_thermal_protocols([repeated])
+        assert repeated['peak_identity']=='source_peak_1'
+        assert repeated['scan_identity']==rows[0]['scan_identity']
+        assert repeated['condition_input_sha256']==rows[0]['condition_input_sha256']
     unknown=[{**base,'observation_id':str(i),'definition_raw':'peak 1/2'} for i in range(2)]
     assert all(r['decision'].startswith('QUARANTINE') for r in identify_thermal_protocols(unknown))
     assert all(r['peak_identity']=='not_resolved' for r in unknown)
     separate=[{**base,'observation_id':'h1','thermal_history_stage':'annealed'},
               {**base,'observation_id':'h2','thermal_history_stage':'as-cast'}]
     assert all(r['decision']=='UNIQUE_ENDPOINT' for r in identify_thermal_protocols(separate))
+
+
+@pytest.mark.parametrize('definition,value,assignment,expected',[
+    ('first','heating','hard_peak_1','not_resolved'),
+    ('first heating','170','hard_peak_1','first_heating'),
+    ('second heating','170','hard_peak_1','second_heating'),
+    ('first and second heating','170','hard_peak_1','not_resolved'),
+])
+def test_scan_markers_do_not_cross_source_fields(definition,value,assignment,expected):
+    """扫描语义必须在单个来源字段内成立，跨字段不制造first heating。"""
+    row={'target':'tm','material_id':'m','campaign_id':'c','split':'train','observation_id':'o',
+         'transition_criterion':'dsc_peak','transition_scope':'hard_segment','condition_raw':'10 C/min',
+         'condition_normalized_json':'{}','property_task':'tm:DSC:dsc_peak','thermal_history_stage':'same',
+         'definition_raw':definition,'original_value_raw':value,'source_transition_assignment':assignment}
+    identify_thermal_protocols([row])
+    assert row['scan_identity']==expected
+
+
+def test_ontology_mapping_requires_record_linked_source_endpoint():
+    """ontology解释句和普通强度不是UTS证据，逐记录原始性质栏可提供正定义。"""
+    row={'target':'tensile_strength_ultimate','property_type':'tensile_strength_ultimate',
+         'definition_raw':'Direct source tensile-strength value; ultimate/break distinction follows the selected ontology label.',
+         'label_origin':'source_measurement'}
+    evidence={'verified':1,'locator_text':'Example I property block','text_raw':'Tensile strength'}
+    assert endpoint_decision(row,{}, {'verified':1},evidence)==('UNRESOLVED','ONTOLOGY_LABEL_IS_NOT_SOURCE_ENDPOINT_EVIDENCE')
+    row['source_endpoint_clarification']={'source_property_row':'Ultimate tensile strength 6,100 psi'}
+    assert endpoint_decision(row,{}, {'verified':1},evidence)[0]=='APPROVED_PRIMARY'
 
 
 @pytest.mark.parametrize('raw,expected',[

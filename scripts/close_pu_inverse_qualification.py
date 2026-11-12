@@ -1,4 +1,4 @@
-"""R3单次受限收尾入口：只执行已授权的资格修复，不进行拟合。"""
+"""单次受限收尾入口：只执行原会话明确授权的资格修复，不进行拟合。"""
 from __future__ import annotations
 
 import argparse

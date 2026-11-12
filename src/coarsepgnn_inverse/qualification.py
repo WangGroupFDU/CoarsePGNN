@@ -191,13 +191,21 @@ def close_qualification(config: dict, directory: Path) -> dict:
     new_u=read_csv(directory/'reported_uncertainty_review.csv')
     u_changes=[{'observation_id':r['observation_id'],'old_type':old_u.get(r['observation_id'],{}).get('type_adjudicated'),**r}
                for r in new_u if r['type_adjudicated']!=old_u.get(r['observation_id'],{}).get('type_adjudicated')]
-    unknown=[r for r in new_u if r['reported_type_raw']=='source ± value; SD/SE/range not stated']
-    standard=[r for r in new_u if r['reported_type_raw']=='standard_deviation']
-    if len(unknown)!=9 or any(r['type_adjudicated']!='unspecified_plus_minus' or r['usable_as_reported_uncertainty']!='False' for r in unknown):
+    unknown_ids={oid for oid,r in old_u.items() if r['reported_type_raw']=='source ± value; SD/SE/range not stated'}
+    standard_ids={oid for oid,r in old_u.items() if r['reported_type_raw']=='standard_deviation'}
+    new_index={r['observation_id']:r for r in new_u}
+    if len(unknown_ids)!=9 or len(standard_ids)!=2 or not (unknown_ids|standard_ids)<=set(new_index):
+        raise AssertionError('原R2不确定性11条历史对照身份不闭合')
+    unknown=[new_index[oid] for oid in sorted(unknown_ids)]
+    standard=[new_index[oid] for oid in sorted(standard_ids)]
+    if any(r['type_adjudicated']!='unspecified_plus_minus' or r['usable_as_reported_uncertainty']!='False' for r in unknown):
         raise AssertionError('原9条未知±未全部保持类型未知')
-    if len(standard)!=2 or any(r['type_adjudicated']!='SD' for r in standard):
+    if any(r['type_adjudicated']!='SD' for r in standard):
         raise AssertionError('原2条standard_deviation未正确正规化')
-    write_json(directory/'uncertainty_corrections.json',{'unknown_plus_minus_count':len(unknown),'standard_deviation_count':len(standard),'changes':u_changes})
+    write_json(directory/'uncertainty_corrections.json',{'historical_unknown_plus_minus_ids':sorted(unknown_ids),
+        'historical_standard_deviation_ids':sorted(standard_ids),'unknown_plus_minus_count':len(unknown),
+        'standard_deviation_count':len(standard),'new_observations':[r for r in new_u if r['observation_id'] not in old_u],
+        'changes':u_changes})
     training=read_json(directory/'train_labels.json')
     contract=read_json(Path(config['success_contract']))
     registry,requests,issues=fixed_query_panel(training,contract)
@@ -221,7 +229,7 @@ def close_qualification(config: dict, directory: Path) -> dict:
     write_json(directory/'grade_feature_whitelist.json',whitelist)
     shard_summary={name:shard_evidence(source,directory/name) for name,source in
                    [('round002_training_evidence_shards',previous/'training_evidence.json'),
-                    ('round003_training_evidence_shards',directory/'training_evidence.json')]}
+                    ('current_training_evidence_shards',directory/'training_evidence.json')]}
     write_json(directory/'evidence_sharding_receipt.json',shard_summary)
     reuse=[]
     for item in config['reuse_evidence']:
@@ -238,7 +246,8 @@ def close_qualification(config: dict, directory: Path) -> dict:
     bound_names=['measurement_adjudication.csv','approved_catalog.json','approved_formulations.json','grade_identity_review.csv',
                  'joint_state_review.csv','joint_state_edges.csv','training_measurement_precision.json','grade_visibility.json',
                  'evaluation_denominators.json','split_labels_manifest.json','protocol_registry.json','fixed_96_requests.json',
-                 'grade_feature_whitelist.json','evidence_sharding_receipt.json','unchanged_evidence_reuse.json']
+                 'grade_feature_whitelist.json','evidence_sharding_receipt.json','unchanged_evidence_reuse.json',
+                 'source_endpoint_clarifications.json']
     code_sha=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
     original={r['observation_id']:r for r in read_json(Path(config['preflight'])/'observations.json')}
     qualified=[]

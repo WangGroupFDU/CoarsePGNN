@@ -12,7 +12,7 @@ from .schema import validate_request
 
 
 def main() -> None:
-    """运行已实现的准备步骤；训练和评估需在 Pro 验收合同冻结后接续实现。"""
+    """运行准备步骤或已获Pro授权的真实训练；训练入口再次核验冻结合同。"""
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     command = sub.add_parser("audit", help="核验来源、完整图张量和无泄漏划分")
@@ -23,6 +23,9 @@ def main() -> None:
     command = sub.add_parser("stoichiometry", help="将双官能 PU 的 R/v 换算为投料比")
     command.add_argument("--input", required=True, type=Path)
     command.add_argument("--output", required=True, type=Path)
+    command = sub.add_parser("train", help="依据冻结合同及授权，在远程训练四任务与逆模型")
+    command.add_argument("--config", required=True, type=Path)
+    command.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     if args.command == "audit":
         result = audit(read_json(args.config), args.output)
@@ -30,6 +33,9 @@ def main() -> None:
         request = validate_request(read_json(args.input))
         result = {"status": "valid_request", "constraints": len(request["constraints"]),
                   "predictions_computed": False}
+    elif args.command == "train":
+        from .training import train
+        result = train(read_json(args.config), args.output)
     else:
         result = decode_ratios(**read_json(args.input))
         write_json(args.output, result)

@@ -22,7 +22,7 @@ TG_CRITERIA = {"tg_dsc_onset": "dsc_onset", "tg_dsc_midpoint": "dsc_midpoint",
                "tg_dma_loss_peak": "dma_loss_modulus_peak",
                "tg_dma_storage_onset": "dma_storage_modulus_drop"}
 SPLITS = ("train", "validation", "test")
-RULE_VERSION = "pu_endpoint_adjudication_v3_20261112"
+RULE_VERSION = "pu_endpoint_adjudication_v4_20261112"
 
 
 def assign_atomic_semantics(row: dict, measurement: dict, campaign: dict, specimen: dict, evidence: dict) -> None:
@@ -78,8 +78,10 @@ def identify_thermal_protocols(rows: list[dict]) -> list[dict]:
     for row in rows:
         if row["target"] not in {"tg", "tm"} or row.get("aggregation_member_count"):
             continue
-        text = (str(row.get("definition_raw") or "") + " " + str(row.get("original_value_raw") or "")
-                + " " + str(row.get("source_transition_assignment") or "").replace("_", " ")).lower()
+        # 明确保留字段边界，避免定义末尾peak与下一字段数值拼出虚假peak编号。
+        text = " | ".join((str(row.get("definition_raw") or ""),
+                           str(row.get("original_value_raw") or ""),
+                           str(row.get("source_transition_assignment") or "").replace("_", " "))).lower()
         scans = set()
         ordinal_names = (("first", "1", "1st"), ("second", "2", "2nd"), ("third", "3", "3rd"))
         for ordinal, number, abbreviation in ordinal_names:
@@ -275,6 +277,13 @@ def endpoint_decision(row: dict, measurement: dict, campaign: dict, evidence: di
     elif kind == "tensile_strength_ultimate":
         if row["property_type"] != "tensile_strength_ultimate":
             return "UNRESOLVED", "STRENGTH_SOURCE_ENDPOINT_NOT_ULTIMATE"
+        clarification = row.get('source_endpoint_clarification')
+        if clarification:
+            # 仅使用已经逐记录核验来源、页码、样品与原数值的直接性质栏。
+            # 保留definition_raw，不把派生修正写回冻结数据库或改动条件特征。
+            definition = clarification['source_property_row'].lower()
+        elif re.search(r'selected ontology label|ontology (?:mapping|label)',definition):
+            return 'UNRESOLVED','ONTOLOGY_LABEL_IS_NOT_SOURCE_ENDPOINT_EVIDENCE'
         # 否定定义优先于关键词。注意“not stress at break”是有效正定义的对照，
         # 不应因出现not一词就否定已明确的maximum engineering stress。
         negative_definition = (r"without.*(ultimate|criterion)|"
@@ -294,6 +303,39 @@ def endpoint_decision(row: dict, measurement: dict, campaign: dict, evidence: di
     if row["label_origin"] == "figure_digitized":
         return "APPROVED_AUXILIARY", "DIGITIZED_VALUE_KEPT_SEPARATE"
     return "APPROVED_PRIMARY", "EXPLICIT_ENDPOINT_WITH_VERIFIED_SOURCE"
+
+
+def apply_endpoint_clarifications(rows: list[dict], config: dict) -> list[dict]:
+    """绑定定点原文裁定到对应观察，校验来源、材料、样品、单位和原数值。
+
+    只接受已在本轮输入清单登记的JSON与原PDF；原始定义和标签保持不变。
+    返回可归档回执，任一身份或物理值关联不符即停止，不能泛化到整篇来源。
+    """
+    path=Path(config['source_endpoint_clarifications']);proof=read_json(path)
+    if sha256(Path(proof['source_pdf_path']))!=proof['source_pdf_sha256']:
+        raise ValueError('端点澄清原PDF散列不一致')
+    indexed={r['observation_id']:r for r in rows};result=[]
+    for item in proof['records']:
+        row=indexed[item['observation_id']]
+        for key in ('measurement_id','material_id','source_id','split','group_id'):
+            if row[key]!=item[key]:
+                raise ValueError(f'端点澄清身份不一致: {key}')
+        if row['specimen']['specimen_id']!=item['specimen_id'] or row['specimen']['specimen_label']!=item['specimen_label']:
+            raise ValueError('端点澄清样品关联不一致')
+        if row['target']!='tensile_strength_ultimate' or row['unit']!='MPa':
+            raise ValueError('端点澄清不能更改目标或单位')
+        if row['definition_raw']!=item['original_definition'] or abs(float(row['value'])-item['existing_value_MPa'])>1e-10:
+            raise ValueError('端点澄清对应原定义或数值变化')
+        # 只核验已有psi→MPa对应关系，不重写数据库浮点标签。
+        if abs(item['source_value_psi']*0.006894757293168-item['existing_value_MPa'])>1e-8:
+            raise ValueError('原文psi与已有MPa值不对应')
+        if item['physical_pdf_page']!=4 or not re.search(r'Ultimate tensile strength\s+[0-9,]+\s+psi',item['source_property_row']):
+            raise ValueError('缺少对应性质栏原文')
+        row['source_endpoint_clarification']={**item,'source_pdf_sha256':proof['source_pdf_sha256'],
+                                             'clarification_file_sha256':sha256(path)}
+        result.append({**row['source_endpoint_clarification'],'decision':'SOURCE_ENDPOINT_CONFIRMED',
+                       'raw_definition_preserved':True,'numeric_label_unchanged':True})
+    return result
 
 
 def hydroxyl_types(mol) -> dict[str, int]:
@@ -563,6 +605,7 @@ def run(config: dict, output: Path) -> dict:
         source = old if row.get("restored_from_mean") else current
         measurement,campaign,specimen = context(row,source)
         assign_atomic_semantics(row,measurement,campaign,specimen,source["evidence"].get(measurement["evidence_id"],{}))
+    endpoint_clarifications = apply_endpoint_clarifications(expanded,config)
     thermal_review = identify_thermal_protocols(expanded)
     atom_by_id = {r["observation_id"]:r for r in expanded}
     for link in lineage:
@@ -595,7 +638,8 @@ def run(config: dict, output: Path) -> dict:
                   "unit": row["unit"], "heldout_value_sealed": row["split"] != "train"}
         record.update(rule_version=RULE_VERSION,source_transition_assignment=row.get("source_transition_assignment"),
                       previous_decision=previous.get(row["observation_id"],{}).get("decision"),
-                      positive_endpoint_evidence=row["definition_raw"],
+                      positive_endpoint_evidence=row.get('source_endpoint_clarification',{}).get('source_property_row',row["definition_raw"]),
+                      endpoint_clarification_json=canonical(row.get('source_endpoint_clarification')),
                       condition_input_sha256=row["condition_input_sha256"],
                       scan_identity=row.get("scan_identity"),peak_identity=row.get("peak_identity"))
         adjudicated.append(record)
@@ -673,6 +717,7 @@ def run(config: dict, output: Path) -> dict:
                             "forward_unseen_grade_materials":len({r["material_id"] for r in part if not r["forward_supervised_seen"]}),
                             "qualified_joint_states":len({r["state_id"] for r in part if r["joint_state_evidence_qualified"]})})
     output.mkdir(parents=True)
+    write_json(output/'source_endpoint_clarifications.json',endpoint_clarifications)
     write_csv(output/"measurement_adjudication.csv", adjudicated, list(adjudicated[0]))
     write_csv(output/"thermal_identity_review.csv", thermal_review, list(thermal_review[0]))
     write_csv(output/"tg_mean_membership.csv", lineage, list(lineage[0]))

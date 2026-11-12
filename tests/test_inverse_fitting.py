@@ -47,7 +47,7 @@ def objects():
 def test_epoch_boundary_resume_matches_continuous_training(tmp_path):
     """一次中断并重建进程对象后，损失轨迹、优化器及权重应与连续运行完全一致。"""
     config = {"max_epochs": 3, "patience": 3, "learning_rate": 0.01,
-              "weight_decay": 0.0001, "gradient_clip": 5.0, "warmup_fraction": 0.05}
+              "weight_decay": 0.0001, "gradient_clip": 5.0}
     identity = {"dataset": "SYNTHETIC_ENGINEERING_ONLY", "seed": 17}
     full, full_loaders = objects()
     expected = fit_development(full, full_loaders, config, tmp_path / "full", identity, squared_loss)
@@ -58,7 +58,8 @@ def test_epoch_boundary_resume_matches_continuous_training(tmp_path):
     resumed, resumed_loaders = objects()
     actual = fit_development(resumed, resumed_loaders, config, tmp_path / "resumed", identity,
                              squared_loss, resume=True)
-    assert actual["history"] == expected["history"]
+    fields=('epoch','train','validation','learning_rate','optimizer_updates')
+    assert [{k:r[k] for k in fields} for r in actual['history']]==[{k:r[k] for k in fields} for r in expected['history']]
     for key, tensor in full.state_dict().items():
         torch.testing.assert_close(tensor, resumed.state_dict()[key], rtol=0, atol=0)
     assert actual["material_counts"] == {"train": 4, "validation": 4}

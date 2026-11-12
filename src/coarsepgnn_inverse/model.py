@@ -16,7 +16,8 @@ class InverseDesigner(nn.Module):
         """配置原料特征 [N,F]、角色资格 [3,N] 和 E=NONE 索引。
 
         资格来自训练库与化学审核；NONE 只允许在 E 步。原料特征是固定输入，
-        投影和选择头参与训练；条件的 48 维 Test Encoder 在本模块之外冻结。
+        投影和选择头参与训练；条件的48维Test Encoder由外部封装联合训练，
+        其中通用文本骨干固定，新数值集合头接受监督梯度。
         """
         super().__init__()
         if grade_features.ndim != 2 or not torch.isfinite(grade_features).all():
