@@ -1,0 +1,24 @@
+{
+  "local_utc": "2026-11-12T08:55:43.983229+00:00",
+  "code_sha": "1745621bffb1e7f721d706c7e5d3b6efcc454c51",
+  "bundle_sha256": "4218321a91bc21acdb6cfbde6969e102a7427bfd93b4722ca0728cefcf2d3a09",
+  "remote": {
+    "alias": "codex-cn2",
+    "command": "cd /home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository && /opt/anaconda2023/bin/python -c 'import subprocess,hashlib,json,sys\nfrom pathlib import Path\nbase=Path(sys.argv[1]);expected=sys.argv[2];bundle_sha=sys.argv[3]\nassert hashlib.sha256((base/'\"'\"'round008_source.bundle'\"'\"').read_bytes()).hexdigest()==bundle_sha\nassert not subprocess.check_output(['\"'\"'git'\"'\"','\"'\"'status'\"'\"','\"'\"'--short'\"'\"'],text=True).strip()\nsubprocess.run(['\"'\"'git'\"'\"','\"'\"'fetch'\"'\"',str(base/'\"'\"'round008_source.bundle'\"'\"'),'\"'\"'HEAD'\"'\"'],check=True)\nsubprocess.run(['\"'\"'git'\"'\"','\"'\"'merge'\"'\"','\"'\"'--ff-only'\"'\"','\"'\"'FETCH_HEAD'\"'\"'],check=True,stdout=subprocess.DEVNULL)\nassert subprocess.check_output(['\"'\"'git'\"'\"','\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"'],text=True).strip()==expected\nassert not subprocess.check_output(['\"'\"'git'\"'\"','\"'\"'status'\"'\"','\"'\"'--short'\"'\"'],text=True).strip()\nprint(json.dumps({'\"'\"'head'\"'\"':expected,'\"'\"'clean'\"'\"':True,'\"'\"'authorization_sha256'\"'\"':hashlib.sha256((base/'\"'\"'round008_authorization.json'\"'\"').read_bytes()).hexdigest(),'\"'\"'review_sha256'\"'\"':hashlib.sha256((base/'\"'\"'round008_review_raw.txt'\"'\"').read_bytes()).hexdigest()}))\n' /home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111 1745621bffb1e7f721d706c7e5d3b6efcc454c51 4218321a91bc21acdb6cfbde6969e102a7427bfd93b4722ca0728cefcf2d3a09",
+    "exit_code": 0,
+    "stdout": "{\"head\": \"1745621bffb1e7f721d706c7e5d3b6efcc454c51\", \"clean\": true, \"authorization_sha256\": \"2563ee4ee0bad0ec6dddfa365e25846ccd08ad2629554db39694bbb2d254c10c\", \"review_sha256\": \"dc8a5c4a55f82ec1220e63ecb772b8a541912145e6c9cf355cde865a5771517a\"}\n",
+    "stderr": "From /home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round008_source.bundle\n * branch            HEAD       -> FETCH_HEAD\n",
+    "output": {
+      "stdout": {
+        "truncated": false,
+        "total_bytes": 245,
+        "total_lines": 1
+      },
+      "stderr": {
+        "truncated": false,
+        "total_bytes": 165,
+        "total_lines": 2
+      }
+    }
+  }
+}
