@@ -1,0 +1,12 @@
+--- loopctl.py.before_ignored_fix
++++ loopctl.py.after_ignored_fix
+@@ -441,7 +441,8 @@
+     # 大量小证据的路径总长会超过系统 ARG_MAX；NUL 清单保留逐文件边界及原归档范围。
+     pathspec = root / "evidence-pathspec.nul"
+     pathspec.write_bytes(b"\0".join(path.encode("utf-8") for path in paths) + b"\0")
+-    git(project, "add", "--pathspec-from-file", str(pathspec), "--pathspec-file-nul", timeout=1800)
++    # 清单已逐文件核验，显式纳入其中被通用忽略规则排除的证据（例如 .pt）。
++    git(project, "add", "--force", "--pathspec-from-file", str(pathspec), "--pathspec-file-nul", timeout=1800)
+     git(project, "commit", "-m", f"research: {state['run_id']} round {state['round']} evidence", timeout=1800)
+     state["artifact_sha"] = git(project, "rev-parse", "HEAD")
+     if "progress" in manifest:
