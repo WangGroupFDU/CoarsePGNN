@@ -15,6 +15,16 @@ def load_development(manifest: dict, reader: Callable = read_json) -> dict[str, 
     """
     result = {}
     seen = set()
+    # 仅读取封存路径元数据；在任何hash/JSON内容读取之前检查两个开发路径。
+    sealed = manifest.get("test", {}).get("path")
+    if not sealed:
+        raise ValueError("开发清单必须声明封存测试路径元数据")
+    sealed_path = Path(sealed).resolve()
+    paths = {s: Path(manifest[s]["path"]).resolve() for s in ("train", "validation")}
+    if sealed_path in paths.values():
+        raise PermissionError("开发条目误指向封存测试文件，在散列读取前拒绝")
+    if paths["train"] == paths["validation"]:
+        raise ValueError("训练和验证路径必须互相独立")
     for split in ("train", "validation"):
         entry = manifest[split]
         path = Path(entry["path"])

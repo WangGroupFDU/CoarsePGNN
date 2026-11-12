@@ -40,3 +40,15 @@ def test_final_test_refuses_draft_before_read(tmp_path):
     path.write_text('{"status":"DRAFT_NOT_FROZEN","frozen":false}')
     with pytest.raises(ValueError, match="已冻结"):
         load_final_test({}, {}, path, {})
+
+
+def test_development_rejects_misrouted_path_before_hash(tmp_path, monkeypatch):
+    """训练条目误指向测试时，连hash函数都不允许调用，更不能读取内容。"""
+    def forbidden_hash(path):
+        raise AssertionError("拒绝路径判断之前调用了散列读取")
+    monkeypatch.setattr("coarsepgnn_inverse.access.sha256", forbidden_hash)
+    manifest = {"train":{"path":str(tmp_path/"sealed.json"),"sha256":"unused"},
+                "validation":{"path":str(tmp_path/"validation.json"),"sha256":"unused"},
+                "test":{"path":str(tmp_path/"sealed.json")}}
+    with pytest.raises(PermissionError, match="散列读取前"):
+        load_development(manifest)

@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import collections
 import copy
+import csv
 import decimal
 import itertools
 import json
@@ -21,6 +22,129 @@ TG_CRITERIA = {"tg_dsc_onset": "dsc_onset", "tg_dsc_midpoint": "dsc_midpoint",
                "tg_dma_loss_peak": "dma_loss_modulus_peak",
                "tg_dma_storage_onset": "dma_storage_modulus_drop"}
 SPLITS = ("train", "validation", "test")
+RULE_VERSION = "pu_endpoint_adjudication_v2_20261112"
+
+
+def assign_atomic_semantics(row: dict, measurement: dict, campaign: dict, specimen: dict, evidence: dict) -> None:
+    """只按当前原子测量恢复相域与判据，父均值的相域不参与推断。
+
+    未辨明相域显式保留unknown。DSC inflection独立于midpoint，不借助值大小
+    或模型便利合并两种定义。原来源、旧字段及位置全部保存用于逐项回读。
+    """
+    row["source_transition_assignment"] = measurement.get("transition_assignment") or ""
+    row["original_criterion_before_adjudication"] = row.get("transition_criterion")
+    row["original_phase_before_adjudication"] = row.get("transition_scope")
+    row["endpoint_evidence_locator"] = evidence.get("locator_text") or ""
+    row["specimen"] = specimen
+    row["reported_uncertainty_value"] = measurement.get("uncertainty_value")
+    row["reported_uncertainty_type"] = measurement.get("uncertainty_type")
+    row["reported_repeat_count"] = measurement.get("repeat_count")
+    if row["target"] not in {"tg", "tm"}:
+        return
+    assignment = re.sub(r"[_-]+", " ", row["source_transition_assignment"].lower())
+    soft, hard = "soft" in assignment, "hard" in assignment
+    if soft and hard:
+        phase = "mixed_soft_hard"
+    elif soft:
+        phase = "soft_segment"
+    elif hard:
+        phase = "hard_segment"
+    elif re.search(r"whole material|bulk|overall", assignment):
+        phase = "whole_material"
+    elif "amorphous" in assignment:
+        phase = "amorphous_phase"
+    else:
+        phase = "not_resolved"
+    row["transition_scope"] = phase
+    if row["target"] == "tg":
+        row["transition_criterion"] = TG_CRITERIA.get(row["property_type"], "reported_unspecified")
+        if row["property_type"].startswith("tg_dsc_") and "inflection" in row["definition_raw"].lower():
+            row["transition_criterion"] = "dsc_inflection"
+    row["property_task"] = ":".join([row["target"], str(campaign["method_family"]),
+                                     row["transition_criterion"], phase])
+    row["thermal_history_stage"] = canonical({k: specimen.get(k) for k in
+        ("preparation_raw", "annealing_text", "conditioning_text", "cure_temperature_c", "cure_time_h")})
+
+
+def identify_thermal_protocols(rows: list[dict]) -> list[dict]:
+    """把有直接文字依据的扫描次序写入协议；同输入多热端点无法辨别时整体隔离。
+
+    仅查看端点定义和原始报告文字，不按性质值大小排列峰或选择有利记录。一个活动
+    中泛称first and second scans不足以指定某条标签的扫描次序；缺证据不猜测。
+    返回逐观察身份裁定，同时显式更新新版本的条件输入散列，保留原字段供追溯。
+    """
+    groups = collections.defaultdict(list)
+    review = []
+    for row in rows:
+        if row["target"] not in {"tg", "tm"} or row.get("aggregation_member_count"):
+            continue
+        text = (str(row.get("definition_raw") or "") + " " + str(row.get("original_value_raw") or "")
+                + " " + str(row.get("source_transition_assignment") or "").replace("_", " ")).lower()
+        scans = set()
+        ordinal_names = (("first", "1", "1st"), ("second", "2", "2nd"), ("third", "3", "3rd"))
+        for ordinal, number, abbreviation in ordinal_names:
+            for direction in ("heating", "cooling"):
+                pattern = (rf"\b(?:{ordinal}|{abbreviation})[- ]{direction}(?:[- ]scan)?\b|"
+                           rf"\b{direction}[- ](?:scan|cycle)[- ]{number}\b")
+                if re.search(pattern, text):
+                    scans.add(ordinal + "_" + direction)
+        # “first and second heating”并未指明当前值属于哪次扫描，不能误认成第二次。
+        for match in re.finditer(r"\b(first|second|third)\s*(?:and|/|,)\s*(first|second|third)\s+(heating|cooling)\b", text):
+            scans.update({match[1] + "_" + match[3], match[2] + "_" + match[3]})
+        scan = next(iter(scans)) if len(scans) == 1 else "not_resolved"
+        peak_matches = re.findall(r"\b(?:tm|tg)[_ ]?([1-3])\b", text)
+        peak = "source_peak_" + peak_matches[0] if len(set(peak_matches)) == 1 else "not_resolved"
+        row.update(scan_identity=scan, peak_identity=peak,
+                   scan_direction=scan.split("_")[-1] if scan != "not_resolved" else "unknown",
+                   scan_index={"first":1,"second":2,"third":3}.get(scan.split("_")[0]),
+                   original_condition_raw_before_endpoint_split=row["condition_raw"],
+                   original_property_task_before_endpoint_split=row["property_task"])
+        row["condition_raw"] += (f" Assigned measurement scan: {scan}; source endpoint: {peak}; "
+                                 f"phase: {row['transition_scope']}; criterion: {row['transition_criterion']}.")
+        normalized = json.loads(row["condition_normalized_json"])
+        normalized.setdefault("fields",{})["transition_criterion"] = {"value":row["transition_criterion"],
+            "unit":None,"mask":int(row["transition_criterion"] != "reported_unspecified"),"origin":"atomic_measurement"}
+        if row["scan_index"] is not None:
+            normalized.setdefault("fields",{})["scan_index"] = {"value":row["scan_index"],"unit":"","mask":1,
+                                                               "origin":"atomic_measurement_definition"}
+        normalized["endpoint_identity"] = {"scan":scan,"peak":peak,"phase":row["transition_scope"],
+            "criterion":row["transition_criterion"],"basis":"atomic_measurement_definition_and_assignment"}
+        row["condition_normalized_json"] = canonical(normalized)
+        row["condition_input_sha256"] = digest({"raw":row["condition_raw"],"normalized":normalized})
+        row["property_task"] += ":" + scan + ":" + peak
+        replicate_matches = re.findall(r"\breplicate\s*(?:no\.?\s*|#\s*)?([0-9]+)\b",text)
+        if len(set(replicate_matches)) == 1:
+            row["replicate_id"] = replicate_matches[0]
+            row["replicate_set_id"] = digest({"campaign":row["campaign_id"],"task":row["property_task"]})
+        key = (row["material_id"],row["campaign_id"],row["target"],row["transition_criterion"],
+               scan,peak)
+        groups[key].append(row)
+    for items in groups.values():
+        # 两条记录具有相同可辨识测量语义，不能假定它们是重复实验或依据数值选峰。
+        independent_replicates = (all(r.get("replicate_id") and r.get("replicate_set_id") for r in items)
+            and len({r["replicate_id"] for r in items}) == len(items)
+            and len({r["replicate_set_id"] for r in items}) == 1
+            and len({(r["transition_scope"],r["condition_input_sha256"]) for r in items}) == 1)
+        unresolved = len(items) > 1 and not independent_replicates
+        duplicate_replicates=all(r.get("replicate_id") for r in items) and len({r["replicate_id"] for r in items})<len(items)
+        for row in items:
+            row["thermal_identity_collision"] = unresolved
+            review.append({"observation_id":row["observation_id"],"material_id":row["material_id"],
+                           "split":row["split"],"campaign_id":row["campaign_id"],"target":row["target"],
+                           "scan_identity":row["scan_identity"],"peak_identity":row["peak_identity"],
+                           "phase":row["transition_scope"],"criterion":row["transition_criterion"],
+                           "source_assignment":row.get("source_transition_assignment"),
+                           "locator":row.get("endpoint_evidence_locator"),
+                           "old_phase":row.get("original_phase_before_adjudication"),
+                           "old_criterion":row.get("original_criterion_before_adjudication"),
+                           "thermal_history_stage":row.get("thermal_history_stage"),
+                           "same_semantic_key_count":len(items),
+                           "identity_reason":"DUPLICATE_EXPLICIT_REPLICATE_ID" if duplicate_replicates else
+                               ("INDEPENDENT_SOURCE_REPLICATES" if independent_replicates else "SOURCE_ENDPOINT_IDENTITIES"),
+                           "decision":"QUARANTINE_UNRESOLVED_MULTIPLE_ENDPOINTS" if unresolved else
+                               ("EXPLICIT_INDEPENDENT_REPLICATES" if len(items)>1 else "UNIQUE_ENDPOINT"),
+                           "definition":row["definition_raw"],"basis":"explicit source wording; no value-ranked peak assignment"})
+    return review
 
 
 def tables(database: Path) -> dict[str, dict]:
@@ -113,6 +237,8 @@ def endpoint_decision(row: dict, measurement: dict, campaign: dict, evidence: di
     """
     if row.get("aggregation_member_count"):
         return "REJECTED", "CROSS_MEASUREMENT_MEAN_REPLACED_BY_ATOMIC_MEMBERS"
+    if row.get("thermal_identity_collision"):
+        return "UNRESOLVED", "MULTIPLE_THERMAL_ENDPOINTS_WITHOUT_UNIQUE_SCAN_OR_PEAK_IDENTITY"
     if not evidence or not evidence.get("verified") or not evidence.get("locator_text"):
         return "UNRESOLVED", "SOURCE_EVIDENCE_NOT_VERIFIED_OR_LOCATED"
     if not campaign.get("verified"):
@@ -123,23 +249,33 @@ def endpoint_decision(row: dict, measurement: dict, campaign: dict, evidence: di
     if re.search(r"unweighted arithmetic mean|multiple.*peaks.*mean|merged.*mean", definition):
         return "UNRESOLVED", "DERIVED_ENDPOINT_REQUIRES_ATOMIC_RECOVERY"
     if kind == "tg":
-        if row["transition_criterion"] not in set(TG_CRITERIA.values()):
+        if row["transition_criterion"] not in set(TG_CRITERIA.values()) | {"dsc_inflection"}:
             return "UNRESOLVED", "TG_CRITERION_UNRESOLVED"
-        if not row.get("transition_scope"):
+        if row.get("transition_scope") in (None,"","not_resolved"):
             return "UNRESOLVED", "TG_PHASE_ASSIGNMENT_MISSING"
     elif kind == "tm":
         if row["property_type"] not in {"tm_dsc_peak", "tm_dsc_onset"}:
             return "UNRESOLVED", "NON_DSC_TM_PROXY_OR_UNRESOLVED_METHOD"
         if re.search(r"dissociat|disrupt|disintegrat|soften|hydrogen.bond", definition):
             return "UNRESOLVED", "TM_ENDPOINT_MAY_BE_DOMAIN_DISSOCIATION"
-        if "melt" not in definition + " " + source_text:
+        # 证据大段文字中melt processing不能给当前热峰提供熔融归属。
+        local_assignment = definition + " " + str(row.get("source_transition_assignment") or "").lower()
+        if not re.search(r"melting\s+(?:endotherm|peak|temperature|transition)|(?:segment|phase|crystal|domain).*melting|melting of", local_assignment):
             return "UNRESOLVED", "ENDOTHERM_WITHOUT_EXPLICIT_MELTING_ASSIGNMENT"
+        if re.search(r"disorder|not.*(?:assign|identif|defin).*melt", local_assignment):
+            return "UNRESOLVED", "TM_ENDPOINT_ASSIGNMENT_AMBIGUOUS"
         if re.search(r"not stated|not specified|unspecified", definition):
             return "UNRESOLVED", "TM_CRITERION_UNRESOLVED"
     elif kind == "tensile_strength_ultimate":
         if row["property_type"] != "tensile_strength_ultimate":
             return "UNRESOLVED", "STRENGTH_SOURCE_ENDPOINT_NOT_ULTIMATE"
-        if re.search(r"without.*(ultimate|criterion)|not.*(distinguish|specif|identif)|unspecified", definition):
+        # 否定定义优先于关键词。注意“not stress at break”是有效正定义的对照，
+        # 不应因出现not一词就否定已明确的maximum engineering stress。
+        negative_definition = (r"without.*(ultimate|criterion)|"
+                               r"\bnot\s+(?:(?:explicitly|further|clearly)\s+)?"
+                               r"(?:defin|stat|restat|distinguish|specif|identif|explicit)|"
+                               r"\bno\s+(?:explicit\s+)?(?:definition|distinction|criterion)|unspecified")
+        if re.search(negative_definition, definition):
             return "UNRESOLVED", "STRENGTH_DEFINITION_EXPLICITLY_AMBIGUOUS"
         if not re.search(r"maximum.*(engineering|stress)|ultimate|iso 37|astm d412", definition):
             return "UNRESOLVED", "ULTIMATE_MEANING_NOT_ESTABLISHED"
@@ -154,7 +290,7 @@ def endpoint_decision(row: dict, measurement: dict, campaign: dict, evidence: di
     return "APPROVED_PRIMARY", "EXPLICIT_ENDPOINT_WITH_VERIFIED_SOURCE"
 
 
-def grade_decisions(catalog: list[dict], db: dict) -> tuple[list[dict], list[dict]]:
+def grade_decisions(catalog: list[dict], db: dict, source_specs: dict | None = None) -> tuple[list[dict], list[dict]]:
     """审核全规格库的结构和角色一致性；混合牌号与纯结构冲突时整条隔离。
 
     小分子通过显式 NCO/OH 个数核对双官能；宏二醇需要名称端基证据及来源官能度。
@@ -163,7 +299,8 @@ def grade_decisions(catalog: list[dict], db: dict) -> tuple[list[dict], list[dic
     from rdkit import Chem
     reviews, approved = [], []
     nco = Chem.MolFromSmarts("[NX2]=[CX2]=[OX1]")
-    oh = Chem.MolFromSmarts("[OX2H1]")
+    oh = Chem.MolFromSmarts("[OX2H1]-[CX4]")
+    acid = Chem.MolFromSmarts("[CX3](=[OX1])[OX2H1]")
     for grade in catalog:
         names = " | ".join(grade["names"])
         text = names.lower()
@@ -177,47 +314,145 @@ def grade_decisions(catalog: list[dict], db: dict) -> tuple[list[dict], list[dic
         elif grade["role"] == "diisocyanate" and len(mol.GetSubstructMatches(nco)) != 2:
             status, reason = "UNRESOLVED", "NCO_FUNCTIONALITY_NOT_TWO"
         elif grade["role"] == "hydroxyl_chain_extender" and len(mol.GetSubstructMatches(oh)) != 2:
-            status, reason = "UNRESOLVED", "OH_FUNCTIONALITY_NOT_TWO"
-        elif grade["role"] == "polyol" and not re.search(r"diol|glycol|dihydroxy|hydroxyl.terminated|hydroxy.terminated|ptmg|ptmo|peg|ppg|二醇", text):
-            status, reason = "UNRESOLVED", "MACRODIOL_END_GROUP_NOT_EXPLICIT"
+            status, reason = "UNRESOLVED", "ALCOHOL_OH_FUNCTIONALITY_NOT_TWO"
+        elif grade["role"] == "hydroxyl_chain_extender" and mol.HasSubstructMatch(acid):
+            status, reason = "UNRESOLVED", "EXTRA_CARBOXYLIC_ACID_REACTIVITY_OUTSIDE_APPROVED_TEMPLATE"
         source_ids = grade["source_component_ids"]
         if any(cid not in db["components"] for cid in source_ids):
             status, reason = "UNRESOLVED", "SOURCE_COMPONENT_MISSING"
+        specs = [item for cid in source_ids for item in (source_specs or {}).get(cid, [])]
+        # 同一数据库成分可在不同配方中承担不同角色；证据关联必须匹配本grade的角色/Mn/结构。
+        specs = [item for item in specs if item.get("role")==grade["role"]]
+        if grade["role"]=="polyol":
+            specs = [item for item in specs if item.get("mn_g_mol")==grade.get("molar_mass_g_mol")
+                     and item.get("structure_psmiles")==grade["structure"]]
+        if grade["role"] == "polyol" and status == "APPROVED":
+            if not specs or any(item.get("functionality") != 2 or item.get("role") != "polyol" or item.get("functional_group") != "oh"
+                                or not item.get("mn_g_mol") or not item.get("structure_psmiles") for item in specs):
+                status, reason = "UNRESOLVED", "MACRODIOL_UPSTREAM_FUNCTIONALITY_MN_OR_END_GROUP_EVIDENCE_MISSING"
+        source_details = [{"component_id":cid, **{k:db["components"].get(cid,{}).get(k) for k in
+            ("canonical_name","functionality","number_average_molar_mass_g_mol",
+             "molecular_weight_g_mol","psmiles","smiles","structure_status","psmiles_note")}}
+            for cid in source_ids]
         reviews.append({"grade_id": grade["grade_id"], "role": grade["role"], "names": names,
                         "source_component_ids": "|".join(source_ids), "status": status, "reason": reason,
                         "representation_level": grade["representation_level"],
+                        "structure":grade["structure"],"molar_mass_g_mol":grade.get("molar_mass_g_mol"),
+                        "catalog_functionality":grade.get("functionality"),
+                        "end_group_basis":grade.get("end_group_basis"),
+                        "source_database_fields":canonical(source_details),
+                        "frozen_upstream_component_evidence":canonical(specs),
+                        "alcohol_oh_count":len(mol.GetSubstructMatches(oh)) if mol else None,
+                        "carboxylic_acid_count":len(mol.GetSubstructMatches(acid)) if mol else None,
                         "migration": "UNCHANGED" if status == "APPROVED" else "QUARANTINED_NOT_REMAPPED"})
         if status == "APPROVED":
             approved.append(grade)
     return reviews, approved
 
 
-def precision(rows: list[dict]) -> dict:
-    """只汇总训练标签的范围、报告分辨率和可比重复差异，不从留出数据设容差。
+def precision_group(rows: list[dict]) -> dict:
+    """按观察等权和材料总权重为1分别汇总，保留原子标签而不生成均值标签。
 
-    报告小数位只是分辨率，不能等同测量不确定度；无可比重复时明确为 null。
+    材料等权分位数采用加权经验CDF的左逆，范围取原值极值。仅有显式独立重复
+    ID且端点、条件、状态一致的对才估计差异；小数位不解释为噪声。
     """
     import numpy as np
+    counts = collections.Counter(r["material_id"] for r in rows)
+    ordered = sorted(rows, key=lambda r: float(r["value"]))
+    values = np.array([float(r["value"]) for r in ordered])
+    weights = np.array([1 / counts[r["material_id"]] for r in ordered])
+    cdf = np.cumsum(weights) / weights.sum()
+    quantiles = [float(values[min(np.searchsorted(cdf,q),len(values)-1)]) for q in (0,.25,.5,.75,1)]
+    resolution, replicate_groups = [], collections.defaultdict(list)
+    for row in rows:
+        raw = str(row["original_value_raw"] or "").strip()
+        if re.fullmatch(r"[-+]?\d+(?:\.\d+)?",raw):
+            resolution.append(float(decimal.Decimal(10) ** decimal.Decimal(raw).as_tuple().exponent))
+        if row.get("replicate_id") and row.get("replicate_set_id"):
+            replicate_groups[(row["replicate_set_id"],row["property_task"],row["condition_input_sha256"],row["state_id"])].append(row)
+    differences = [abs(float(a["value"])-float(b["value"])) for group in replicate_groups.values()
+                   for a,b in itertools.combinations(group,2) if a["replicate_id"] != b["replicate_id"]]
+    return {"unit":rows[0]["unit"],"observations":len(rows),"materials":len(counts),
+            "closure_groups":len({r["group_id"] for r in rows}),
+            "observation_weighted_quantiles":np.quantile(values,[0,.25,.5,.75,1]).tolist(),
+            "material_equal_weight_quantiles":quantiles,
+            "material_weight_rule":"each material total weight 1; weighted empirical CDF left inverse; no averaging labels",
+            "reported_resolution_counts":dict(collections.Counter(map(str,resolution))),
+            "comparable_repeat_pair_count":len(differences),
+            "repeat_absolute_difference_median":float(np.median(differences)) if differences else None,
+            "repeat_evidence_status":"EXPLICIT_REPLICATE_IDENTITIES" if differences else "NO_QUALIFIED_REPLICATES",
+            "uncertainty_limit":"Reported decimals are resolution, not measurement uncertainty."}
+
+
+def precision(rows: list[dict]) -> dict:
+    """仅对训练主标签输出总体及端点/协议分层统计，明确替代第一轮错误重复差值。"""
     result = {}
     for target in sorted({r["target"] for r in rows}):
         selected = [r for r in rows if r["target"] == target]
-        values = [float(r["value"]) for r in selected]
-        resolution = []
         groups = collections.defaultdict(list)
         for row in selected:
-            raw = str(row["original_value_raw"] or "").strip()
-            if re.fullmatch(r"[-+]?\d+(?:\.\d+)?", raw):
-                resolution.append(float(decimal.Decimal(10) ** decimal.Decimal(raw).as_tuple().exponent))
-            groups[(row["material_id"], row["campaign_id"], row["property_task"])].append(float(row["value"]))
-        differences = [abs(a-b) for g in groups.values() for a, b in itertools.combinations(g, 2)]
-        result[target] = {"observations": len(selected), "materials": len({r["material_id"] for r in selected}),
-                          "closure_groups": len({r["group_id"] for r in selected}),
-                          "quantiles_0_25_50_75_100": np.quantile(values, [0,.25,.5,.75,1]).tolist(),
-                          "reported_resolution_counts": dict(collections.Counter(map(str, resolution))),
-                          "comparable_repeat_pair_count": len(differences),
-                          "repeat_absolute_difference_median": float(np.median(differences)) if differences else None,
-                          "uncertainty_limit": "报告精度不是测量误差；无重复测量时不据此估计实验不确定度。"}
+            groups[(row["property_task"],row["condition_input_sha256"])].append(row)
+        result[target] = {**precision_group(selected), "strata":[
+            {"property_task":key[0],"condition_input_sha256":key[1],**precision_group(items)}
+            for key,items in sorted(groups.items())]}
+    return {"supersedes":"round_001_adjudication/training_measurement_precision.json",
+            "superseded_claim":"Tg 5 K and Tm 46.7 K pair medians are invalid repeatability or tolerance estimates",
+            "targets":result}
+
+
+def uncertainty_review(rows: list[dict]) -> list[dict]:
+    """保留训练侧作者报告的不确定性和n；未知±不得转换为SD或假定重复数。"""
+    result=[]
+    for row in rows:
+        raw_type = str(row.get("reported_uncertainty_type") or "")
+        text = raw_type.lower().strip()
+        kind = "missing" if row.get("reported_uncertainty_value") is None else "unspecified_plus_minus"
+        if row.get("reported_uncertainty_value") is not None:
+            if text in {"sd","std","standard deviation"} or "standard deviation" in text:
+                kind="SD"
+            elif text in {"se","sem","standard error"} or "standard error" in text:
+                kind="SE"
+            elif "confidence" in text or text=="ci":
+                kind="CI"
+            elif "range" in text:
+                kind="range"
+        result.append({"observation_id":row["observation_id"],"material_id":row["material_id"],
+                       "target":row["target"],"unit":row["unit"],"reported_value":row.get("reported_uncertainty_value"),
+                       "reported_type_raw":raw_type,"type_adjudicated":kind,
+                       "sample_size":row.get("reported_repeat_count"),"sample_size_missing":row.get("reported_repeat_count") is None,
+                       "measurement_evidence_id":row.get("measurement_evidence_id"),
+                       "locator":row.get("endpoint_evidence_locator"),"conversion_applied":False,
+                       "usable_as_reported_uncertainty":kind in {"SD","SE","CI","range"}})
     return result
+
+
+def condition_identity_checks(rows: list[dict], primary: list[dict]) -> dict:
+    """复算真实条件缓存输入和assay词表，验证已知扫描反例；不拟合或复用监督权重。"""
+    from .development import condition_record
+    from condition_encoding_benchmark.v2_core import raw_prompt_v2
+    from coarsepgnn_hybrid_v3.data import build_assay_vocab
+    selected=[r for r in rows if r["target"] in {"tg","tm"}]
+    checks=[]
+    for r in selected:
+        actual=digest({"raw":r["condition_raw"],"normalized":json.loads(r["condition_normalized_json"])})
+        if actual != r["condition_input_sha256"]:
+            raise ValueError(f"条件哈希不闭合: {r['observation_id']}")
+        record=condition_record(r)
+        checks.append({"observation_id":r["observation_id"],"input_sha256":actual,
+                       "prompt_cache_key":raw_prompt_v2(record).sha256,"property_task":r["property_task"],
+                       "numeric_scan_index":[t.value for t in record.numeric_tags if t.key=="scan_index"]})
+    by_id={r["observation_id"]:r for r in checks}
+    a,b=(by_id[k] for k in ("MEA_00622204543a8c0a6be3_ATOMIC","MEA_6ed731656de35e06c403_ATOMIC"))
+    vocab=build_assay_vocab(primary,{r["observation_id"]:r["split"] for r in primary})
+    different=all(a[k]!=b[k] for k in ("input_sha256","prompt_cache_key","property_task","numeric_scan_index"))
+    if not different:
+        raise AssertionError("不同扫描未进入实际条件和assay输入")
+    return {"status":"INPUT_IDENTITIES_VERIFIED_NO_ENCODER_FIT","thermal_rows_checked":len(checks),
+            "first_second_heating": [a,b],"distinct_actual_inputs":different,
+            "train_assay_indices":[vocab["property_task"].get(r["property_task"],0) for r in (a,b)],
+            "supervised_encoder_used":False,"embedding_vectors_computed":False,
+            "condition_input_entry":"coarsepgnn_inverse.development.condition_record",
+            "all_thermal_input_identities":checks}
 
 
 def run(config: dict, output: Path) -> dict:
@@ -233,15 +468,24 @@ def run(config: dict, output: Path) -> dict:
         if sha256(Path(item["path"])) != item["sha256"]:
             raise ValueError(f"审计输入散列不一致: {item['path']}")
     preflight = Path(config["preflight"])
+    with Path(config["previous_adjudication"]).open(encoding="utf-8-sig",newline="") as handle:
+        previous={r["observation_id"]:r for r in csv.DictReader(handle)}
     original = read_json(preflight / "observations.json")
     catalog = read_json(preflight / "catalog.json")
     formulations = read_json(preflight / "formulations.json")
     current, old = tables(Path(config["database"])), tables(Path(config["pre_aggregation_database"]))
-    grade_review, approved_catalog = grade_decisions(catalog, current)
+    source_specs = collections.defaultdict(list)
+    source_spec_seen = set()
+    for row in original:
+        for component in json.loads(row["components_json"]):
+            key = canonical(component)
+            if key not in source_spec_seen:
+                source_specs[component["component_id"]].append(component)
+                source_spec_seen.add(key)
+    grade_review, approved_catalog = grade_decisions(catalog, current, source_specs)
     allowed = {g["grade_id"] for g in approved_catalog} | {"NONE"}
     eligible = {f["material_id"] for f in formulations if set(f["grade_ids"]) <= allowed}
     formula_by_id = {f["material_id"]: f for f in formulations}
-    train_grades = {g for f in formulations if f["material_id"] in eligible and f["split"] == "train" for g in f["grade_ids"]}
     expanded, lineage = [], []
     for row in original:
         if row["aggregation_member_count"]:
@@ -252,8 +496,20 @@ def run(config: dict, output: Path) -> dict:
             expanded.append(copy.deepcopy(row))
     if len({r["observation_id"] for r in expanded}) != len(expanded):
         raise ValueError("恢复导致重复原子监督；必须核查谱系")
+    for row in expanded:
+        source = old if row.get("restored_from_mean") else current
+        measurement,campaign,specimen = context(row,source)
+        assign_atomic_semantics(row,measurement,campaign,specimen,source["evidence"].get(measurement["evidence_id"],{}))
+    thermal_review = identify_thermal_protocols(expanded)
+    atom_by_id = {r["observation_id"]:r for r in expanded}
+    for link in lineage:
+        atom = atom_by_id[link["atomic_observation_id"]]
+        link.update(criterion=atom["transition_criterion"],scope=atom["transition_scope"],protocol=atom["condition_raw"],
+                    source_transition_assignment=atom.get("source_transition_assignment"),
+                    condition_input_sha256=atom["condition_input_sha256"])
     adjudicated, primary, training_evidence = [], [], []
-    for row in original + [r for r in expanded if r.get("restored_from_mean")]:
+    # 原均值保留拒绝记录，其他监督仅使用新版本端点身份；不遗失原记录去向。
+    for row in [r for r in original if r["aggregation_member_count"]] + expanded:
         source = old if row.get("restored_from_mean") else current
         measurement, campaign, specimen = context(row, source)
         evidence = source["evidence"].get(measurement["evidence_id"], {})
@@ -274,6 +530,11 @@ def run(config: dict, output: Path) -> dict:
                   "restored_from_mean": row.get("restored_from_mean"),
                   "value": row["value"] if row["split"] == "train" else None,
                   "unit": row["unit"], "heldout_value_sealed": row["split"] != "train"}
+        record.update(rule_version=RULE_VERSION,source_transition_assignment=row.get("source_transition_assignment"),
+                      previous_decision=previous.get(row["observation_id"],{}).get("decision"),
+                      positive_endpoint_evidence=row["definition_raw"],
+                      condition_input_sha256=row["condition_input_sha256"],
+                      scan_identity=row.get("scan_identity"),peak_identity=row.get("peak_identity"))
         adjudicated.append(record)
         if row["split"] == "train":
             training_evidence.append({**record, "evidence_text": evidence.get("text_raw"),
@@ -283,13 +544,32 @@ def run(config: dict, output: Path) -> dict:
             # 同一真实测试活动内的力学端点可关联；不同活动不能仅凭试样ID合并。
             if not campaign.get("verified"):
                 raise ValueError(f"主监督协议尚未核验: {campaign['campaign_id']}")
-            row.update(adjudication=decision, state_id="CAMPAIGN_STATE_"+campaign["campaign_id"],
-                       state_basis="same_verified_measurement_campaign",
-                       unseen_grade=bool(set(formula_by_id[row["material_id"]]["grade_ids"])-train_grades))
+            specimen_evidence=source["evidence"].get(specimen.get("evidence_id"),{})
+            state_evidence = bool(specimen_evidence.get("verified") and specimen_evidence.get("locator_text") and any(specimen.get(k) for k in
+                                  ("preparation_raw","forming_method","conditioning_text","annealing_text")))
+            thermal = row["target"] in {"tg","tm"}
+            if thermal:
+                state_evidence = state_evidence and row["scan_identity"] != "not_resolved"
+            state_key = {"campaign":campaign["campaign_id"],"specimen":specimen["specimen_id"],
+                         "scan":row.get("scan_identity"),"history":row.get("thermal_history_stage")}
+            row.update(adjudication=decision,
+                       state_id="VERIFIED_STATE_"+digest(state_key)[:20] if state_evidence else "SINGLE_OBSERVATION_"+row["observation_id"],
+                       state_basis="verified_specimen_preparation_and_same_activity_scan" if state_evidence else "no_joint_state_inference",
+                       joint_state_evidence_qualified=state_evidence)
             primary.append(row)
     # 保留每个原记录的去向；被均值替代者也在逐观察表中，不静默删除。
     if len(adjudicated) != len(original) + len(lineage):
         raise AssertionError("原记录裁定不闭合")
+    if {r["observation_id"] for r in adjudicated} != set(previous):
+        raise ValueError("与第一轮逐观察身份不闭合，禁止静默遗漏记录")
+    supervised_grades = {g for r in primary if r["split"]=="train" for g in formula_by_id[r["material_id"]]["grade_ids"]}
+    forward_grades = {t:{g for r in primary if r["split"]=="train" and r["target"]==t
+                        for g in formula_by_id[r["material_id"]]["grade_ids"]} for t in {r["target"] for r in original}}
+    for row in primary:
+        gids=set(formula_by_id[row["material_id"]]["grade_ids"])
+        row.update(catalog_known=gids<=allowed, inverse_supervised_seen=gids<=supervised_grades,
+                   forward_supervised_seen=gids<=forward_grades[row["target"]],
+                   unseen_grade=not gids<=supervised_grades,has_extender="NONE" not in gids)
     overlaps = {}
     for field in IDENTITY_FIELDS:
         owners = {s: {r[field] for r in primary if r["split"] == s} for s in SPLITS}
@@ -309,7 +589,10 @@ def run(config: dict, output: Path) -> dict:
             joint.append({"material_id": mid, "state_id": sid, "split": records[0]["split"],
                           "group_id": records[0]["group_id"], "targets": "|".join(sorted({r['target'] for r in records})),
                           "observation_ids": "|".join(r["observation_id"] for r in records),
-                          "status": "APPROVED_SAME_CAMPAIGN", "basis": "same verified measurement campaign; no cross-campaign pooling"})
+                          "status": "APPROVED_SAME_STATE" if records[0]["joint_state_evidence_qualified"] else "SINGLE_ENDPOINT_ONLY",
+                          "allowed_property_masks":"|".join(",".join(mask) for n in range(1,len({r['target'] for r in records})+1)
+                              for mask in itertools.combinations(sorted({r['target'] for r in records}),n)),
+                          "basis":records[0]["state_basis"]})
         if len({r["target"] for r in items}) > 1 and len(by_state) > 1:
             joint.append({"material_id": mid, "state_id": "CROSS_CAMPAIGN_UNRESOLVED", "split": items[0]["split"],
                           "group_id": items[0]["group_id"], "targets": "|".join(sorted({r['target'] for r in items})),
@@ -322,9 +605,13 @@ def run(config: dict, output: Path) -> dict:
                             "materials": len({r["material_id"] for r in part}),
                             "states": len({r["state_id"] for r in part}),
                             "groups": len({r["group_id"] for r in part}),
-                            "unseen_grade_materials": len({r["material_id"] for r in part if r["unseen_grade"]})})
+                            "unseen_grade_materials": len({r["material_id"] for r in part if r["unseen_grade"]}),
+                            "inverse_unseen_grade_materials":len({r["material_id"] for r in part if not r["inverse_supervised_seen"]}),
+                            "forward_unseen_grade_materials":len({r["material_id"] for r in part if not r["forward_supervised_seen"]}),
+                            "qualified_joint_states":len({r["state_id"] for r in part if r["joint_state_evidence_qualified"]})})
     output.mkdir(parents=True)
     write_csv(output/"measurement_adjudication.csv", adjudicated, list(adjudicated[0]))
+    write_csv(output/"thermal_identity_review.csv", thermal_review, list(thermal_review[0]))
     write_csv(output/"tg_mean_membership.csv", lineage, list(lineage[0]))
     write_csv(output/"grade_identity_review.csv", grade_review, list(grade_review[0]))
     write_csv(output/"grade_id_migration.csv", grade_review, list(grade_review[0]))
@@ -333,16 +620,43 @@ def run(config: dict, output: Path) -> dict:
                  "action":"QUARANTINE_FORMULATION"} for f in formulations if f["material_id"] not in eligible]
     write_csv(output/"affected_materials.csv", affected,
               ["material_id","split","group_id","unapproved_grade_ids","action"])
-    write_csv(output/"joint_state_review.csv", joint, list(joint[0]))
+    write_csv(output/"joint_state_review.csv", joint, sorted(set().union(*(r.keys() for r in joint))))
     edges = [{"state_id":j["state_id"],"observation_a":a,"observation_b":b,"basis":j["basis"]}
-             for j in joint if j["status"] == "APPROVED_SAME_CAMPAIGN"
+             for j in joint if j["status"] == "APPROVED_SAME_STATE"
              for a,b in itertools.combinations(j["observation_ids"].split("|"),2)]
     write_csv(output/"joint_state_edges.csv", edges, ["state_id","observation_a","observation_b","basis"])
     write_json(output/"approved_catalog.json", approved_catalog)
     write_json(output/"approved_formulations.json", [f for f in formulations if f["material_id"] in eligible])
     write_json(output/"training_evidence.json", training_evidence)
     write_json(output/"training_measurement_precision.json", precision([r for r in primary if r["split"] == "train"]))
+    uncertainties=uncertainty_review([r for r in primary if r["split"]=="train"])
+    write_csv(output/"reported_uncertainty_review.csv",uncertainties,list(uncertainties[0]) if uncertainties else
+              ["observation_id","target","reported_value","type_adjudicated"])
     write_json(output/"evaluation_denominators.json", denominator)
+    strata=collections.defaultdict(list)
+    for r in primary:
+        strata[(r["split"],r["target"],r["property_task"],r["condition_input_sha256"],r["has_extender"],
+                r["inverse_supervised_seen"],r["forward_supervised_seen"])].append(r)
+    write_json(output/"evaluation_denominators_stratified.json",[
+        {**dict(zip(("split","target","property_task","condition_input_sha256","has_extender",
+                     "inverse_supervised_seen","forward_supervised_seen"),key)),
+         "observations":len(items),"materials":len({r['material_id'] for r in items}),
+         "states":len({r['state_id'] for r in items}),"groups":len({r['group_id'] for r in items})}
+        for key,items in sorted(strata.items())])
+    write_json(output/"grade_visibility.json",{"catalog_known":sorted(allowed),
+        "inverse_supervised_seen":sorted(supervised_grades),
+        "forward_supervised_seen_by_target":{k:sorted(v) for k,v in forward_grades.items()}})
+    write_json(output/"joint_mask_denominators.json",[
+        {"split":split,"target_count":n,"states":len(part),"materials":len({r['material_id'] for r in part}),
+         "groups":len({r['group_id'] for r in part})} for split,n in itertools.product(SPLITS,(2,3,4))
+        for part in [[j for j in joint if j["split"]==split and j["status"]=="APPROVED_SAME_STATE"
+                      and len(j["targets"].split("|"))==n]]])
+    write_json(output/"condition_identity_checks.json",condition_identity_checks(expanded,primary))
+    write_json(output/"adjudication_corrections.json",{"rule_version":RULE_VERSION,
+        "previous_path":config["previous_adjudication"],
+        "superseded_statistics":["round_001 Tg 5 K and Tm 46.7 K repeat medians"],
+        "decision_transitions":dict(collections.Counter(str(r["previous_decision"])+"->"+r["decision"] for r in adjudicated)),
+        "invariant":"same observation IDs, input files, closure and split assignments; no model fit or performance selection"})
     split_manifest = {}
     for split in SPLITS:
         path = output/(split+"_labels.json")

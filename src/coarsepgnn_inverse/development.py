@@ -2,9 +2,34 @@
 from __future__ import annotations
 
 from typing import Callable
+import json
 
 from .access import load_development
 from .io import read_json
+
+
+def condition_record(row: dict):
+    """把研究行转为实际Test Encoder输入，含显式扫描和事件序号，不加载旧监督头。
+
+    复用既有字段注册表及单位规范；类别条件走原文，数值条件只读取带mask的
+    注册标量。性质值和样本ID不进入文本prompt。本函数供新缓存构建和审计共用。
+    """
+    from condition_encoding_benchmark.v2_core import FIELD_REGISTRY_V2, V2Record, make_tag_v2
+    from pu_v24_benchmark_harness.condition_cache import FIELD_ALIASES
+    aliases={**FIELD_ALIASES,"scan_index":"scan_index","transition_event_index":"transition_event_index"}
+    fields=json.loads(row["condition_normalized_json"]).get("fields",{})
+    tags=[]
+    for key,target in aliases.items():
+        field=fields.get(key,{})
+        if field.get("mask") != 1:
+            continue
+        value=field["value"]
+        if isinstance(value,bool) or not isinstance(value,(int,float)):
+            raise ValueError(f"条件字段必须为标量: {row['observation_id']}:{key}")
+        tags.append(make_tag_v2(target,value,str(field.get("unit") or ""),FIELD_REGISTRY_V2[target].display_name))
+    return V2Record(case_id=row["observation_id"],raw_condition_text=row["condition_raw"],
+                    numeric_tags=tuple(tags),canonical_conditions_sha256=row["condition_input_sha256"],
+                    dataset_type="pu_inverse_frozen_split",split=row["split"])
 
 
 def build_development_loaders(manifest: dict, target: str, *, mode: str = "structure_only",
