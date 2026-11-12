@@ -35,12 +35,15 @@ def main() -> None:
     command.add_argument("--data-lock", required=True, type=Path)
     command.add_argument("--input", required=True, type=Path)
     command.add_argument("--output", required=True, type=Path)
-    command = sub.add_parser("evaluate", help="当前授权下固定validation锚点评价，测试仍封存")
-    command.add_argument("--config", required=True, type=Path)
-    command.add_argument("--model-dir", required=True, type=Path)
-    command.add_argument("--manifest-sha256", required=True)
+    command = sub.add_parser("evaluate", help="开发锚点评价或显式授权的最终评价/独立复算")
+    command.add_argument("--config", type=Path)
+    command.add_argument("--model-dir", type=Path)
+    command.add_argument("--manifest-sha256")
     command.add_argument("--output", required=True, type=Path)
     command.add_argument("--readonly-producer", type=Path)
+    command.add_argument("--final-plan", type=Path, help="冻结的R9/R10无训练计划")
+    command.add_argument("--recompute-reference", type=Path)
+    command.add_argument("--reference-sha256")
     args = parser.parse_args()
     if args.command == "audit":
         result = audit(read_json(args.config), args.output)
@@ -58,9 +61,20 @@ def main() -> None:
                                  contract_path=args.contract,data_lock_path=args.data_lock)
         result=run_design(read_json(args.input),model,args.output)
     elif args.command == "evaluate":
-        from .evaluation import evaluate_configuration
-        result=evaluate_configuration(read_json(args.config),args.model_dir,args.manifest_sha256,args.output,
-            readonly_producer=read_json(args.readonly_producer) if args.readonly_producer else None)
+        if args.final_plan:
+            if any((args.config, args.model_dir, args.manifest_sha256, args.readonly_producer)):
+                parser.error('最终计划不能混入开发评价参数')
+            if bool(args.recompute_reference) != bool(args.reference_sha256):
+                parser.error('独立复算须同时给原目录和归档清单SHA')
+            from .final_round import run
+            result=run(args.final_plan,args.output,'recompute' if args.recompute_reference else 'evaluate',
+                       reference=args.recompute_reference,reference_sha256=args.reference_sha256)
+        else:
+            if not all((args.config,args.model_dir,args.manifest_sha256)) or args.recompute_reference or args.reference_sha256:
+                parser.error('开发评价要求config/model-dir/manifest-sha256且不接受复算参数')
+            from .evaluation import evaluate_configuration
+            result=evaluate_configuration(read_json(args.config),args.model_dir,args.manifest_sha256,args.output,
+                readonly_producer=read_json(args.readonly_producer) if args.readonly_producer else None)
     else:
         result = decode_ratios(**read_json(args.input))
         write_json(args.output, result)

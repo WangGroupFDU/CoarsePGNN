@@ -11,7 +11,7 @@ from .io import read_json, sha256, write_json
 
 
 @contextmanager
-def prohibit_refitting(*, enabled: bool):
+def prohibit_refitting(*, enabled: bool, allow_text_inference: bool = False):
     """在只读资产运行中计数并拒绝拟合入口，finally仍保留实际调用审计。
 
     这是执行约束而非重新计算后比较：任何禁用函数被调用均立即抛错。
@@ -20,8 +20,10 @@ def prohibit_refitting(*, enabled: bool):
     targets=['pu_v24_benchmark_harness.common.TargetTransform.fit',
         'coarsepgnn_inverse.training.fit_ple_v2','coarsepgnn_inverse.training.build_assay_vocab',
         'coarsepgnn_hybrid_v3.data.build_assay_vocab',
-        'coarsepgnn_inverse.training.catalog_features','coarsepgnn_inverse.training.inverse_bound_transforms',
-        'coarsepgnn_inverse.training.QwenMRL32Encoder.encode']
+        'coarsepgnn_inverse.training.catalog_features','coarsepgnn_inverse.training.inverse_bound_transforms']
+    # 只有最终窗口明确授权的覆盖层阶段可应用固定文本编码器；开发默认仍拒绝。
+    if not allow_text_inference:
+        targets.append('coarsepgnn_inverse.training.QwenMRL32Encoder.encode')
     calls={name:0 for name in targets}
     def denied(name):
         """为每个禁止入口绑定独立计数，保留可定位的错误信息。"""

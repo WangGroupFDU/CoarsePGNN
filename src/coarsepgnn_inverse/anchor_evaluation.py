@@ -85,12 +85,12 @@ def prepare_anchor_conditions(model, rows: list[dict]) -> ConditionInputs:
 
 @torch.no_grad()
 def real_anchor_predictions(model, rows: list[dict], training: list[dict], formulas: dict,
-                            *, split: str) -> tuple[list[dict],list[dict]]:
+                            *, split: str, include_forward: bool = True) -> tuple[list[dict],list[dict]]:
     """原始完整图预测与真实配方概率分别计算，禁止以重构候选图替换留出来源图。"""
     if split not in ('validation','test') or any(r['split']!=split for r in rows):
         raise ValueError('锚点集合归属不一致')
     conditions=prepare_anchor_conditions(model,rows);forward=[]
-    for target in TARGET_UNITS:
+    for target in (TARGET_UNITS if include_forward else ()):
         current=[r for r in rows if r['target']==target];by_id={r['observation_id']:r for r in current}
         dataset=PUObservationDataset(current,split_map={r['observation_id']:split for r in current},
             split=split,target_transform=model.transforms[target],
