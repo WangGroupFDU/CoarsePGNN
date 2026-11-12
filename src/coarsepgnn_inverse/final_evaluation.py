@@ -1,4 +1,4 @@
-"""第九轮唯一最终评价窗口；全部入口代码及第十轮复算在开窗前锁定。"""
+"""R10唯一最终评价窗口；评价和独立复算全部入口在开窗前锁定。"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -26,21 +26,23 @@ from .startup import parse_review
 from .qualification import protocol_definition
 
 
-def check_inputs(plan_path: Path, *, recompute: bool = False) -> tuple[dict, dict, dict, dict]:
-    """只读核验C9消费者、R8授权、原数据/模型生产者和全源码，尚不读取测试值。"""
+def check_inputs(plan_path: Path, *, recompute: bool = False, output: Path | None = None) -> tuple[dict, dict, dict, dict]:
+    """只读核验C10消费者、R8/R9授权、原数据/模型生产者和全源码，不读取测试值。"""
     plan = read_json(plan_path)
     auth = read_json(Path(plan['authorization']))
     if sha256(plan_path) != auth['plan_sha256']:
         raise PermissionError('最终计划SHA改变')
     current = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
     if not recompute and current != auth['consumer_code_sha']:
-        raise PermissionError('不是实际冻结C9')
+        raise PermissionError('不是实际冻结C10')
     source = source_check(Path(auth['source_manifest']))
     if source['consumer_code_sha'] != auth['consumer_code_sha'] or sha256(Path(auth['source_manifest'])) != auth['source_manifest_sha256']:
         raise PermissionError('消费者源码清单身份不同')
     if sha256(Path(plan['review'])) != auth['review_sha256']:
         raise PermissionError('原Pro完整回复改变')
     review = parse_review(Path(plan['review']))
+    from .final_authorization import verify_recovery_authorization
+    verify_recovery_authorization(plan, auth, review)
     if plan['policies'] != {k: review[k] for k in plan['policies']} or review['request_id'] != 'pu-inverse-20261111-5f082242266a':
         raise PermissionError('最终计划与原Pro政策不同')
     immutable = review['final_evaluation_authorization']['immutable_inputs']
@@ -59,7 +61,7 @@ def check_inputs(plan_path: Path, *, recompute: bool = False) -> tuple[dict, dic
     verify_files(auth['static_inputs'])
     if Path(plan['fixed_requests']).stat().st_size != 957930 or read_json(Path(plan['selection_lock']))['selected_config_id'] != 'D0':
         raise PermissionError('原面板大小或D0选择变化')
-    files = {**expected, **metadata_files, **model_bindings(plan, review), **auth['static_inputs']}
+    files = {**expected, **metadata_files, **model_bindings(plan, review, output/'checkpoint_verification.json' if output is not None else None), **auth['static_inputs']}
     return plan, review, auth, files
 
 
@@ -161,17 +163,23 @@ def make_lock(plan: dict, auth: dict, files: dict, data: dict, panel: list, outp
 def evaluate(plan_path: Path, output: Path, *, deadline: float) -> dict:
     """先门禁再开唯一窗口并走完整评价；数值门槛失败不终止预注册后续任务。"""
     torch.set_num_threads(8)
-    plan, review, auth, files = check_inputs(plan_path)
-    data = read_json(Path(plan['data_lock'])); directory = Path(plan['data_lock']).parent
+    preliminary = read_json(plan_path)
+    data = read_json(Path(preliminary['data_lock'])); directory = Path(preliminary['data_lock']).parent
     test_path = Path(data['split_labels']['test']['path'])
-    panel = read_json(Path(plan['fixed_requests']))
-    if len(panel) != 96:
-        raise ValueError('最终面板不是96请求')
-    with test_read_guard(test_path, output/'test_access.jsonl', window=None), no_fitting() as preaudit:
-        # 工程测试只使用合成夹具与开发数据；子进程算入同一绝对期限。
+    with test_read_guard(test_path, output/'test_access.jsonl', window=None), no_fitting(audit_path=output/'preopening_audit.json') as preaudit:
+        plan, review, auth, files = check_inputs(plan_path, output=output)
+        panel = read_json(Path(plan['fixed_requests']))
+        if len(panel) != 96:
+            raise ValueError('最终面板不是96请求')
+        # pytest在独立解释器内安装实际封存路径的拒绝规则；父进程补丁不冒充子证据。
         with (output/'preopening_tests.log').open('x') as stream:
-            subprocess.run([sys.executable, '-m', 'pytest', '-q', *plan['tests'], '--junitxml='+str(output/'preopening_tests.xml')],
-                           stdout=stream, stderr=subprocess.STDOUT, check=True, timeout=max(0, deadline-time.monotonic()))
+            subprocess.run([sys.executable, '-m', 'coarsepgnn_inverse.final_gate',
+                '--sealed-test', str(test_path), '--output', str(output/'test_gate'),
+                '--deadline', str(deadline), '--tests', *plan['tests']],
+                stdout=stream, stderr=subprocess.STDOUT, check=True, timeout=max(0, deadline-time.monotonic()))
+        gate = read_json(output/'test_gate/result.json')
+        if gate['status'] != 'PASSED' or not gate['sealed_access_rejected']:
+            raise PermissionError('子进程门禁没有完成')
         loaded = load_development(data['split_labels'])
         formulas = {r['material_id']: r for r in read_json(directory/'approved_formulations.json')}
         models = load_models(plan, review, output)
@@ -188,7 +196,7 @@ def evaluate(plan_path: Path, output: Path, *, deadline: float) -> dict:
     atomic_json(output/'test_observations.json', rows)
     with test_read_guard(test_path, output/'test_access.jsonl', window=window):
         overlay = build_overlay(rows, panel, models, review['test_condition_inference_policy'], output/'condition_overlay')
-        with no_fitting() as audit:
+        with no_fitting(audit_path=output/'evaluation_audit.json') as audit:
             anchors = {}
             for name, model in models.items():
                 anchors[name] = score_anchors(model, rows, loaded['train'], formulas, split='test', forward=name.startswith('main_'))

@@ -64,7 +64,7 @@ def verify_files(files: dict[str, str], *, root: Path = Path('.')) -> None:
 
 
 @contextmanager
-def no_fitting(*, allow_text_inference: bool = False):
+def no_fitting(*, allow_text_inference: bool = False, audit_path: Path | None = None):
     """拒绝所有统计拟合、反向传播和优化器更新；仅覆盖层阶段可执行固定文本推理。"""
     targets = ('torch.Tensor.backward', 'torch.autograd.backward', 'torch.optim.AdamW.step',
                'torch.optim.Adam.step', 'torch.optim.SGD.step')
@@ -78,8 +78,22 @@ def no_fitting(*, allow_text_inference: bool = False):
     with prohibit_refitting(enabled=True, allow_text_inference=allow_text_inference) as fits, ExitStack() as stack:
         for key in targets:
             stack.enter_context(patch(key, side_effect=reject(key)))
-        yield {'fit_calls': fits, 'update_and_backward_calls': calls,
-               'text_inference_authorized': allow_text_inference}
+        audit = {'fit_calls': fits, 'update_and_backward_calls': calls,
+                 'text_inference_authorized': allow_text_inference, 'status': 'ENTERED',
+                 'pid': os.getpid(), 'entered_at': utc_now()}
+        if audit_path is not None:
+            atomic_json(audit_path.with_name(audit_path.stem+'.entered.json'), audit)
+        try:
+            yield audit
+        except BaseException:
+            audit['status'] = 'FAILED'
+            raise
+        else:
+            audit['status'] = 'COMPLETED'
+        finally:
+            audit['ended_at'] = utc_now()
+            if audit_path is not None:
+                atomic_json(audit_path, audit)
 
 
 @contextmanager
@@ -111,13 +125,30 @@ def source_check(manifest_path: Path) -> dict:
     return manifest
 
 
-def model_bindings(plan: dict, review: dict) -> dict:
+def verify_checkpoint(item: dict) -> dict:
+    """核原权重SHA并记录实际大小；旧清单无bytes仍须通过同一SHA校验。
+
+    item必须含path/sha256。不存在、SHA不符或已声明大小不符立即拒绝；
+    不修改生产者原清单，也不以本次测得大小补造历史声明。
+    """
+    path = Path(item['path'])
+    actual_sha = sha256(path)
+    actual_bytes = path.stat().st_size
+    if actual_sha != item['sha256']:
+        raise PermissionError('实际权重SHA不匹配: '+str(path))
+    if 'bytes' in item and actual_bytes != item['bytes']:
+        raise PermissionError('实际权重大小不匹配: '+str(path))
+    return {'path': str(path), 'sha256': actual_sha, 'actual_bytes': actual_bytes,
+            'declared_bytes': item.get('bytes'), 'status': 'PASSED'}
+
+
+def model_bindings(plan: dict, review: dict, receipt: Path | None = None) -> dict:
     """核对8套既有模型的生产者、实际权重和14项资产，不读任何测试性质。"""
     from .training import verify_preprocessing_assets
     allowed = {r['model']: r for r in review['final_evaluation_authorization']['frozen_model_manifests']}
     if set(plan['models']) != set(allowed):
         raise PermissionError('最终模型集合不是获准的8套')
-    files = {}
+    files = {}; verified = {}
     for name, binding in plan['models'].items():
         root = Path(binding['root'])
         expected = allowed[name]
@@ -135,13 +166,16 @@ def model_bindings(plan: dict, review: dict) -> dict:
             raise PermissionError('基础资产不是固定14项')
         for relative, value in assets.items():
             files[str(root/relative)] = value
-        for item in manifest['checkpoints'].values():
-            p = Path(item['path'])
-            if p.stat().st_size != item['bytes'] or sha256(p) != item['sha256']:
-                raise PermissionError('实际权重字节不匹配: '+str(p))
-            files[str(p)] = item['sha256']
+        verified[name] = {'manifest_sha256': expected['checkpoint_manifest_sha256'],
+                          'producer': manifest['identity'], 'base_assets': assets, 'checkpoints': {}}
+        for stage, item in manifest['checkpoints'].items():
+            actual = verify_checkpoint(item)
+            verified[name]['checkpoints'][stage] = actual
+            files[actual['path']] = actual['sha256']
         for relative in ('checkpoint_manifest.json', 'inputs_ready.json', 'run_config.json', 'training_result.json'):
             files[str(root/relative)] = sha256(root/relative)
+    if receipt is not None:
+        atomic_json(receipt, verified)
     return files
 
 

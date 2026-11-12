@@ -120,14 +120,14 @@ def verify_top(actual: dict, saved: dict, contract: dict) -> list[dict]:
 
 
 def recompute(plan_path: Path, output: Path, *, reference: Path, inventory_sha256: str) -> dict:
-    """在独立进程按原C9重载、重新编码及全量复算，不调用原汇总作为数值输入。"""
+    """在独立进程按同一C10重载、重新编码及全量复算，不调用原汇总作为数值输入。"""
     torch.set_num_threads(8)
-    plan, review, auth, files = check_inputs(plan_path, recompute=True)
+    plan, review, auth, files = check_inputs(plan_path, recompute=True, output=output)
     if sha256(reference/'scientific_inventory.json') != inventory_sha256:
-        raise PermissionError('R9归档产物清单身份不同')
+        raise PermissionError('R10评价阶段的封存产物清单身份不同')
     verify_files(read_json(reference/'scientific_inventory.json'), root=reference)
     if read_json(reference/'final_result.json')['status'] != 'FINAL_EVALUATION_COMPLETE_NOT_RESEARCH_PASS':
-        raise PermissionError('R9未完整完成，不能补做新搜索')
+        raise PermissionError('R10评价阶段未完整完成，不能补做新搜索')
     data = read_json(Path(plan['data_lock'])); directory = Path(plan['data_lock']).parent
     test_path = Path(data['split_labels']['test']['path'])
     panel = read_json(Path(plan['fixed_requests'])); lookup = {r['request_id']: r for r in panel}
@@ -135,7 +135,7 @@ def recompute(plan_path: Path, output: Path, *, reference: Path, inventory_sha25
     if lock['consumer_code_sha'] != auth['consumer_code_sha'] or lock['all_frozen_inputs'] != files:
         raise PermissionError('复算输入与同一最终窗口不同')
     atomic_json(output/'final_lock.json', lock)
-    with test_read_guard(test_path, output/'test_access.jsonl', window=None), no_fitting():
+    with test_read_guard(test_path, output/'test_access.jsonl', window=None), no_fitting(audit_path=output/'preopening_audit.json'):
         loaded = load_development(data['split_labels'])
         formulas = {r['material_id']: r for r in read_json(directory/'approved_formulations.json')}
         models = load_models(plan, review, output)
@@ -143,12 +143,17 @@ def recompute(plan_path: Path, output: Path, *, reference: Path, inventory_sha25
     atomic_json(output/'final_window.json', window)
     with test_read_guard(test_path, output/'test_access.jsonl', window=window):
         build_overlay(rows, panel, models, review['test_condition_inference_policy'], output/'condition_overlay', reference=reference/'condition_overlay')
-        with no_fitting() as audit:
+        with no_fitting(audit_path=output/'recompute_audit.json') as audit:
             anchors = {}; anchor_differences = {}
             for name, model in models.items():
                 result = score_anchors(model, rows, loaded['train'], formulas, split='test', forward=name.startswith('main_'))
                 atomic_json(output/'anchors'/f'{name}.json', result)
                 previous = read_json(reference/'anchors'/f'{name}.json')
+                for kind, field in (('inverse', 'observation_id'), ('joint', 'observation_ids')):
+                    a = result[kind] if kind == 'inverse' else result[kind]['observations']
+                    b = previous[kind] if kind == 'inverse' else previous[kind]['observations']
+                    if len(a) != len(b) or [r[field] for r in a] != [r[field] for r in b]:
+                        raise ValueError('复算观察/共同状态覆盖或顺序不一致: '+name+'/'+kind)
                 anchor_differences[name] = {'forward': compare_forward(result['forward'], previous['forward'], model.contract),
                     'inverse': [{ 'observation_id': a['observation_id'], **compare_tree(a, b)} for a, b in zip(result['inverse'], previous['inverse'])],
                     'joint': [{ 'observation_ids': a['observation_ids'], **compare_tree(a, b)} for a, b in zip(result['joint']['observations'], previous['joint']['observations'])]}

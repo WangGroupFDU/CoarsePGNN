@@ -42,6 +42,7 @@ def main() -> None:
     command.add_argument("--output", required=True, type=Path)
     command.add_argument("--readonly-producer", type=Path)
     command.add_argument("--final-plan", type=Path, help="冻结的R9/R10无训练计划")
+    command.add_argument("--combined-final", action="store_true", help="R10单一共享截止的评价加独立复算")
     command.add_argument("--recompute-reference", type=Path)
     command.add_argument("--reference-sha256")
     args = parser.parse_args()
@@ -66,11 +67,16 @@ def main() -> None:
                 parser.error('最终计划不能混入开发评价参数')
             if bool(args.recompute_reference) != bool(args.reference_sha256):
                 parser.error('独立复算须同时给原目录和归档清单SHA')
-            from .final_round import run
-            result=run(args.final_plan,args.output,'recompute' if args.recompute_reference else 'evaluate',
-                       reference=args.recompute_reference,reference_sha256=args.reference_sha256)
+            from .final_round import run, run_combined
+            if args.combined_final:
+                if args.recompute_reference or args.reference_sha256:
+                    parser.error('合并入口自动绑定内部评价清单，不能指定外部复算目录')
+                result=run_combined(args.final_plan,args.output)
+            else:
+                result=run(args.final_plan,args.output,'recompute' if args.recompute_reference else 'evaluate',
+                           reference=args.recompute_reference,reference_sha256=args.reference_sha256)
         else:
-            if not all((args.config,args.model_dir,args.manifest_sha256)) or args.recompute_reference or args.reference_sha256:
+            if not all((args.config,args.model_dir,args.manifest_sha256)) or args.recompute_reference or args.reference_sha256 or args.combined_final:
                 parser.error('开发评价要求config/model-dir/manifest-sha256且不接受复算参数')
             from .evaluation import evaluate_configuration
             result=evaluate_configuration(read_json(args.config),args.model_dir,args.manifest_sha256,args.output,

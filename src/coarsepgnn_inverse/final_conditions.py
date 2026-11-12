@@ -95,7 +95,7 @@ def build_overlay(rows: list[dict], requests: list[dict], models: dict, policy: 
             raise ValueError('同一prompt键对应不同文本')
     missing = [p for p in prompts if p.sha256 not in base_text]
     atomic_json(output/'missing_prompts.json', [p.__dict__ for p in missing])
-    with no_fitting(allow_text_inference=True) as audit:
+    with no_fitting(allow_text_inference=True, audit_path=output/'inference_audit.json') as audit:
         if missing:
             encoder = QwenMRL32Encoder(Path(config['model_path']), device_name='cuda')
             if encoder.model.training:
