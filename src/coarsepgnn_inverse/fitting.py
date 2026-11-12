@@ -12,7 +12,7 @@ from typing import Callable
 import numpy as np
 import torch
 
-from .io import digest, write_json
+from .io import digest, read_json, write_json
 
 
 def seed_everything(seed: int) -> None:
@@ -113,6 +113,16 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
     else:
         write_json(output / "configuration.json", {"identity": identity, "config": config,
                                                     "identity_sha256": identity_sha})
+    # 记录真实模型参数组，避免只由配置文件推测优化器实际接收的参数。
+    groups=[{k:(list(v) if isinstance(v,tuple) else v) for k,v in group.items() if k!='params'}
+            | {'parameter_tensors':len(group['params']),'parameter_elements':sum(p.numel() for p in group['params'])}
+            for group in optimizer.param_groups]
+    if any(group['lr']!=config['learning_rate'] or group['weight_decay']!=config['weight_decay'] for group in groups):
+        raise ValueError('真实AdamW参数组与冻结配置不同')
+    group_path=output/'actual_optimizer_groups.json'
+    if group_path.exists():
+        if read_json(group_path)!=groups:raise ValueError('恢复后优化器参数组变化')
+    else:write_json(group_path,groups)
     actual_updates=history[-1]["optimizer_updates"] if history else 0
     for epoch in range(first_epoch, config["max_epochs"] + 1):
         if stale >= config["patience"] and not config.get("fixed_update_epochs",False):

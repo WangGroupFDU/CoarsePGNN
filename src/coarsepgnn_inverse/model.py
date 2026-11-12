@@ -179,7 +179,7 @@ class InverseDesigner(nn.Module):
 
     @torch.no_grad()
     def sample_proposals(self, context: torch.Tensor, count: int,
-                         generator: torch.Generator) -> list[dict]:
+                         generator: torch.Generator, *, allowed_masks: torch.Tensor | None=None) -> list[dict]:
         """从自回归原料分布和MDN连续分布采样指定数量的原始提案。
 
         context为单请求[1,H]，generator必须与张量设备匹配且由调用方保存状态。
@@ -189,6 +189,9 @@ class InverseDesigner(nn.Module):
         """
         if context.shape != (1, self.hidden) or type(count) is not int or count <= 0:
             raise ValueError("采样需要单请求[1,H]和正整数count")
+        if allowed_masks is not None and (allowed_masks.shape!=self.role_masks.shape or
+            (allowed_masks & ~self.role_masks).any() or not allowed_masks.any(dim=1).all()):
+            raise ValueError('请求候选角色掩码不属于冻结目录或为空')
         self.eval()
         context = context.expand(count, -1)
         embeddings = self.grade_encoder(self.grade_features)
@@ -197,6 +200,8 @@ class InverseDesigner(nn.Module):
         scores = context.new_zeros(count)
         for role in range(3):
             state, logits = self.step(context, state, previous, role, embeddings)
+            if allowed_masks is not None:
+                logits=logits.masked_fill(~allowed_masks[role],-torch.inf)
             log_probs = F.log_softmax(logits, dim=-1)
             selected = torch.multinomial(log_probs.exp(), 1, generator=generator).squeeze(1)
             scores += log_probs.gather(1, selected[:, None]).squeeze(1)

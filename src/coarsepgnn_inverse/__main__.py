@@ -27,6 +27,20 @@ def main() -> None:
     command.add_argument("--config", required=True, type=Path)
     command.add_argument("--output", required=True, type=Path)
     command.add_argument("--resume", action="store_true", help="仅接续同一代码、合同和配置的未完成轮")
+    command.add_argument("--deadline-monotonic", type=float, help="外层整轮共享单调时钟期限")
+    command = sub.add_parser("design", help="从冻结权重生成配方、粗图和逐协议预测")
+    command.add_argument("--model-dir", required=True, type=Path)
+    command.add_argument("--manifest-sha256", required=True)
+    command.add_argument("--contract", required=True, type=Path)
+    command.add_argument("--data-lock", required=True, type=Path)
+    command.add_argument("--input", required=True, type=Path)
+    command.add_argument("--output", required=True, type=Path)
+    command = sub.add_parser("evaluate", help="当前授权下固定validation锚点评价，测试仍封存")
+    command.add_argument("--config", required=True, type=Path)
+    command.add_argument("--model-dir", required=True, type=Path)
+    command.add_argument("--manifest-sha256", required=True)
+    command.add_argument("--output", required=True, type=Path)
+    command.add_argument("--readonly-producer", type=Path)
     args = parser.parse_args()
     if args.command == "audit":
         result = audit(read_json(args.config), args.output)
@@ -36,7 +50,17 @@ def main() -> None:
                   "predictions_computed": False}
     elif args.command == "train":
         from .training import train
-        result = train(read_json(args.config), args.output,resume=args.resume)
+        result = train(read_json(args.config), args.output,resume=args.resume,deadline_monotonic=args.deadline_monotonic)
+    elif args.command == "design":
+        from .inference import FrozenDesignModels
+        from .design import run_design
+        model=FrozenDesignModels(args.model_dir,manifest_sha256=args.manifest_sha256,
+                                 contract_path=args.contract,data_lock_path=args.data_lock)
+        result=run_design(read_json(args.input),model,args.output)
+    elif args.command == "evaluate":
+        from .evaluation import evaluate_configuration
+        result=evaluate_configuration(read_json(args.config),args.model_dir,args.manifest_sha256,args.output,
+            readonly_producer=read_json(args.readonly_producer) if args.readonly_producer else None)
     else:
         result = decode_ratios(**read_json(args.input))
         write_json(args.output, result)

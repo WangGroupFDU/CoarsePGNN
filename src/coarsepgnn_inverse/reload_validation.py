@@ -49,7 +49,7 @@ def collect_inverse_trace(model, loader) -> dict:
     return {'audit':audits,**{key:torch.cat([part[key] for part in parts],dim=0) for key in parts[0]}}
 
 
-def independent_validation(config: dict, training_root: Path, output: Path) -> dict:
+def independent_validation(config: dict, training_root: Path, output: Path, *, readonly_binding: dict | None=None) -> dict:
     """只由配置、冻结输入清单和checkpoint重建模型，逐观察复算验证输出及MAE。
 
     不复用训练中的网络、DataLoader、GraphStore或ConditionInputs对象；不调用
@@ -57,9 +57,19 @@ def independent_validation(config: dict, training_root: Path, output: Path) -> d
     """
     from .training import training_gate, reload_inputs
     from .runtime_policy import enforce_deterministic_runtime
-    runtime=enforce_deterministic_runtime(config['execution_policy'])
+    runtime=enforce_deterministic_runtime(config['execution_policy'],config['optimizer'])
     started=time.monotonic()
-    contract,lock,authorization=training_gate(config)
+    if readonly_binding is None:
+        contract,lock,authorization=training_gate(config)
+    else:
+        # 消费C7只读核对C6：外层已用当前授权安装测试拒绝钩子；不冒充C6恢复训练。
+        contract=read_json(Path(config['contract']));lock=read_json(Path(config['data_lock']))
+        authorization={'test_access_guard':readonly_binding['test_access_guard']}
+        if sha256(training_root/'checkpoint_manifest.json')!=readonly_binding['producer_manifest_sha256']:
+            raise ValueError('只读生产者清单变化')
+        owner=read_json(training_root/'run_config.json')['identity']
+        if owner['code_sha']!=readonly_binding['producer_code_sha']:
+            raise ValueError('只读生产者代码身份不匹配')
     saved_config=read_json(training_root/'run_config.json')
     if saved_config['config']!=config:
         raise ValueError('独立重载配置不同')
@@ -84,6 +94,13 @@ def independent_validation(config: dict, training_root: Path, output: Path) -> d
         expected={**identity,'stage':stage,'target_transform_sha256':sha256(training_root/transform_name)}
         if checkpoint['identity']!=expected or checkpoint['identity_sha256']!=digest({'identity':expected,'config':config['optimizer']}):
             raise ValueError(f'最佳checkpoint身份不同: {stage}')
+        if config['round']>=7:
+            actual=checkpoint['optimizer']['param_groups']
+            recorded=read_json(training_root/stage/'actual_optimizer_groups.json')
+            comparable=[{k:(list(v) if isinstance(v,tuple) else v) for k,v in g.items() if k!='params'}
+                        | {'parameter_tensors':len(g['params'])} for g in actual]
+            expected_groups=[{k:v for k,v in g.items() if k!='parameter_elements'} for g in recorded]
+            if comparable!=expected_groups:raise ValueError('checkpoint实际AdamW参数组不同')
         model.load_state_dict(checkpoint['model'],strict=True);return model.to(device).eval()
     reports={}
     for target in TARGET_UNITS:
@@ -140,7 +157,7 @@ def independent_validation(config: dict, training_root: Path, output: Path) -> d
     result={'status':'PASSED','identity':identity,'preprocessing_refitted':False,'optimizer_updates':0,
         'elapsed_seconds':time.monotonic()-started,'test_access_guard':authorization['test_access_guard'],
         'checkpoint_manifest_sha256':sha256(training_root/'checkpoint_manifest.json'),
-        'reports':reports,'test_access':False,'final96_performance_computed':False}
+        'reports':reports,'test_access':False,'final96_performance_computed':False,'readonly_binding':readonly_binding}
     write_json(output,result);return result
 
 

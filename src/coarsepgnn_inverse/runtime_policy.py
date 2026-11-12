@@ -10,7 +10,7 @@ import subprocess
 import torch
 
 
-def enforce_deterministic_runtime(policy: dict) -> dict:
+def enforce_deterministic_runtime(policy: dict, optimizer_config: dict) -> dict:
     """在CUDA首个数值操作前核准环境、启用严格模式并回读实际设置。
 
     返回可进入checkpoint身份的稳定摘要，不含墙钟等每次变化字段。
@@ -30,7 +30,7 @@ def enforce_deterministic_runtime(policy: dict) -> dict:
         extensions[module]={'available':available,'version':importlib.metadata.version(module) if available else None}
     devices=subprocess.check_output(['nvidia-smi','--query-gpu=name,uuid,driver_version','--format=csv,noheader'],text=True).strip().splitlines()
     # 不创建CUDA张量或更新参数；读取当前AdamW默认实现选项，保留默认自动选择语义。
-    optimizer=torch.optim.AdamW([torch.nn.Parameter(torch.zeros(1))],lr=.001,weight_decay=.0001)
+    optimizer=torch.optim.AdamW([torch.nn.Parameter(torch.zeros(1))],lr=optimizer_config['learning_rate'],weight_decay=optimizer_config['weight_decay'])
     return {'host':platform.node(),'python':platform.python_version(),'torch':str(torch.__version__),
         'cuda':torch.version.cuda,'cudnn':torch.backends.cudnn.version(),'extensions':extensions,'gpus':devices,
         'deterministic_algorithms':torch.are_deterministic_algorithms_enabled(),

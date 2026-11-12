@@ -91,7 +91,7 @@ def inverse_anchor_score(model, batch: dict, *, half_width: float=0.005,
     if half_width!=0.005 or probability_floor!=1e-12:
         raise ValueError('锚点窗口及概率下限必须与冻结合同一致')
     model.eval();context=model.encode(batch);designer=model.designer
-    choices=batch['choices'];v=batch['v'].double()
+    choices=batch['choices'];v=batch.get('v_reference',batch['v']).double()
     embeddings=designer.grade_encoder(designer.grade_features)
     previous=torch.zeros_like(context);state=context;factors=[]
     for role in range(3):

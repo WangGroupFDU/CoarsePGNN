@@ -188,7 +188,7 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
     模型完成不等同研究PASS，测试评价必须使用另外的最终锁和一次性入口。
     """
     from .runtime_policy import enforce_deterministic_runtime
-    runtime=enforce_deterministic_runtime(config['execution_policy'])
+    runtime=enforce_deterministic_runtime(config['execution_policy'],config['optimizer'])
     contract,lock,authorization=training_gate(config)
     if not torch.cuda.is_available():
         raise RuntimeError('正式训练要求授权cn2 CUDA，不自动降级到CPU')
@@ -203,7 +203,7 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
     identity={'code_sha':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
               'contract_sha256':sha256(Path(config['contract'])),'data_lock_sha256':sha256(Path(config['data_lock'])),
               'authorization_review_sha256':authorization['review_sha256'],'seed':config['seed'],
-              'execution_settings_sha256':digest(runtime)}
+              'execution_settings_sha256':digest(runtime),'full_config_sha256':digest(config)}
     run_config={'config':config,'identity':identity}
     if resume:
         if read_json(output/'run_config.json')!=run_config:
@@ -360,13 +360,17 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
     return result
 
 
-def train(config: dict, output: Path, *, resume: bool=False) -> dict:
+def train(config: dict, output: Path, *, resume: bool=False, deadline_monotonic: float | None=None) -> dict:
     """对全部授权检查、预处理、恢复对照和九阶段拟合设置统一硬墙钟期限。
 
     外层正式job另有总预算硬限制；这里使直接CLI调用也不能悄悄越过本轮期限。
     超时抛错并保留上一个完整epoch checkpoint，不把部分输出写成训练完成。
     """
     limit=config['timeout_seconds']
+    if config['round']>=7 and deadline_monotonic is None:
+        raise PermissionError('多配置训练必须传入外层共享单调时钟截止时间')
+    if deadline_monotonic is not None:
+        limit=min(limit,deadline_monotonic-time.monotonic())
     if isinstance(limit,bool) or not isinstance(limit,(int,float)) or not math.isfinite(limit) or limit<=0:
         raise ValueError('训练墙钟上限必须为正有限秒数')
     def timeout_handler(signum,frame):

@@ -26,7 +26,13 @@ def parse_review(path: Path) -> dict:
 
 def verify_configuration(config: dict, allowed: dict) -> None:
     """逐字段比较实际配置和原评审全部超参数/预算；不得只核对随机种子。"""
-    hp=allowed['hyperparameters']
+    hp=dict(allowed['hyperparameters'])
+    if allowed.get('configuration_authorization_mode')=='EXACT_ALLOWLIST':
+        entries={row['config_id']:row for row in allowed['allowed_configurations']}
+        entry=entries.get(config.get('config_id'))
+        if entry is None or entry['mode']!='FRESH_NINE_STAGE_TRAINING':
+            raise PermissionError('未知或只读config_id不允许新增训练')
+        hp.update({k:entry[k] for k in ('learning_rate','weight_decay')})
     expected={'learning_rate':hp['learning_rate'],'weight_decay':hp['weight_decay'],
               'max_epochs':hp['max_epochs_per_stage'],'patience':hp['early_stopping_patience'],
               'gradient_clip':hp['gradient_norm_clip']}
@@ -66,7 +72,9 @@ def verify_startup(config: dict, current_code_sha: str) -> tuple[dict,dict,dict]
         raise PermissionError('data_lock SHA与冻结合同或授权不同')
     if lock['data_condition_failures']:
         raise PermissionError('数据最低条件未满足')
-    if authorization['training_code_sha']!=current_code_sha or authorization['config_sha256']!=digest(config):
+    expected_config=(authorization['config_sha256_by_id'].get(config.get('config_id'))
+                     if 'config_sha256_by_id' in authorization else authorization['config_sha256'])
+    if authorization['training_code_sha']!=current_code_sha or expected_config!=digest(config):
         raise PermissionError('训练源码或完整配置不属于该轮回执')
     review_path=Path(authorization['review_path'])
     if sha256(review_path)!=authorization['review_sha256']:
