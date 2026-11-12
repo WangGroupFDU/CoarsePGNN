@@ -32,8 +32,8 @@
 
 ## 阻塞与接续
 
-技能要求在原 Safari Pro 会话中取得完整规划答复；当前没有 Safari Computer Use，尚未获准改用原生会话工具。未发送新消息、未声称 Pro 可见、未手动改变 loopctl 的绑定/评审状态。
+2026-11-12 接续：Safari Computer Use 已实际恢复，已核对原会话 URL 和选中的 Pro，并通过 loopctl 正式绑定。规划请求 `pu-inverse-20261111-3ca35914035c` 已发送，网页显示正在思考；尚未取得完整回复或冻结成功合同。此前的通道阻塞已解除。
 
-下一步把 `pending_goal_request.md` 和本目录证据送入原会话，由 GPT 确定并冻结成功合同。收到完整答复后仍需审查其可实现性与证据边界，才进入正式训练。训练、前向模型接线、候选构图、基线、消融和三种子最终测试尚未完成。详细接续顺序见 `docs/pu_inverse_design.md`。
+`pending_goal_request.md` 的内容和本目录固定版本证据已随正式请求送入原会话。收到完整答复后，核查其可实现性与证据边界并冻结成功合同，才进入正式训练。训练、前向模型接线、候选构图的真实回放验证、基线、消融和三种子最终测试尚未完成。详细接续顺序见 `docs/pu_inverse_design.md`。
 
 控制状态仍在本地 `.codex-chatgpt-loop/pu-inverse-20261111/`，正式轮次 0/10、正式计算 0/259200 秒；准备检查另有真实耗时回执，不能将状态解释为整项任务没有用过计算。远程运行目录 `/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111`，主机 `codex-cn2`。恢复时先查原回执，勿重复预检或重置预算。
