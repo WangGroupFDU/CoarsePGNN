@@ -33,14 +33,18 @@ def verify_configuration(config: dict, allowed: dict) -> None:
         if entry is None or entry['mode']!='FRESH_NINE_STAGE_TRAINING':
             raise PermissionError('未知或只读config_id不允许新增训练')
         hp.update({k:entry[k] for k in ('learning_rate','weight_decay')})
-    expected={'learning_rate':hp['learning_rate'],'weight_decay':hp['weight_decay'],
-              'max_epochs':hp['max_epochs_per_stage'],'patience':hp['early_stopping_patience'],
-              'gradient_clip':hp['gradient_norm_clip']}
-    if config['optimizer']!=expected or config['optimizer_name']!=hp['optimizer']:
-        raise PermissionError('实际AdamW配置不属于该轮授权')
-    for key in ('batch_size','inverse_hidden','mdn_components','distillation'):
-        if config[key]!=hp[key]:
-            raise PermissionError(f'实际配置与授权不同: {key}')
+    if allowed.get('configuration_authorization_mode')=='EXACT_OPERATION_ALLOWLIST':
+        from .operation_policy import validate_operation
+        validate_operation(config,allowed)
+    else:
+        expected={'learning_rate':hp['learning_rate'],'weight_decay':hp['weight_decay'],
+                  'max_epochs':hp['max_epochs_per_stage'],'patience':hp['early_stopping_patience'],
+                  'gradient_clip':hp['gradient_norm_clip']}
+        if config['optimizer']!=expected or config['optimizer_name']!=hp['optimizer']:
+            raise PermissionError('实际AdamW配置不属于该轮授权')
+        for key in ('batch_size','inverse_hidden','mdn_components','distillation'):
+            if config[key]!=hp[key]:
+                raise PermissionError(f'实际配置与授权不同: {key}')
     if config['seed'] not in allowed['allowed_seeds'] or config['round']!=allowed['next_round']:
         raise PermissionError('种子或正式轮次不属于原评审授权')
     if config['timeout_seconds']!=allowed['maximum_round_wall_seconds']:
@@ -72,8 +76,13 @@ def verify_startup(config: dict, current_code_sha: str) -> tuple[dict,dict,dict]
         raise PermissionError('data_lock SHA与冻结合同或授权不同')
     if lock['data_condition_failures']:
         raise PermissionError('数据最低条件未满足')
-    expected_config=(authorization['config_sha256_by_id'].get(config.get('config_id'))
-                     if 'config_sha256_by_id' in authorization else authorization['config_sha256'])
+    if 'config_sha256_by_operation' in authorization:
+        from .operation_policy import operation_key,verify_derived_config
+        expected_config=authorization['config_sha256_by_operation'].get(operation_key(config))
+        verify_derived_config(config,authorization)
+    else:
+        expected_config=(authorization['config_sha256_by_id'].get(config.get('config_id'))
+                         if 'config_sha256_by_id' in authorization else authorization['config_sha256'])
     if authorization['training_code_sha']!=current_code_sha or expected_config!=digest(config):
         raise PermissionError('训练源码或完整配置不属于该轮回执')
     review_path=Path(authorization['review_path'])
@@ -100,8 +109,21 @@ def verify_startup(config: dict, current_code_sha: str) -> tuple[dict,dict,dict]
     verify_configuration(config,allowed)
     if config.get('preprocessing_source') is not None:
         source=config['preprocessing_source']
-        if source!=authorization['preprocessing_source'] or source['code_sha']!=review['code_sha'] or source['artifact_sha']!=review['artifact_sha']:
-            raise PermissionError('预处理复用来源与当前评审不同')
+        reuse=allowed.get('preprocessing_reuse')
+        if source!=authorization['preprocessing_source']:
+            raise PermissionError('预处理生产者与执行回执不同')
+        if reuse is not None:
+            expected={'code_sha':reuse['source_code_sha'],'artifact_sha':reuse['source_artifact_sha'],
+                      'inputs_ready_sha256':reuse['inputs_ready_sha256'],'asset_count':reuse['asset_count']}
+            if any(source[k]!=v for k,v in expected.items()):
+                raise PermissionError('预处理生产者不属于原评审明确批准的来源')
+        elif source['code_sha']!=review['code_sha'] or source['artifact_sha']!=review['artifact_sha']:
+            raise PermissionError('历史预处理生产者身份不同')
+        if config.get('operation')=='READ_ONLY_REEVALUATION':
+            producer=next(r for r in allowed['allowed_configurations'] if r['config_id']=='D0')
+            if (source['code_sha']!=producer['producer_code_sha'] or source['artifact_sha']!=producer['producer_artifact_sha'] or
+                sha256(Path(source['path'])/'checkpoint_manifest.json')!=producer['checkpoint_manifest_sha256']):
+                raise PermissionError('D0只读生产者身份不同')
         if config['execution_policy']!={'cublas_workspace_config':':4096:8','deterministic_algorithms':True,'warn_only':False}:
             raise PermissionError('严格执行设置不符合第6轮授权')
     # 先核对路径元数据，不能先计算被错误映射成test的开发文件散列。

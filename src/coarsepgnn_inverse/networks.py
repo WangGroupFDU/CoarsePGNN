@@ -62,6 +62,21 @@ class ConditionalInverse(nn.Module):
         return self.designer.supervised_loss(self.encode(batch),batch['choices'],batch['v'])['loss']
 
 
+def inverse_from_config(catalog: dict, assay_vocab_sizes: list[int], config: dict) -> ConditionalInverse:
+    """由同一冻结配置构造训练、恢复和推理的逆模型，防止消融参数只在单一入口生效。
+
+    目录特征与assay词表保持不变；隐藏维度、MDN分量和输入屏蔽明确来自运行配置。
+    历史主模型未设置屏蔽字段时维持原先两个False，不加载或转换已有权重。
+    """
+    model=ConditionalInverse(catalog,assay_vocab_sizes,hidden=config['inverse_hidden'],
+        components=config['mdn_components'],no_target_values=config.get('no_target_values',False),
+        no_test_conditions=config.get('no_test_conditions',False))
+    if (model.designer.hidden,model.designer.components,model.no_target_values,model.no_test_conditions)!=(
+        config['inverse_hidden'],config['mdn_components'],config.get('no_target_values',False),config.get('no_test_conditions',False)):
+        raise ValueError('逆模型实际对象与配置不一致')
+    return model
+
+
 def device_batch(batch: dict, device: torch.device) -> dict:
     """移动模型输入与标签到设备，保留审计记录在CPU且不把ID传入网络。"""
     return {key:(value.to(device) if key!='audit' and hasattr(value,'to') else value)

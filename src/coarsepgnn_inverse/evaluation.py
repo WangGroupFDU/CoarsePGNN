@@ -33,7 +33,7 @@ def evaluate_configuration(config: dict, training_root: Path, manifest_sha256: s
                                      contract_path=Path(config['contract']),data_lock_path=Path(config['data_lock']))
             if readonly_producer is not None:
                 from .reload_validation import independent_validation
-                if readonly_producer['code_sha']!=authorization['review_code_sha'] or readonly_producer['artifact_sha']!=authorization['review_artifact_sha']:
+                if readonly_producer['code_sha']!=config['preprocessing_source']['code_sha'] or readonly_producer['artifact_sha']!=config['preprocessing_source']['artifact_sha']:
                     raise ValueError('只读模型不是当前评审的原C6/A6')
                 binding={'producer_code_sha':readonly_producer['code_sha'],
                          'producer_artifact_sha':readonly_producer['artifact_sha'],

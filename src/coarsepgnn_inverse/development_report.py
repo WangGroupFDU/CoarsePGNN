@@ -65,7 +65,8 @@ def inverse_development_report(model, loader, rows: list[dict], output: Path) ->
     """
     by_id={r['observation_id']:r for r in rows};records=[]
     for batch in loader:
-        score=inverse_anchor_score(model,device_batch(batch,next(model.parameters()).device))
+        score=inverse_anchor_score(model,device_batch(batch,next(model.parameters()).device),
+                                   scoring_scope='LEGACY_NON_ACCEPTANCE_DIAGNOSTIC')
         for i,audit in enumerate(batch['audit']):
             if len(audit['observation_ids'])!=1:
                 raise ValueError('首轮逆向验证必须是固定单目标观察')
@@ -79,7 +80,8 @@ def inverse_development_report(model, loader, rows: list[dict], output: Path) ->
     metrics={target:{'nll':material_mean([r for r in records if r['target']==target],'nll'),
                      'source_statistics':closure_statistics([r for r in records if r['target']==target],'nll')}
              for target in TARGET_UNITS}
-    result={'split':'validation','targets':metrics,'four_target_mean_nll':sum(m['nll'] for m in metrics.values())/4,
+    result={'scoring_scope':'LEGACY_NON_ACCEPTANCE_DIAGNOSTIC','eligible_for_selection_or_acceptance':False,
+            'split':'validation','targets':metrics,'four_target_mean_nll':sum(m['nll'] for m in metrics.values())/4,
             'factor_floor_counts':[sum(int(r['floored'][j]) for r in records) for j in range(4)],
             'paired_no_target_improvement':None,'research_pass':False,'test_access':False}
     write_json(output/'inverse_validation_scored_rows.json',records)

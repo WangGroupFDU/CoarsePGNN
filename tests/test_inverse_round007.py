@@ -43,6 +43,7 @@ def test_source_precision_none_boundaries_and_probability_floor():
     batch={'choices':torch.tensor([[0,1,2],[0,1,3],[0,1,2],[0,1,2]]),
            'v':torch.tensor([v,0.,1e-9,1-1e-9],dtype=torch.float32),
            'v_reference':torch.tensor([v,0.,1e-9,1-1e-9],dtype=torch.float64)}
+    batch['v_source']=torch.tensor([v,0.,1e-9,1-1e-9],dtype=torch.float64)
     result=inverse_anchor_score(KnownModel(),batch)
     cdf=lambda z:(1+math.erf(z/math.sqrt(2)))/2
     lower=math.log((v-.005)/(1-v+.005));upper=math.log((v+.005)/(1-v-.005))

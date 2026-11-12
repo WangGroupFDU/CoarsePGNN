@@ -63,6 +63,18 @@ def test_epoch_boundary_resume_matches_continuous_training(tmp_path):
     for key, tensor in full.state_dict().items():
         torch.testing.assert_close(tensor, resumed.state_dict()[key], rtol=0, atol=0)
     assert actual["material_counts"] == {"train": 4, "validation": 4}
+    # 真实生产和消费链核对最佳epoch模型及AdamW步数，不借用最后epoch状态。
+    from coarsepgnn_inverse.reload_validation import verify_optimizer_groups
+    best=torch.load(tmp_path/'resumed'/'best.pt',weights_only=True)
+    assert 'optimizer' in best
+    assert {int(v['step']) for v in best['optimizer']['state'].values()}=={best['epoch']*len(resumed_loaders['train'])}
+    continuous_best=torch.load(tmp_path/'full'/'best.pt',weights_only=True)
+    for key,value in best['model'].items():
+        torch.testing.assert_close(value,continuous_best['model'][key],rtol=0,atol=0)
+    verify_optimizer_groups(tmp_path/'resumed',identity,best['identity_sha256'])
+    import pytest
+    with pytest.raises(ValueError,match='阶段身份不同'):
+        verify_optimizer_groups(tmp_path/'resumed',{**identity,'seed':18},best['identity_sha256'])
 
 
 def test_failed_resume_probe_persists_and_restores_checkpoint(tmp_path):

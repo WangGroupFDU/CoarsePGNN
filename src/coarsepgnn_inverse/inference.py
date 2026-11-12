@@ -19,7 +19,7 @@ from .conditions import tensorize_conditions
 from .development import condition_record
 from .graph import recipe_to_complete_graph
 from .io import canonical, digest, read_json, sha256, write_json
-from .networks import ConditionalForward, ConditionalInverse
+from .networks import ConditionalForward, inverse_from_config
 from .schema import validate_request
 from .search import CandidateSearch, recipe_identity
 from .training import verify_preprocessing_assets
@@ -100,9 +100,23 @@ class FrozenDesignModels:
         self.featurizer=GraphFeaturizer.from_sample_schema(package_schema())
         self.forward_models={};self.inverse_model=None;self.encoded_requests={};self.scores={}
         self.generator=torch.Generator(device=self.device).manual_seed(self.config['seed'])
+        self.forward_parent=None
+        if self.config.get('operation','').startswith('INVERSE_ONLY_'):
+            paired=self.config['paired_main']
+            if self.manifest['forward_producer']!=paired or self.manifest['inverse_producer']['identity']!=self.identity:
+                raise ValueError('组合模型生产者身份不同')
+            if self.manifest['consumer_code_sha']!=self.identity['code_sha']:
+                raise ValueError('组合模型消费代码身份不同')
+            self.forward_parent=FrozenDesignModels(Path(paired['root']),manifest_sha256=paired['manifest_sha256'],
+                                                  contract_path=contract_path,data_lock_path=data_lock_path,device=device)
+            for key in ('seed','contract_sha256','data_lock_sha256','preprocessing_receipt_sha256'):
+                if self.forward_parent.identity[key]!=self.identity[key]:
+                    raise ValueError('固定前向和逆向生产者共享输入身份不同: '+key)
 
     def load_model(self, stage: str):
         """核验字节hash、内部身份、阶段变换后加载；不接受裸state_dict来源不明文件。"""
+        if stage!='inverse_full' and self.forward_parent is not None:
+            return self.forward_parent.load_model(stage)
         path=self.root/stage/'best.pt'
         if sha256(path)!=self.manifest['checkpoints'][stage]['sha256']:
             raise ValueError('checkpoint文件发生变化: '+stage)
@@ -113,18 +127,16 @@ class FrozenDesignModels:
         if saved['identity']!=expected or saved['identity_sha256']!=digest({'identity':expected,'config':self.config['optimizer']}):
             raise ValueError('checkpoint内部身份不一致: '+stage)
         if inverse:
-            model=ConditionalInverse(self.features,self.sizes,hidden=self.config['inverse_hidden'],
-                components=self.config['mdn_components'],no_target_values=self.config.get('no_target_values',False),
-                no_test_conditions=self.config.get('no_test_conditions',False))
+            model=inverse_from_config(self.features,self.sizes,self.config)
         else:
             model=ConditionalForward(StructureOnlyRegressor(target=stage.removesuffix('_full'),schema=package_schema()),self.sizes)
         model.load_state_dict(saved['model'],strict=True)
         return model.to(self.device).eval()
 
     def prepare_requests(self, requests: list[dict]) -> int:
-        """合并一批协议的缺失prompt，一次加载固定文本模型，避免按每条锚点重复加载。
+        """合并检查一批协议的prompt，全部必须已存在于冻结文本缓存。
 
-        验证基础模型逐文件SHA后才编码；只扩展当前推理对象内存缓存，不写回训练资产。
+        本开发入口不加载Qwen、不编码新协议，也不改写训练资产；缺失时明确拒绝。
         """
         rows=[row for request in requests for row in request_rows(request)]
         prompts=unique_prompts(p for row in rows for p in prompts_for_record_v2(condition_record(row),all_schemes=False))
@@ -243,6 +255,7 @@ class FrozenDesignModels:
             batch['nco_oh_ratio']=torch.tensor([r['nco_oh_ratio'] for r in part],dtype=torch.float32,device=self.device)
             batch['choices']=torch.tensor([[grade_index[g] for g in r['grade_ids']] for r in part],dtype=torch.long,device=self.device)
             batch['v_reference']=torch.tensor([r['extender_oh_fraction'] for r in part],dtype=torch.float64,device=self.device)
+            batch['v_source']=torch.tensor([r['extender_oh_fraction'] for r in part],dtype=torch.float64,device=self.device)
             batch['v']=batch['v_reference'].float()
             result=inverse_anchor_score(self.inverse_model,batch)
             scores.extend((-result['nll']).cpu().tolist())

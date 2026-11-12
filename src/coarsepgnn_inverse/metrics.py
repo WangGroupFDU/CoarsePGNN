@@ -82,7 +82,7 @@ def normal_interval_log_mass(lower: torch.Tensor, upper: torch.Tensor) -> torch.
 
 @torch.no_grad()
 def inverse_anchor_score(model, batch: dict, *, half_width: float=0.005,
-                         probability_floor: float=1e-12) -> dict:
+                         probability_floor: float=1e-12, scoring_scope: str='FORMAL_SOURCE_FLOAT64') -> dict:
     """独立给真实D/P/E及v窗口评分，不用z点密度冒充配方概率。
 
     batch已经按对应模型设备排列；每个离散因子与连续窗口质量分别截到固定下限，
@@ -90,8 +90,19 @@ def inverse_anchor_score(model, batch: dict, *, half_width: float=0.005,
     """
     if half_width!=0.005 or probability_floor!=1e-12:
         raise ValueError('锚点窗口及概率下限必须与冻结合同一致')
+    if scoring_scope=='FORMAL_SOURCE_FLOAT64':
+        if 'v_reference' not in batch or batch['v_reference'].dtype!=torch.float64:
+            raise ValueError('正式评分要求源float64 v_reference')
+        if ('v_source' not in batch or batch['v_source'].dtype!=torch.float64 or
+                not torch.equal(batch['v_reference'],batch['v_source'])):
+            raise ValueError('正式评分尚未逐项核对源配方v')
+        v=batch['v_reference']
+    elif scoring_scope=='LEGACY_NON_ACCEPTANCE_DIAGNOSTIC':
+        v=batch['v'].double()
+    else:
+        raise ValueError('未知评分作用域')
     model.eval();context=model.encode(batch);designer=model.designer
-    choices=batch['choices'];v=batch.get('v_reference',batch['v']).double()
+    choices=batch['choices']
     embeddings=designer.grade_encoder(designer.grade_features)
     previous=torch.zeros_like(context);state=context;factors=[]
     for role in range(3):

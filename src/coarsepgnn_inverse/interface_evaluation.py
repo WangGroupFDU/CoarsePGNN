@@ -54,6 +54,17 @@ def replay_training_formula(model, training: list[dict], formulas: dict, output:
     shifted_prediction=model.score(request,[shifted])[0]['predictions'][0]
     none={**recipe,'grade_ids':[*recipe['grade_ids'][:2],'NONE'],'extender_oh_fraction':0.0}
     model.featurizer.prepare_graph(model.graph(none))
+    from .chemistry import decode_ratios
+    catalog={r['grade_id']:r for r in model.catalog};stoichiometry=[]
+    for current in (recipe,shifted,none):
+        masses=[catalog[g]['molar_mass_g_mol'] for g in current['grade_ids'] if g!='NONE']
+        decoded=decode_ratios(current['nco_oh_ratio'],current['extender_oh_fraction'],masses,current['grade_ids'][2]!='NONE')
+        mol=decoded['molecule_ratios'];r_back=mol[0]/sum(mol[1:]);v_back=mol[2]/sum(mol[1:]) if len(mol)==3 else 0.
+        errors=[abs(r_back-current['nco_oh_ratio']),abs(v_back-current['extender_oh_fraction']),abs(sum(decoded['mass_fractions'])-1)]
+        if max(errors)>1e-8 or (current['grade_ids'][2]=='NONE' and v_back!=0):
+            raise ValueError('真实适配器计量回读不通过')
+        stoichiometry.append({'recipe':current,'decoded':decoded,'absolute_errors':errors})
+    write_json(output/'stoichiometry_readback.json',stoichiometry)
     entry=model.lock['original_inputs'][0]
     example=read_training_route_example(Path(entry['path']),entry['sha256'],formula)
     write_json(output/'synthesis_source_readback.json',example)

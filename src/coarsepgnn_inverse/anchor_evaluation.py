@@ -50,10 +50,16 @@ class FixedAnchorDataset(Dataset):
 class AnchorCollator(InverseCollator):
     """保留训练接口的掩码张量，但评分v中心使用真实float64，不经float32再转回。"""
 
+    def __init__(self,conditions,formulas):
+        """独立保留源配方映射，用材料身份核对评分中心而非相信预处理item。"""
+        super().__init__(conditions);self.formulas=formulas
+
     def __call__(self,items):
         """未改变神经网络输入精度；v只用于独立窗口质量评分。"""
         batch=super().__call__(items)
         batch['v_reference']=torch.tensor([item['v'] for item in items],dtype=torch.float64)
+        batch['v_source']=torch.tensor([self.formulas[item['audit']['material_id']]['extender_oh_fraction']
+                                        for item in items],dtype=torch.float64)
         return batch
 
 
@@ -107,7 +113,7 @@ def real_anchor_predictions(model, rows: list[dict], training: list[dict], formu
         del network
     dataset=FixedAnchorDataset(rows,formulas,model.features['grade_ids'],model.bounds,model.contract,split=split)
     loader=DataLoader(dataset,batch_size=64,shuffle=False,num_workers=0,
-        generator=torch.Generator().manual_seed(model.config['seed']),collate_fn=AnchorCollator(conditions))
+        generator=torch.Generator().manual_seed(model.config['seed']),collate_fn=AnchorCollator(conditions,formulas))
     inverse=model.load_model('inverse_full');by_id={r['observation_id']:r for r in rows};scored=[]
     for batch in loader:
         score=inverse_anchor_score(inverse,device_batch(batch,model.device))
@@ -208,7 +214,7 @@ def joint_anchor_predictions(model,rows,formulas,*,split):
     dataset=JointAnchorDataset(rows,formulas,model.features['grade_ids'],model.bounds,model.contract,split=split)
     if not len(dataset):return {'status':'NOT_APPLICABLE','joint_states':0,'observations':[]}
     loader=DataLoader(dataset,batch_size=64,shuffle=False,num_workers=0,
-        generator=torch.Generator().manual_seed(model.config['seed']),collate_fn=AnchorCollator(conditions))
+        generator=torch.Generator().manual_seed(model.config['seed']),collate_fn=AnchorCollator(conditions,formulas))
     network=model.load_model('inverse_full');scored=[]
     for batch in loader:
         score=inverse_anchor_score(network,device_batch(batch,model.device))
@@ -240,3 +246,25 @@ def anchor_factor_record(batch: dict, score: dict, index: int, formula: dict) ->
         'window_lower':max(0,v-.005),'window_upper':min(1,v+.005),'none_continuous_probability_one':none,
         'log_probability_factors':[('-Infinity' if value==-math.inf else value) for value in logs],
         'factor_floored':score['floored'][index].tolist()}
+
+
+def paired_joint_summary(main: dict,control: dict) -> dict:
+    """先对同观察对配对，再状态内和材料内等权汇总，保留闭包统计及真实分母。"""
+    from collections import defaultdict
+    def key(row):
+        """联合请求身份包含状态和两个原始观察，不以目标相同冒充同一实验状态。"""
+        return (row['material_id'],row['state_id'],tuple(row['observation_ids']))
+    lookup={key(r):r for r in control['observations']}
+    if len(lookup)!=len(control['observations']) or set(lookup)!={key(r) for r in main['observations']}:
+        raise ValueError('双目标对照请求分母不同')
+    grouped=defaultdict(list)
+    for row in main['observations']:
+        other=lookup[key(row)]
+        if (other['group_id'],other['target_pair'])!=(row['group_id'],row['target_pair']):
+            raise ValueError('双目标对照来源或目标对不同')
+        grouped[(row['material_id'],row['state_id'])].append({**row,'improvement_nats':other['nll']-row['nll']})
+    states=[{**{k:rows[0][k] for k in ('material_id','state_id','group_id','target_pair')},
+             'improvement_nats':sum(r['improvement_nats'] for r in rows)/len(rows)} for rows in grouped.values()]
+    return {'joint_states':len(states),'materials':len({r['material_id'] for r in states}),
+            'mean_improvement_nats':material_mean(states,'improvement_nats'),
+            'source_statistics':closure_statistics(states,'improvement_nats'),'state_scores':states}

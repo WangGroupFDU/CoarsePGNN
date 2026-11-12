@@ -12,7 +12,7 @@ from typing import Callable
 import numpy as np
 import torch
 
-from .io import digest, read_json, write_json
+from .io import digest, read_json, sha256, write_json
 
 
 def seed_everything(seed: int) -> None:
@@ -124,10 +124,19 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
         if read_json(group_path)!=groups:raise ValueError('恢复后优化器参数组变化')
     else:write_json(group_path,groups)
     actual_updates=history[-1]["optimizer_updates"] if history else 0
+    trace_path=output/'request_trace.jsonl'
+    trace_enabled=identity.get('stage')=='inverse_full'
+    if resume and trace_enabled:
+        from .sampling_trace import trace_state, restore_replay_state
+        restore_replay_state(loaders['train'].dataset,checkpoint['request_trace_state'])
+        if trace_state(trace_path,loaders['train'].dataset)!=checkpoint['request_trace_state']:
+            raise ValueError('恢复请求日志、来源或游标与checkpoint不同')
     for epoch in range(first_epoch, config["max_epochs"] + 1):
         if stale >= config["patience"] and not config.get("fixed_update_epochs",False):
             break
         started = time.monotonic()
+        if hasattr(loaders['train'].dataset,'set_epoch'):
+            loaders['train'].dataset.set_epoch(epoch)
         if torch.cuda.is_available():
             torch.cuda.reset_peak_memory_stats()
         record = {"epoch": epoch}
@@ -137,7 +146,9 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
             model.train(training)
             numerator = 0.0
             seen_observations = 0
-            for batch in loaders[split]:
+            for batch_index,batch in enumerate(loaders[split]):
+                if training and hasattr(loaders[split].dataset,'verify_batch'):
+                    loaders[split].dataset.verify_batch(batch_index,batch)
                 if training:
                     optimizer.zero_grad(set_to_none=True)
                 with torch.set_grad_enabled(training):
@@ -156,6 +167,11 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
                             raise FloatingPointError("梯度范数不是有限数")
                         optimizer.step()
                         actual_updates+=1
+                        if trace_enabled:
+                            from .sampling_trace import append_request_record, request_record
+                            append_request_record(trace_path,request_record(epoch,batch_index,batch))
+                        if hasattr(loaders[split].dataset,'cursor'):
+                            loaders[split].dataset.cursor=batch_index+1
                         with (output/'update_progress.jsonl').open('a') as stream:
                             stream.write(json.dumps({'epoch':epoch,'optimizer_updates':actual_updates})+'\n')
                 numerator += float((per_observation.detach() * weights).sum())
@@ -171,7 +187,9 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
         else:
             stale += 1
         record["learning_rate"] = optimizer.param_groups[0]["lr"]
-        record["optimizer_updates"] = epoch * len(loaders["train"])
+        if actual_updates!=epoch*len(loaders['train']):
+            raise ValueError('实际optimizer.step计数与完整epoch批次数不同')
+        record["optimizer_updates"] = actual_updates
         record["elapsed_seconds"] = time.monotonic()-started
         record["cuda_peak_allocated_bytes"] = torch.cuda.max_memory_allocated() if torch.cuda.is_available() else 0
         history.append(record)
@@ -179,17 +197,21 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
                    "epoch": epoch, "model": model.state_dict(), "optimizer": optimizer.state_dict(),
                    "random": random_state(generator),
                    "history": history, "best": best, "stale": stale}
+        if trace_enabled:
+            from .sampling_trace import trace_state
+            payload['request_trace_state']=trace_state(trace_path,loaders['train'].dataset)
         replace_checkpoint(output / "last.pt", payload)
         if improved:
             replace_checkpoint(output / "best.pt", {"identity": identity, "identity_sha256": identity_sha,
-                               "config": config, "epoch": epoch, "model": model.state_dict(), "validation": best})
+                               "config": config, "epoch": epoch, "model": model.state_dict(),
+                               "optimizer":optimizer.state_dict(), "validation": best})
         print(json.dumps({"stage":str(output),**record},ensure_ascii=False),flush=True)
         if stop_after_epoch is not None and epoch >= stop_after_epoch:
             if resume_probe_factory is not None:
                 from .resume_probe import verify_next_update
                 verify_next_update(model,optimizer,loaders,config,resume_probe_factory,losses,
                                    output/'last.pt',output/'resume_transition.json',
-                                   live_training_state={'epoch':epoch,'history':history,'best':best,'stale':stale})
+                                   live_training_state={k:payload[k] for k in ('epoch','history','best','stale','request_trace_state') if k in payload})
             return {"status": "INTERRUPTED_AT_DECLARED_EPOCH", "history": history, "last": str(output / "last.pt")}
     result = {"status": "FIT_COMPLETED_NOT_SCIENTIFIC_ACCEPTANCE", "history": history,
               "best_validation": best, "best_checkpoint": str(output / "best.pt"),
@@ -197,6 +219,9 @@ def fit_development(model: torch.nn.Module, loaders: dict, config: dict, output:
               "formal_optimizer_updates":history[-1]['optimizer_updates'],
               "diagnostic_optimizer_updates":2 if (output/'resume_transition.json').exists() else 0,
               "best_epoch":min(history,key=lambda row:row['validation'])['epoch'],
-              "stop_reason":"PATIENCE_REACHED" if stale>=config['patience'] else "MAX_EPOCHS_REACHED"}
+              "completed_epochs":history[-1]['epoch'],
+              "request_trace_state":payload.get('request_trace_state'),
+              "stop_reason":("FIXED_UPDATE_BUDGET_REACHED" if config.get('fixed_update_epochs') else
+                             "PATIENCE_REACHED" if stale>=config['patience'] else "MAX_EPOCHS_REACHED")}
     write_json(output / "completion.json", result)
     return result

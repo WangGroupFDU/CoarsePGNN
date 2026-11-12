@@ -17,9 +17,27 @@ from pu_v24_benchmark_harness.common import TargetTransform
 from . import TARGET_UNITS
 from .io import digest, read_json, sha256, write_json
 from .metrics import material_mean
-from .networks import ConditionalForward, ConditionalInverse, device_batch
+from .networks import ConditionalForward, inverse_from_config, device_batch
 from .resume_probe import compare_states, snapshot
 from .training_data import InverseCollator, InverseDataset
+
+
+def verify_optimizer_groups(directory: Path, expected_identity: dict, identity_sha256: str) -> None:
+    """从实际best.pt核对同一最佳epoch的AdamW状态，禁止以last状态代替。
+
+    文件必须属于已核准阶段；真实优化器参数组须与构造回执一致。C6历史文件
+    由调用方明确跳过新格式消费，保持其字节不变。
+    """
+    best=torch.load(directory/'best.pt',weights_only=True,map_location='cpu')
+    if best['identity']!=expected_identity or best['identity_sha256']!=identity_sha256:
+        raise ValueError('最佳checkpoint阶段身份不同')
+    actual=best['optimizer']['param_groups']
+    recorded=read_json(directory/'actual_optimizer_groups.json')
+    comparable=[{k:(list(v) if isinstance(v,tuple) else v) for k,v in group.items() if k!='params'}
+                | {'parameter_tensors':len(group['params'])} for group in actual]
+    expected_groups=[{k:v for k,v in group.items() if k!='parameter_elements'} for group in recorded]
+    if comparable!=expected_groups:
+        raise ValueError('checkpoint实际AdamW参数组不同')
 
 
 @torch.no_grad()
@@ -49,6 +67,35 @@ def collect_inverse_trace(model, loader) -> dict:
     return {'audit':audits,**{key:torch.cat([part[key] for part in parts],dim=0) for key in parts[0]}}
 
 
+@torch.no_grad()
+def verify_inverse_variant(model, batch: dict, config: dict) -> dict:
+    """用实际eval对象核对K及屏蔽不变性；比较编码、分类和MDN输出，不改权重。"""
+    model.eval();designer=model.designer
+    observed=(designer.hidden,designer.components,model.no_target_values,model.no_test_conditions)
+    expected=(config['inverse_hidden'],config['mdn_components'],config.get('no_target_values',False),config.get('no_test_conditions',False))
+    if observed!=expected:raise ValueError('实际逆模型构造参数不符')
+    before=collect_inverse_trace(model,[batch])
+    if before['mdn_weights'].shape[1]!=config['mdn_components']:
+        raise ValueError('实际MDN分量数不同')
+    changed={k:v.clone() if isinstance(v,torch.Tensor) else v for k,v in batch.items()}
+    checked=None
+    if model.no_target_values:
+        changed['bounds']=changed['bounds']+7.125;checked='target_bounds'
+    if model.no_test_conditions:
+        for key in ('raw','values'):changed[key]=changed[key]+0.125
+        changed['mask']=~changed['mask']
+        for i,embedding in enumerate(model.assay_embeddings):
+            changed['assay'][...,i]=(changed['assay'][...,i]+1)%embedding.num_embeddings
+        checked='condition_and_assay'
+    if checked:
+        after=collect_inverse_trace(model,[changed])
+        for key in ('condition_representation','classification_probabilities','mdn_weights','mdn_means','mdn_scales','supervised_loss'):
+            compare_states(before[key],after[key],floating_tolerance=0,path='ablation.'+key)
+    return {'status':'PASSED','hidden':observed[0],'mdn_components':observed[1],
+            'no_target_values':observed[2],'no_test_conditions':observed[3],
+            'exact_invariance_checked':checked,'model_training':model.training}
+
+
 def independent_validation(config: dict, training_root: Path, output: Path, *, readonly_binding: dict | None=None) -> dict:
     """只由配置、冻结输入清单和checkpoint重建模型，逐观察复算验证输出及MAE。
 
@@ -57,7 +104,6 @@ def independent_validation(config: dict, training_root: Path, output: Path, *, r
     """
     from .training import training_gate, reload_inputs
     from .runtime_policy import enforce_deterministic_runtime
-    runtime=enforce_deterministic_runtime(config['execution_policy'],config['optimizer'])
     started=time.monotonic()
     if readonly_binding is None:
         contract,lock,authorization=training_gate(config)
@@ -70,6 +116,7 @@ def independent_validation(config: dict, training_root: Path, output: Path, *, r
         owner=read_json(training_root/'run_config.json')['identity']
         if owner['code_sha']!=readonly_binding['producer_code_sha']:
             raise ValueError('只读生产者代码身份不匹配')
+    runtime=enforce_deterministic_runtime(config['execution_policy'],config['optimizer'])
     saved_config=read_json(training_root/'run_config.json')
     if saved_config['config']!=config:
         raise ValueError('独立重载配置不同')
@@ -95,15 +142,38 @@ def independent_validation(config: dict, training_root: Path, output: Path, *, r
         if checkpoint['identity']!=expected or checkpoint['identity_sha256']!=digest({'identity':expected,'config':config['optimizer']}):
             raise ValueError(f'最佳checkpoint身份不同: {stage}')
         if config['round']>=7:
-            actual=checkpoint['optimizer']['param_groups']
-            recorded=read_json(training_root/stage/'actual_optimizer_groups.json')
-            comparable=[{k:(list(v) if isinstance(v,tuple) else v) for k,v in g.items() if k!='params'}
-                        | {'parameter_tensors':len(g['params'])} for g in actual]
-            expected_groups=[{k:v for k,v in g.items() if k!='parameter_elements'} for g in recorded]
-            if comparable!=expected_groups:raise ValueError('checkpoint实际AdamW参数组不同')
+            verify_optimizer_groups(training_root/stage,expected,checkpoint['identity_sha256'])
         model.load_state_dict(checkpoint['model'],strict=True);return model.to(device).eval()
+    inverse_only=config.get('operation','').startswith('INVERSE_ONLY_')
     reports={}
-    for target in TARGET_UNITS:
+    # 实际解读每个最佳文件，包括结构阶段；核对条件阶段确实继承冻结结构权重。
+    inheritance={}
+    for stage,entry in manifest['checkpoints'].items():
+        path=training_root/stage/'best.pt'
+        if sha256(path)!=entry['sha256']:raise ValueError('阶段最佳权重散列变化')
+        saved=torch.load(path,weights_only=True,map_location='cpu')
+        transform_name=('inverse_bound_transforms.json' if stage=='inverse_full' else
+                        stage.removesuffix('_structure').removesuffix('_full')+'_transform.json')
+        expected={**identity,'stage':stage,'target_transform_sha256':sha256(training_root/transform_name)}
+        if saved['identity']!=expected or saved['identity_sha256']!=digest({'identity':expected,'config':config['optimizer']}):
+            raise ValueError('阶段最佳权重身份变化')
+        if config['round']>=8:verify_optimizer_groups(training_root/stage,expected,saved['identity_sha256'])
+        if stage.endswith('_full') and stage!='inverse_full':
+            structure_stage=stage.removesuffix('_full')+'_structure'
+            inherited=torch.load(training_root/structure_stage/'best.pt',weights_only=True,map_location='cpu')
+            actual={k.removeprefix('regressor.structure_model.'):v for k,v in saved['model'].items()
+                    if k.startswith('regressor.structure_model.')}
+            compare_states(inherited['model'],actual,floating_tolerance=0,path='inherited.'+stage)
+            inheritance[stage]={'source_stage':structure_stage,'sha256':manifest['checkpoints'][structure_stage]['sha256'],'exact':True}
+    if inverse_only:
+        paired=config['paired_main']
+        if manifest['forward_producer']!=paired:raise ValueError('固定前向引用变化')
+        if sha256(Path(paired['validation_receipt_path']))!=paired['validation_receipt_sha256']:
+            raise ValueError('固定前向独立核验回执变化')
+        if read_json(Path(paired['validation_receipt_path']))['status']!='PASSED':
+            raise ValueError('固定前向未通过独立核验')
+        reports['fixed_forward_reference']={'status':'REFERENCED_NOT_RETRAINED','producer':paired}
+    for target in (() if inverse_only else TARGET_UNITS):
         transform_name=target+'_transform.json';transform=TargetTransform(**read_json(training_root/transform_name))
         rows=[r for r in prepared['loaded']['validation'] if r['target']==target]
         split_map={r['observation_id']:'validation' for r in rows}
@@ -140,7 +210,8 @@ def independent_validation(config: dict, training_root: Path, output: Path, *, r
         prepared['inverse_transforms'],contract,'validation')
     loader=DataLoader(dataset,batch_size=config['batch_size'],shuffle=False,num_workers=0,
         generator=torch.Generator().manual_seed(config['seed']),collate_fn=InverseCollator(prepared['conditions']))
-    model=load_best(ConditionalInverse(prepared['catalog'],sizes),'inverse_full','inverse_bound_transforms.json')
+    model=load_best(inverse_from_config(prepared['catalog'],sizes,config),'inverse_full','inverse_bound_transforms.json')
+    variant_check=verify_inverse_variant(model,next(iter(loader)),config)
     actual=collect_inverse_trace(model,loader)
     reference=torch.load(training_root/'inverse_validation_outputs.pt',weights_only=True,map_location='cpu')
     exact_keys=('audit','property_ids','bounds','bound_mask','target_mask','choices','v','nco_oh_ratio')
@@ -157,7 +228,7 @@ def independent_validation(config: dict, training_root: Path, output: Path, *, r
     result={'status':'PASSED','identity':identity,'preprocessing_refitted':False,'optimizer_updates':0,
         'elapsed_seconds':time.monotonic()-started,'test_access_guard':authorization['test_access_guard'],
         'checkpoint_manifest_sha256':sha256(training_root/'checkpoint_manifest.json'),
-        'reports':reports,'test_access':False,'final96_performance_computed':False,'readonly_binding':readonly_binding}
+        'reports':reports,'inverse_variant_check':variant_check,'structure_inheritance':inheritance,'test_access':False,'final96_performance_computed':False,'readonly_binding':readonly_binding}
     write_json(output,result);return result
 
 

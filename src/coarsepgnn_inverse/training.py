@@ -26,7 +26,7 @@ from .conditions import tensorize_conditions
 from .development import build_development_loaders, condition_record
 from .fitting import fit_development, seed_everything, random_state, restore_random_state
 from .io import digest, read_json, sha256, write_json
-from .networks import ConditionalForward, ConditionalInverse, forward_objective, inverse_objective, physical_validation
+from .networks import ConditionalForward, inverse_from_config, forward_objective, inverse_objective, physical_validation
 from .qualification import read_csv
 from .training_data import ConditionInputs, InverseDataset, InverseCollator, inverse_bound_transforms
 
@@ -188,8 +188,10 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
     模型完成不等同研究PASS，测试评价必须使用另外的最终锁和一次性入口。
     """
     from .runtime_policy import enforce_deterministic_runtime
-    runtime=enforce_deterministic_runtime(config['execution_policy'],config['optimizer'])
     contract,lock,authorization=training_gate(config)
+    if config.get('operation') in ('READ_ONLY_REEVALUATION','LAST_RANKING_ONLY_SHARED_POOL'):
+        raise PermissionError('此操作禁止优化器更新')
+    runtime=enforce_deterministic_runtime(config['execution_policy'],config['optimizer'])
     if not torch.cuda.is_available():
         raise RuntimeError('正式训练要求授权cn2 CUDA，不自动降级到CPU')
     if output.exists() and not resume:
@@ -288,7 +290,8 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
                 'transition_status':diagnostic.get('status','NOT_EXECUTED'),'test_access_guard':authorization['test_access_guard']})
             raise
     from pu_v24_benchmark_harness.common import TargetTransform
-    for target in TARGET_UNITS:
+    inverse_only=config.get('operation','').startswith('INVERSE_ONLY_')
+    for target in (() if inverse_only else TARGET_UNITS):
         seed_everything(config['seed'])
         transform_path=output/(target+'_transform.json')
         development=build_development_loaders(lock['split_labels'],target,batch_size=64,seed=config['seed'],
@@ -329,23 +332,41 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
     for split in ('train','validation'):
         dataset=InverseDataset(prepared['loaded'][split],prepared['formulations'],grade_index,
                                prepared['inverse_transforms'],contract,split)
-        inverse_loaders[split]=DataLoader(dataset,batch_size=64,shuffle=split=='train',num_workers=0,
+        replay=split=='train' and inverse_only
+        if replay:
+            from .sampling_trace import ReplayInverseDataset
+            dataset=ReplayInverseDataset(Path(config['paired_main']['trace_path']),config['paired_main']['trace_sha256'])
+        inverse_loaders[split]=DataLoader(dataset,batch_size=64,shuffle=split=='train' and not replay,num_workers=0,
             generator=torch.Generator().manual_seed(config['seed']),collate_fn=InverseCollator(prepared['conditions']))
-    inverse=ConditionalInverse(prepared['catalog'],[len(prepared['vocab'][f]) for f in ASSAY_FIELDS]).to(device)
+    inverse=inverse_from_config(prepared['catalog'],[len(prepared['vocab'][f]) for f in ASSAY_FIELDS],config).to(device)
     inverse=fit_stage(inverse,inverse_loaders,'inverse_full',inverse_objective,
-                     lambda:ConditionalInverse(prepared['catalog'],[len(prepared['vocab'][f]) for f in ASSAY_FIELDS]))
-    from .reload_validation import collect_inverse_trace
+                     lambda:inverse_from_config(prepared['catalog'],[len(prepared['vocab'][f]) for f in ASSAY_FIELDS],config))
+    if inverse_only:
+        completed=stages['inverse_full'];paired=config['paired_main']
+        if (completed['formal_optimizer_updates']!=paired['updates'] or
+            completed['completed_epochs']!=paired['epochs'] or
+            sha256(output/'inverse_full/request_trace.jsonl')!=paired['trace_sha256']):
+            raise ValueError('对照正式更新、epoch或完整请求字节与主模型不相同')
+        write_json(output/'paired_training_receipt.json',{'status':'PASSED','paired_main':paired,
+            'formal_optimizer_updates':completed['formal_optimizer_updates'],
+            'request_trace_sha256':sha256(output/'inverse_full/request_trace.jsonl')})
+    from .reload_validation import collect_inverse_trace, verify_inverse_variant
+    first=next(iter(inverse_loaders['validation']))
+    write_json(output/'inverse_variant_check.json',verify_inverse_variant(inverse,first,config))
     trace_path=output/'inverse_validation_outputs.pt'
     if not trace_path.exists():
         torch.save(collect_inverse_trace(inverse,inverse_loaders['validation']),trace_path)
     manifest_path=output/'checkpoint_manifest.json'
     if not manifest_path.exists():
         write_json(manifest_path,{'identity':identity,'checkpoints':{
-            name:{'path':str(output/name/'best.pt'),'sha256':sha256(output/name/'best.pt')}
+            name:{'path':str(output/name/'best.pt'),'sha256':sha256(output/name/'best.pt'),
+                  'bytes':(output/name/'best.pt').stat().st_size}
             for name in stages},'validation_references':{name:sha256(output/name) for name in
-                ['inverse_validation_outputs.pt']+[t+'_validation_predictions.json' for t in TARGET_UNITS]}})
+                ['inverse_validation_outputs.pt']+([] if inverse_only else [t+'_validation_predictions.json' for t in TARGET_UNITS])},
+            'forward_producer':config.get('paired_main') if inverse_only else {'root':str(output),'identity':identity},
+            'inverse_producer':{'root':str(output),'identity':identity},'consumer_code_sha':identity['code_sha']})
     from .development_report import forward_development_report, inverse_development_report
-    if not (output/'forward_validation_metrics.json').exists():
+    if not inverse_only and not (output/'forward_validation_metrics.json').exists():
         forward_development_report(prepared['loaded'],contract,output)
     if not (output/'inverse_validation_metrics.json').exists():
         inverse_development_report(inverse,inverse_loaders['validation'],prepared['loaded']['validation'],output)
@@ -355,7 +376,7 @@ def _train(config: dict, output: Path, *, resume: bool=False) -> dict:
             'stages':stages,'test_access':False,'distillation':False,
             'test_access_guard':authorization['test_access_guard'],
             'validation_metrics':{name:sha256(output/name) for name in
-                ('forward_validation_metrics.json','inverse_validation_metrics.json')}}
+                (['inverse_validation_metrics.json'] if inverse_only else ['forward_validation_metrics.json','inverse_validation_metrics.json'])}}
     write_json(output/'training_result.json',result)
     return result
 

@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Callable
 
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, RandomSampler
 
 from .fitting import random_state, restore_random_state
 from .io import sha256, write_json
@@ -63,7 +63,7 @@ def compare_states(a, b, *, floating_tolerance: float, path: str='root') -> floa
 
 def fresh_loaders(loaders: dict) -> dict:
     """重新创建加载器与generator，复用只读Dataset和确定性图缓存，恢复时覆盖随机态。"""
-    return {split:DataLoader(loader.dataset,batch_size=loader.batch_size,shuffle=split=='train',num_workers=0,
+    return {split:DataLoader(loader.dataset,batch_size=loader.batch_size,shuffle=isinstance(loader.sampler,RandomSampler),num_workers=0,
             generator=torch.Generator().manual_seed(0),collate_fn=loader.collate_fn)
             for split,loader in loaders.items()}
 
@@ -84,7 +84,8 @@ def verify_next_update(model, optimizer, loaders: dict, config: dict, factory: C
               'random':snapshot(random_state(generator)),'metadata':snapshot(live_training_state)}
     original_training=model.training
     expected={k:snapshot(checkpoint[k]) for k in ('model','optimizer','random')}
-    expected['metadata']={k:snapshot(checkpoint[k]) for k in ('epoch','history','best','stale')}
+    metadata_keys=('epoch','history','best','stale','request_trace_state')
+    expected['metadata']={k:snapshot(checkpoint[k]) for k in metadata_keys if k in checkpoint}
     names=['pre_live_'+k for k in expected]+['pre_restored_'+k for k in expected]+[
         'post_batch','post_random','post_optimizer_steps','post_loss','post_model','post_optimizer',
         'post_gradients_before_clip','post_gradients_after_clip','post_gradient_norms']
@@ -110,7 +111,13 @@ def verify_next_update(model, optimizer, loaders: dict, config: dict, factory: C
     def one_update(network,optim,training_loader,branch):
         """保存实际batch、loss、裁剪前后梯度及一步更新后的原精度模型/AdamW。"""
         nonlocal updates
-        network.train();batch=next(iter(training_loader));branch['batch']=snapshot(batch)
+        network.train()
+        if hasattr(training_loader.dataset,'set_epoch'):
+            training_loader.dataset.set_epoch(checkpoint['epoch']+1)
+        batch=next(iter(training_loader))
+        if hasattr(training_loader.dataset,'verify_batch'):
+            training_loader.dataset.verify_batch(0,batch)
+        branch['batch']=snapshot(batch)
         optim.zero_grad(set_to_none=True);per_observation=objective(network,batch)
         if not torch.isfinite(per_observation).all():
             raise FloatingPointError('续跑对照损失非有限')
@@ -140,7 +147,7 @@ def verify_next_update(model, optimizer, loaders: dict, config: dict, factory: C
         restore_random_state(checkpoint['random'],recreated_loaders['train'].generator)
         recovered={'model':snapshot(recreated.state_dict()),'optimizer':snapshot(recreated_optimizer.state_dict()),
             'random':snapshot(random_state(recreated_loaders['train'].generator)),
-            'metadata':{k:snapshot(checkpoint[k]) for k in ('epoch','history','best','stale')}}
+            'metadata':{k:snapshot(checkpoint[k]) for k in metadata_keys if k in checkpoint}}
         branches['restored']['before']=recovered
         for key in expected: compare('pre_restored_'+key,original[key],recovered[key],0)
         if errors: raise errors[0]
@@ -163,6 +170,12 @@ def verify_next_update(model, optimizer, loaders: dict, config: dict, factory: C
             optimizer.load_state_dict(copy.deepcopy(original['optimizer']))
             model.zero_grad(set_to_none=True);model.train(original_training)
             restore_random_state(original['random'],generator)
+            if 'request_trace_state' in checkpoint:
+                from .sampling_trace import restore_replay_state, trace_state
+                restore_replay_state(loaders['train'].dataset,checkpoint['request_trace_state'])
+                compare_states(checkpoint['request_trace_state'],
+                    trace_state(checkpoint_path.parent/'request_trace.jsonl',loaders['train'].dataset),
+                    floating_tolerance=0,path='restore.request_trace_state')
             for key,value in {'model':snapshot(model.state_dict()),'optimizer':snapshot(optimizer.state_dict()),
                               'random':snapshot(random_state(generator))}.items():
                 compare_states(original[key],value,floating_tolerance=0,path='restore.'+key)

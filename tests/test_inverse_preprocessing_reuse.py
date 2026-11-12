@@ -46,7 +46,9 @@ def test_strict_runtime_rejects_missing_launch_environment(monkeypatch):
     from coarsepgnn_inverse.runtime_policy import enforce_deterministic_runtime
     monkeypatch.delenv('CUBLAS_WORKSPACE_CONFIG',raising=False)
     with pytest.raises(RuntimeError,match='启动Python前'):
-        enforce_deterministic_runtime({'cublas_workspace_config':':4096:8','deterministic_algorithms':True,'warn_only':False})
+        enforce_deterministic_runtime(
+            {'cublas_workspace_config':':4096:8','deterministic_algorithms':True,'warn_only':False},
+            {'learning_rate':0.001,'weight_decay':0.0001})
 
 
 def test_loader_uses_saved_transform_without_fit(tmp_path,monkeypatch):
