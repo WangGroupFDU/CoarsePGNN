@@ -61,6 +61,27 @@ class ChemistryAndBoundaryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_request(bad)
 
+    def test_protocol_intersection_and_unspecified_ratio_search(self):
+        """同协议多项边界取交集检查；缺失R留给外层搜索，不默认补为1。"""
+        item = {"target": "tg", "unit": "degC", "lower": 0,
+                "protocol_id": "synthetic_protocol", "condition": {"method": "DSC"},
+                "assay": {"transition_criterion": "midpoint"}}
+        request = {"schema_version": 1, "constraints": [item]}
+        normalized = validate_request(request)
+        self.assertIsNone(normalized["nco_oh_ratio"])
+        self.assertEqual(normalized["nco_oh_ratio_origin"], "outer_search_over_frozen_training_range")
+        self.assertNotIn("nco_oh_ratio", request)
+        request["constraints"][0]["unit"] = "°C"
+        validate_request(request)
+        request["constraints"].append({**item, "lower": None, "upper": -1})
+        with self.assertRaisesRegex(ValueError, "互相矛盾"):
+            validate_request(request)
+        request["constraints"][1]["upper"] = 2
+        validate_request(request)
+        request["constraints"][1]["condition"] = {"method": "DMA"}
+        with self.assertRaisesRegex(ValueError, "不同的测试"):
+            validate_request(request)
+
     def test_csv_roundtrip(self):
         """含逗号、引号和换行的证据必须可无损往返，并具有 BOM/CRLF。"""
         value = '中文, "quoted"\nline'
@@ -181,6 +202,23 @@ class NeuralTests(unittest.TestCase):
                 self.assertEqual(candidate["extender_oh_fraction"], 0)
             else:
                 self.assertTrue(0 < candidate["extender_oh_fraction"] < 1)
+
+    def test_sampling_count_roles_and_seed(self):
+        """连续采样支持512个原始提案，角色/NONE正确，固定generator可独立复现。"""
+        context = self.model.encode(**self.inputs)[:1]
+        first = self.model.sample_proposals(context, 512, torch.Generator().manual_seed(123))
+        second = self.model.sample_proposals(context, 512, torch.Generator().manual_seed(123))
+        self.assertEqual(len(first), 512)
+        self.assertEqual(first, second)
+        self.assertGreater(len({r["extender_oh_fraction"] for r in first}), 100)
+        for row in first:
+            for role, index in enumerate(row["grade_indices"]):
+                self.assertTrue(self.model.role_masks[role, index])
+            if row["grade_indices"][-1] == self.model.none_index:
+                self.assertEqual(row["extender_oh_fraction"], 0.0)
+                self.assertIsNone(row["mixture_component"])
+            else:
+                self.assertTrue(0 < row["extender_oh_fraction"] < 1)
 
 
 if __name__ == "__main__":

@@ -22,7 +22,7 @@ TG_CRITERIA = {"tg_dsc_onset": "dsc_onset", "tg_dsc_midpoint": "dsc_midpoint",
                "tg_dma_loss_peak": "dma_loss_modulus_peak",
                "tg_dma_storage_onset": "dma_storage_modulus_drop"}
 SPLITS = ("train", "validation", "test")
-RULE_VERSION = "pu_endpoint_adjudication_v2_20261112"
+RULE_VERSION = "pu_endpoint_adjudication_v3_20261112"
 
 
 def assign_atomic_semantics(row: dict, measurement: dict, campaign: dict, specimen: dict, evidence: dict) -> None:
@@ -92,7 +92,9 @@ def identify_thermal_protocols(rows: list[dict]) -> list[dict]:
         for match in re.finditer(r"\b(first|second|third)\s*(?:and|/|,)\s*(first|second|third)\s+(heating|cooling)\b", text):
             scans.update({match[1] + "_" + match[3], match[2] + "_" + match[3]})
         scan = next(iter(scans)) if len(scans) == 1 else "not_resolved"
-        peak_matches = re.findall(r"\b(?:tm|tg)[_ ]?([1-3])\b", text)
+        peak_matches = re.findall(r"\b(?:tm|tg|peak)[_ ]?([0-9]+)\b", text)
+        for match in re.finditer(r"\b(?:tm|tg|peaks?)[_ ]?([0-9]+)\s*(?:and|/|,)\s*([0-9]+)\b", text):
+            peak_matches.extend(match.groups())
         peak = "source_peak_" + peak_matches[0] if len(set(peak_matches)) == 1 else "not_resolved"
         row.update(scan_identity=scan, peak_identity=peak,
                    scan_direction=scan.split("_")[-1] if scan != "not_resolved" else "unknown",
@@ -107,6 +109,10 @@ def identify_thermal_protocols(rows: list[dict]) -> list[dict]:
         if row["scan_index"] is not None:
             normalized.setdefault("fields",{})["scan_index"] = {"value":row["scan_index"],"unit":"","mask":1,
                                                                "origin":"atomic_measurement_definition"}
+        if peak != "not_resolved":
+            normalized.setdefault("fields",{})["transition_event_index"] = {
+                "value":int(peak.rsplit("_",1)[1]),"unit":"","mask":1,
+                "origin":"explicit_source_peak_identifier"}
         normalized["endpoint_identity"] = {"scan":scan,"peak":peak,"phase":row["transition_scope"],
             "criterion":row["transition_criterion"],"basis":"atomic_measurement_definition_and_assignment"}
         row["condition_normalized_json"] = canonical(normalized)
@@ -117,7 +123,7 @@ def identify_thermal_protocols(rows: list[dict]) -> list[dict]:
             row["replicate_id"] = replicate_matches[0]
             row["replicate_set_id"] = digest({"campaign":row["campaign_id"],"task":row["property_task"]})
         key = (row["material_id"],row["campaign_id"],row["target"],row["transition_criterion"],
-               scan,peak)
+               row["transition_scope"],scan,peak,canonical(normalized),row.get("thermal_history_stage"))
         groups[key].append(row)
     for items in groups.values():
         # 两条记录具有相同可辨识测量语义，不能假定它们是重复实验或依据数值选峰。
@@ -290,6 +296,44 @@ def endpoint_decision(row: dict, measurement: dict, campaign: dict, evidence: di
     return "APPROVED_PRIMARY", "EXPLICIT_ENDPOINT_WITH_VERIFIED_SOURCE"
 
 
+def hydroxyl_types(mol) -> dict[str, int]:
+    """分别计数醇、酚、羧酸及其他OH，不把任意O-H都当作可用双官能位点。"""
+    from rdkit import Chem
+    patterns = {"alcohol_oh_count":"[OX2H1]-[CX4]", "phenol_oh_count":"[OX2H1]-[c]",
+                "carboxylic_acid_count":"[CX3](=[OX1])[OX2H1]"}
+    counts = {key:len(mol.GetSubstructMatches(Chem.MolFromSmarts(pattern))) for key,pattern in patterns.items()}
+    counts["other_oh_count"] = len(mol.GetSubstructMatches(Chem.MolFromSmarts("[OX2H1]"))) - sum(counts.values())
+    return counts
+
+
+def hydroxyl_site_identity(structure: str, site_psmiles: str) -> bool:
+    """确认两个来源星号各接一个氧，移除星号后可还原同一完整小分子结构。
+
+    此处只验证扩链剂的已有反应位点表示，不推断宏二醇端基或生成新PSMILES。
+    不可解析、星号数不为2、位点连在非氧原子或还原结构不一致均返回False。
+    """
+    from rdkit import Chem
+    source, reacted = Chem.MolFromSmiles(structure), Chem.MolFromSmiles(site_psmiles or "")
+    if source is None or reacted is None:
+        return False
+    stars=[a.GetIdx() for a in reacted.GetAtoms() if a.GetAtomicNum()==0]
+    if len(stars)!=2 or any(reacted.GetAtomWithIdx(i).GetDegree()!=1 or
+                            reacted.GetAtomWithIdx(i).GetNeighbors()[0].GetAtomicNum()!=8 for i in stars):
+        return False
+    rebuilt=Chem.RWMol(reacted)
+    for i in sorted(stars,reverse=True):
+        rebuilt.RemoveAtom(i)
+    try:
+        result=rebuilt.GetMol()
+        Chem.SanitizeMol(result)
+    except ValueError:
+        return False
+    for molecule in (source,result):
+        for atom in molecule.GetAtoms():
+            atom.SetAtomMapNum(0)
+    return Chem.MolToSmiles(source)==Chem.MolToSmiles(result)
+
+
 def grade_decisions(catalog: list[dict], db: dict, source_specs: dict | None = None) -> tuple[list[dict], list[dict]]:
     """审核全规格库的结构和角色一致性；混合牌号与纯结构冲突时整条隔离。
 
@@ -299,24 +343,26 @@ def grade_decisions(catalog: list[dict], db: dict, source_specs: dict | None = N
     from rdkit import Chem
     reviews, approved = [], []
     nco = Chem.MolFromSmarts("[NX2]=[CX2]=[OX1]")
-    oh = Chem.MolFromSmarts("[OX2H1]-[CX4]")
-    acid = Chem.MolFromSmarts("[CX3](=[OX1])[OX2H1]")
     for grade in catalog:
         names = " | ".join(grade["names"])
         text = names.lower()
         reason = "STRUCTURE_ROLE_AND_SOURCE_SPECIFICATION_CONSISTENT"
         status = "APPROVED"
         mol = Chem.MolFromSmiles(grade["structure"])
+        hydroxyl = hydroxyl_types(mol) if mol else {k:None for k in
+            ("alcohol_oh_count","phenol_oh_count","carboxylic_acid_count","other_oh_count")}
         if mol is None:
             status, reason = "UNRESOLVED", "STRUCTURE_NOT_PARSEABLE"
         elif re.search(r"mixture|80%|20%|isomer.*mix|混合", text):
             status, reason = "UNRESOLVED", "MIXTURE_GRADE_REPRESENTED_BY_SINGLE_STRUCTURE"
         elif grade["role"] == "diisocyanate" and len(mol.GetSubstructMatches(nco)) != 2:
             status, reason = "UNRESOLVED", "NCO_FUNCTIONALITY_NOT_TWO"
-        elif grade["role"] == "hydroxyl_chain_extender" and len(mol.GetSubstructMatches(oh)) != 2:
-            status, reason = "UNRESOLVED", "ALCOHOL_OH_FUNCTIONALITY_NOT_TWO"
-        elif grade["role"] == "hydroxyl_chain_extender" and mol.HasSubstructMatch(acid):
+        elif grade["role"] == "hydroxyl_chain_extender" and hydroxyl["alcohol_oh_count"]+hydroxyl["phenol_oh_count"] != 2:
+            status, reason = "UNRESOLVED", "APPROVED_ALCOHOL_PHENOL_OH_FUNCTIONALITY_NOT_TWO"
+        elif grade["role"] == "hydroxyl_chain_extender" and hydroxyl["carboxylic_acid_count"]:
             status, reason = "UNRESOLVED", "EXTRA_CARBOXYLIC_ACID_REACTIVITY_OUTSIDE_APPROVED_TEMPLATE"
+        elif grade["role"] == "hydroxyl_chain_extender" and hydroxyl["other_oh_count"]:
+            status, reason = "UNRESOLVED", "OTHER_OH_REACTIVITY_NOT_APPROVED"
         source_ids = grade["source_component_ids"]
         if any(cid not in db["components"] for cid in source_ids):
             status, reason = "UNRESOLVED", "SOURCE_COMPONENT_MISSING"
@@ -330,6 +376,20 @@ def grade_decisions(catalog: list[dict], db: dict, source_specs: dict | None = N
             if not specs or any(item.get("functionality") != 2 or item.get("role") != "polyol" or item.get("functional_group") != "oh"
                                 or not item.get("mn_g_mol") or not item.get("structure_psmiles") for item in specs):
                 status, reason = "UNRESOLVED", "MACRODIOL_UPSTREAM_FUNCTIONALITY_MN_OR_END_GROUP_EVIDENCE_MISSING"
+        calculated_mass = None
+        if grade["role"] == "hydroxyl_chain_extender" and mol is not None:
+            from rdkit.Chem.Descriptors import MolWt
+            calculated_mass = MolWt(mol)
+            declared_mass = grade.get("molar_mass_g_mol")
+            # 仅作为完整小分子身份的一致性筛查：1%或1 g/mol中较大者容纳来源舍入。
+            # 不能以质量接近替代结构、来源角色或反应位点证据。
+            if declared_mass is not None and abs(float(declared_mass)-calculated_mass)>max(1.0,0.01*calculated_mass):
+                status, reason = "UNRESOLVED", "SOURCE_STRUCTURE_MOLAR_MASS_CONFLICT"
+            elif status == "APPROVED":
+                if not specs or any(r.get("functionality")!=2 or r.get("functional_group")!="oh" or
+                        r.get("smiles")!=grade["structure"] or
+                        not hydroxyl_site_identity(grade["structure"],r.get("reaction_site_psmiles")) for r in specs):
+                    status,reason="UNRESOLVED","EXTENDER_SOURCE_ROLE_OR_TWO_OH_SITE_IDENTITY_NOT_VERIFIED"
         source_details = [{"component_id":cid, **{k:db["components"].get(cid,{}).get(k) for k in
             ("canonical_name","functionality","number_average_molar_mass_g_mol",
              "molecular_weight_g_mol","psmiles","smiles","structure_status","psmiles_note")}}
@@ -342,8 +402,7 @@ def grade_decisions(catalog: list[dict], db: dict, source_specs: dict | None = N
                         "end_group_basis":grade.get("end_group_basis"),
                         "source_database_fields":canonical(source_details),
                         "frozen_upstream_component_evidence":canonical(specs),
-                        "alcohol_oh_count":len(mol.GetSubstructMatches(oh)) if mol else None,
-                        "carboxylic_acid_count":len(mol.GetSubstructMatches(acid)) if mol else None,
+                        **hydroxyl,"structure_calculated_molar_mass_g_mol":calculated_mass,
                         "migration": "UNCHANGED" if status == "APPROVED" else "QUARANTINED_NOT_REMAPPED"})
         if status == "APPROVED":
             approved.append(grade)
@@ -405,10 +464,13 @@ def uncertainty_review(rows: list[dict]) -> list[dict]:
     result=[]
     for row in rows:
         raw_type = str(row.get("reported_uncertainty_type") or "")
-        text = raw_type.lower().strip()
+        text = re.sub(r"[_-]+", " ", raw_type.lower()).strip()
         kind = "missing" if row.get("reported_uncertainty_value") is None else "unspecified_plus_minus"
         if row.get("reported_uncertainty_value") is not None:
-            if text in {"sd","std","standard deviation"} or "standard deviation" in text:
+            unknown = re.search(r"not\s+(?:stated|specified|reported|defined)|unspecified|unknown|unclear",text)
+            if unknown:
+                kind="unspecified_plus_minus"
+            elif text in {"sd","std","standard deviation"} or "standard deviation" in text:
                 kind="SD"
             elif text in {"se","sem","standard error"} or "standard error" in text:
                 kind="SE"
@@ -440,7 +502,8 @@ def condition_identity_checks(rows: list[dict], primary: list[dict]) -> dict:
         record=condition_record(r)
         checks.append({"observation_id":r["observation_id"],"input_sha256":actual,
                        "prompt_cache_key":raw_prompt_v2(record).sha256,"property_task":r["property_task"],
-                       "numeric_scan_index":[t.value for t in record.numeric_tags if t.key=="scan_index"]})
+                       "numeric_scan_index":[t.value for t in record.numeric_tags if t.key=="scan_index"],
+                       "numeric_event_index":[t.value for t in record.numeric_tags if t.key=="transition_event_index"]})
     by_id={r["observation_id"]:r for r in checks}
     a,b=(by_id[k] for k in ("MEA_00622204543a8c0a6be3_ATOMIC","MEA_6ed731656de35e06c403_ATOMIC"))
     vocab=build_assay_vocab(primary,{r["observation_id"]:r["split"] for r in primary})
@@ -561,7 +624,7 @@ def run(config: dict, output: Path) -> dict:
     if len(adjudicated) != len(original) + len(lineage):
         raise AssertionError("原记录裁定不闭合")
     if {r["observation_id"] for r in adjudicated} != set(previous):
-        raise ValueError("与第一轮逐观察身份不闭合，禁止静默遗漏记录")
+        raise ValueError("与上一轮逐观察身份不闭合，禁止静默遗漏记录")
     supervised_grades = {g for r in primary if r["split"]=="train" for g in formula_by_id[r["material_id"]]["grade_ids"]}
     forward_grades = {t:{g for r in primary if r["split"]=="train" and r["target"]==t
                         for g in formula_by_id[r["material_id"]]["grade_ids"]} for t in {r["target"] for r in original}}
@@ -663,8 +726,18 @@ def run(config: dict, output: Path) -> dict:
         write_json(path, [r for r in primary if r["split"] == split])
         split_manifest[split] = {"path": str(path), "sha256": sha256(path), "bytes": path.stat().st_size}
     write_json(output/"split_labels_manifest.json", split_manifest)
-    # 对原始1162图重新计算张量身份；恢复标签不创建新图或重复昂贵上游计算。
-    graph_check = verify_graphs(original, True)
+    # R3显式复用已有完整图审计；输入及审计回执必须逐文件匹配冻结配置。
+    # 本分支不是失败后的降级；只有预注册reuse_graph_audit时才启用。
+    if "reuse_graph_audit" in config:
+        receipt=config["reuse_graph_audit"]
+        if sha256(Path(receipt["path"])) != receipt["sha256"]:
+            raise ValueError("复用图审计回执散列不一致")
+        graph_check={"status":"REUSED_VERIFIED_ROUND_002", "source":receipt,
+                     "original_receipt":read_json(Path(receipt["path"])),
+                     "original_observations_sha256":sha256(preflight/"observations.json"),
+                     "full_graph_recomputation_performed":False}
+    else:
+        graph_check = verify_graphs(original, True)
     write_json(output/"graph_reaudit.json", graph_check)
     summary = {"status": "AUDIT_COMPLETE_PENDING_GPT_ADJUDICATION", "formal_training_started": False,
                "original_observations": len(original), "restored_atomic_tg": len(lineage),

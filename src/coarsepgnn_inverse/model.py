@@ -96,7 +96,8 @@ class InverseDesigner(nn.Module):
         """
         selected = embeddings[choices].flatten(start_dim=1)
         logits, means, raw_scales = self.ratio_head(torch.cat([context, selected], dim=-1)).chunk(3, dim=-1)
-        return F.log_softmax(logits, dim=-1), means, F.softplus(raw_scales) + 1e-3
+        # 数值合同预注册z尺度范围[0.05,5]，避免尖峰似然和无限宽混合分量。
+        return F.log_softmax(logits, dim=-1), means, F.softplus(raw_scales).clamp(0.05, 5.0)
 
     def supervised_loss(self, context: torch.Tensor, choices: torch.Tensor,
                         extender_fraction: torch.Tensor) -> dict[str, torch.Tensor]:
@@ -174,3 +175,45 @@ class InverseDesigner(nn.Module):
                                        "monomer_log_probability": score,
                                        "mixture_weight": float(weights[0, k].exp())})
         return result
+
+    @torch.no_grad()
+    def sample_proposals(self, context: torch.Tensor, count: int,
+                         generator: torch.Generator) -> list[dict]:
+        """从自回归原料分布和MDN连续分布采样指定数量的原始提案。
+
+        context为单请求[1,H]，generator必须与张量设备匹配且由调用方保存状态。
+        每一步条件于已经抽到的原料；MDN在最终D/P/E确定后计算。有E时采样
+        z再取sigmoid，NONE严格给v=0。保留重复或浮点端点供外层统一计费与拒绝，
+        不静默减少候选预算，也不将生成概率或混合权重解释为性质成功概率。
+        """
+        if context.shape != (1, self.hidden) or type(count) is not int or count <= 0:
+            raise ValueError("采样需要单请求[1,H]和正整数count")
+        self.eval()
+        context = context.expand(count, -1)
+        embeddings = self.grade_encoder(self.grade_features)
+        state, previous = context, torch.zeros_like(context)
+        choices = []
+        scores = context.new_zeros(count)
+        for role in range(3):
+            state, logits = self.step(context, state, previous, role, embeddings)
+            log_probs = F.log_softmax(logits, dim=-1)
+            selected = torch.multinomial(log_probs.exp(), 1, generator=generator).squeeze(1)
+            scores += log_probs.gather(1, selected[:, None]).squeeze(1)
+            choices.append(selected)
+            previous = embeddings[selected]
+        choices_tensor = torch.stack(choices, dim=1)
+        log_weights, means, scales = self.ratio_parameters(context, choices_tensor, embeddings)
+        component = torch.multinomial(log_weights.exp(), 1, generator=generator).squeeze(1)
+        indices = torch.arange(count, device=context.device)
+        z = means[indices, component] + scales[indices, component] * torch.randn(
+            count, dtype=context.dtype, device=context.device, generator=generator)
+        v = torch.sigmoid(z)
+        none = choices_tensor[:, 2] == self.none_index
+        v[none] = 0.0
+        # 原料得分包括NONE的离散概率；NONE没有连续密度或MDN混合成分。
+        return [{"grade_indices": choices_tensor[i].tolist(),
+                 "extender_oh_fraction": float(v[i]),
+                 "monomer_log_probability": float(scores[i]),
+                 "mixture_component": None if bool(none[i]) else int(component[i]),
+                 "mixture_weight": 1.0 if bool(none[i]) else float(log_weights[i, component[i]].exp())}
+                for i in range(count)]

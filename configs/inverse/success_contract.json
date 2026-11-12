@@ -1,0 +1,383 @@
+{
+  "schema_version": 1,
+  "contract_version": "pu-inverse-success-v1.0.0",
+  "run_id": "pu-inverse-20261111",
+  "goal_sha256": "6b7d7be4137ada058174c9d6682e4350b746fd181944061764cc9fc3fc80dddd",
+  "origin_review_request_id": "pu-inverse-20261111-193041ba9451",
+  "status": "DRAFT_NOT_FROZEN",
+  "frozen": false,
+  "numerical_rules_status": "FINAL_PRE_REGISTERED",
+  "data_lock_sha256": null,
+  "unresolved_numeric_thresholds": [],
+  "scope": {
+    "materials": "既有来源支持的线型双官能PU，一种D、一种宏二醇P和可选一种E；不包含新增合成实验、交联体系或未经核准的额外反应位点。",
+    "targets": [
+      "tg",
+      "tm",
+      "tensile_strength_ultimate",
+      "elongation_at_break"
+    ],
+    "claim_supported_by_pass": "在冻结数据、固定有限留出集和固定计算请求面板上达到本合同门槛，且实现可追溯的条件逆向配方生成与代理筛选。",
+    "claims_not_supported_by_pass": [
+      "三或四性质联合实测总体泛化。",
+      "新组合已经实验成功或已经具备完整可执行合成工艺。",
+      "三个初始化前向模型相当于三份独立实验真值。",
+      "Tg单一测试来源闭包能够估计总体泛化置信区间。"
+    ]
+  },
+  "physical_definitions": {
+    "D": "来源核准的双异氰酸酯规格，包含结构及摩尔质量。",
+    "P": "来源核准的宏二醇规格，包含重复单元、端基资格和Mn。",
+    "E": "来源核准的双羟基扩链剂规格或NONE。",
+    "R": "NCO/OH当量比；全部有效官能度为2时，R=n_D/(n_P+n_E)。",
+    "v": "扩链剂占总OH的当量份额；全部有效官能度为2时，v=n_E/(n_P+n_E)。",
+    "molar_recipe": "D:P:E=R:(1-v):v；E=NONE时v必须精确等于0。",
+    "mass_recipe": "先以相对摩尔数乘对应来源摩尔质量或宏二醇Mn，再除以总质量得到质量分数。",
+    "probability_meaning": "原料softmax和MDN给出生成分布；它们不是实验达标概率。"
+  },
+  "data_policy": {
+    "primary_supervision": "仅使用最终核准的真实主标签。来源数字化值单列为辅助，不进入独立实测验收分母；跨测量整理均值不作为原子条件标签。",
+    "split_policy": "保持既有材料/配方/来源/实际图输入传递闭包及原train/validation/test归属，12项跨集交集必须全部为0。",
+    "partial_labels": "单目标记录可以监督相应目标；真实多目标监督仅取获准共同状态中的非空目标子集。缺失标签不填0、不跨未知状态拼接。",
+    "normalization": "目标变换、数值标准化、PLE统计、监督投影、词表和校准只使用训练侧允许数据；验证只用于选择，测试不用于拟合或选择。",
+    "catalog": "允许冻结候选库中无标签泄漏的规格特征。分别保留目录可见、真实逆向监督可见和逐目标前向监督可见身份。",
+    "old_weights": "禁止复用不能证明与新留出闭包隔离的旧监督资产；固定无监督骨干及确定性特征可按版本和散列复用。",
+    "test_denominator": "纳入data_lock中所有合格测试观察，不得依据误差、未见规格、预测失败或请求难度剔除。",
+    "minimum_samples_are_not_power_claims": true,
+    "minimum_samples": {
+      "tg": {
+        "train_materials": 38,
+        "train_closure_groups": 7,
+        "validation_materials": 16,
+        "validation_closure_groups": 1,
+        "test_materials": 3,
+        "test_closure_groups": 1
+      },
+      "tm": {
+        "train_materials": 61,
+        "train_closure_groups": 23,
+        "validation_materials": 7,
+        "validation_closure_groups": 3,
+        "test_materials": 11,
+        "test_closure_groups": 3
+      },
+      "tensile_strength_ultimate": {
+        "train_materials": 192,
+        "train_closure_groups": 37,
+        "validation_materials": 71,
+        "validation_closure_groups": 4,
+        "test_materials": 99,
+        "test_closure_groups": 4
+      },
+      "elongation_at_break": {
+        "train_materials": 360,
+        "train_closure_groups": 84,
+        "validation_materials": 77,
+        "validation_closure_groups": 7,
+        "test_materials": 114,
+        "test_closure_groups": 9
+      }
+    },
+    "minimum_sample_failure": "若合法修正使任一最低证据条件不满足，报告本合同数据条件未满足；不得恢复不合格标签、重划分或自动降低下限。"
+  },
+  "design_tolerances": {
+    "interpretation": "评审预先选择的材料筛选分辨率，不是实验噪声、不确定性估计或已达到的模型误差。",
+    "tg": {
+      "canonical_unit": "degC",
+      "absolute_error_unit": "K",
+      "delta": 10,
+      "query_centers": [
+        -50,
+        -35,
+        -20
+      ]
+    },
+    "tm": {
+      "canonical_unit": "degC",
+      "absolute_error_unit": "K",
+      "delta": 15,
+      "query_centers": [
+        90,
+        140,
+        190
+      ]
+    },
+    "tensile_strength_ultimate": {
+      "canonical_unit": "MPa",
+      "absolute_error_unit": "MPa",
+      "delta": 5,
+      "query_centers": [
+        15,
+        25,
+        35
+      ]
+    },
+    "elongation_at_break": {
+      "canonical_unit": "percent",
+      "absolute_error_unit": "percentage_points",
+      "delta": 100,
+      "query_centers": [
+        400,
+        650,
+        900
+      ]
+    },
+    "basis": "对应当前训练材料等权IQR约31.8 K、94.8 K、23.4 MPa和454个百分点；所选容差约为这些IQR的31%、16%、21%和22%。这说明尺度，不构成测量误差证明。"
+  },
+  "model_and_composition_policy": {
+    "inverse_architecture": "现有hidden128集合编码、自回归D/P/E选择、最终选定原料条件化的三分量MDN；不另换模型体系。",
+    "mdn_components": 3,
+    "mdn_variable": "z=logit(v)",
+    "mdn_sigma_z_min": 0.05,
+    "mdn_sigma_z_max": 5,
+    "none_rule": "NONE有独立离散概率，v精确为0，不参加连续比值损失。",
+    "R_given": "用户明确指定R时保持该值，不替换成1；输出其相对训练支持范围的标志。",
+    "R_unspecified": "R不是当前神经头的输出。缺省时由外层在核准训练主标签所关联配方的R最小值与最大值之间搜索；范围在data_lock冻结。构造32个R值，包含合法范围端点及范围内的1，其余点在log(R)范围分层抽样，随机性由请求和种子固定；退化范围只使用唯一R。",
+    "R_strata": 32,
+    "v_domain": "有E时0<v<1，NONE时v=0；报告相对训练v范围的外推标志，不把连续外推说成已实验验证。",
+    "grade_feature_whitelist": [
+      "固定结构描述符",
+      "摩尔质量或Mn",
+      "官能度与有效位点类型",
+      "立体信息",
+      "结构表示层级"
+    ],
+    "forbidden_grade_features": [
+      "材料或来源ID",
+      "样品编号",
+      "来源出现频率",
+      "上游配方中的molecule_ratio",
+      "来源图node_count",
+      "验证或测试性质统计"
+    ]
+  },
+  "training_and_development": {
+    "final_seeds": [
+      20261111,
+      20261112,
+      20261113
+    ],
+    "initial_development_seed": 20261111,
+    "material_weighting": "前向每任务材料等权；逆向先均匀选择训练材料，再选择其合格状态和允许的非空目标子集，避免多测量材料主导。",
+    "initial_optimizer": "AdamW",
+    "initial_learning_rate": 0.001,
+    "initial_weight_decay": 0.0001,
+    "batch_size": 64,
+    "max_epochs_per_stage": 300,
+    "early_stopping_patience": 30,
+    "gradient_norm_clip": 1,
+    "forward_training": "保持CoarsePGNN结构及条件残差体系，结构阶段和条件阶段均在新训练划分上重新拟合；固定无监督骨干可复用。训练目标采用训练侧变换，验证选择使用还原物理单位后的材料等权MAE。",
+    "inverse_training": "真实原料teacher forcing；损失为三步分类交叉熵与有E样本的z空间MDN负对数似然之和，逐材料等权。目标上下界在训练侧进行单位统一和数值变换；掩码与真实零值分开。",
+    "training_constraint_modes": {
+      "two_sided_probability": 0.5,
+      "lower_only_probability": 0.25,
+      "upper_only_probability": 0.25,
+      "construction": "双侧区间中心为实测值加Uniform(-delta/2,delta/2)，半宽delta；单侧边界在实测值相应一侧、距离不超过delta，保证监督配方满足所构造请求。仅从真实合格共同状态组合多个标签。"
+    },
+    "optional_distillation": {
+      "allowed": true,
+      "first_experiment_uses_it": false,
+      "maximum_synthetic_formulations_per_seed": 20000,
+      "minimum_real_loss_weight": 0.5,
+      "rules": "仅用该种子已冻结且只在真实train训练的CoarsePGNN生成派生标签；原料限制为真实训练监督可见规格，协议和范围来自train。伪标签、teacher散列、候选及派生来源单独归档，不参与任何独立实测门槛或真实共同状态计数；禁止以最终96请求面板进行定向蒸馏。"
+    },
+    "development_selection": "最多4套明确归档的训练/搜索配置，仅用validation选择；允许在学习率0.001或0.0003、权重衰减0.0001或0.001及是否启用限定蒸馏之间进行预先记录的开发选择。hidden128和主模型MDN3保持。不得以最终测试结果选择配置。",
+    "first_fitting_experiment_after_authorization": "以20261111先训练四个前向任务及无蒸馏逆模型，完成真实FULL条件缓存接线和训练侧变换，报告首个真实epoch吞吐、峰值显存、各阶段验证轨迹及最佳checkpoint身份。此首轮拟合上限14400秒；该行动须等待数据核准、合同冻结及下一步训练授权，本次不执行。"
+  },
+  "forward_real_anchor_evaluation": {
+    "population": "全部冻结合格测试观察，包括未见规格和所有获准端点/协议。",
+    "notation": "t为目标，s为训练种子，m为材料，I_m,t为该材料在目标t下的合格观察集合，y_i为实测值，p_s,i为还原物理单位后的预测，delta_t为设计容差。",
+    "material_MAE": "MAE_s,t = mean_m(mean_i_in_I_m,t(abs(p_s,i-y_i)))",
+    "material_hit_rate": "H_s,t = mean_m(mean_i_in_I_m,t(indicator(abs(p_s,i-y_i)<=delta_t)))",
+    "baseline": "使用train中相同target/method/criterion/phase类的材料等权中位数；该类不存在时使用该目标全train材料等权中位数。层次规则固定，不用测试数值选择。",
+    "normalized_score": "S_s = mean_t(MAE_s,t/delta_t)，四目标等权；S_baseline按完全相同分母计算。",
+    "required_thresholds": {
+      "each_target_each_seed_MAE_over_delta_max": 1,
+      "each_target_each_seed_hit_rate_min": 0.6,
+      "each_seed_normalized_score_over_baseline_max": 0.9,
+      "each_target_seed_MAE_range_over_delta_max": 0.25
+    },
+    "unseen_grade_evaluation": {
+      "definition": "配方中至少一个规格不在该目标真实train监督规格集合。",
+      "required_reporting": "每目标逐种子报告材料数、闭包数、MAE、命中率和逐样本结果；空分层标not_applicable，不虚构指标。",
+      "required_threshold_when_nonempty": "每目标未见规格子集的三种子平均材料等权MAE不超过1.25*delta_t。",
+      "population_claim": "小分层只支持该冻结子集的有限核对。"
+    },
+    "nonfinite_or_missing_prediction": "不得删样本；计为未命中，MAE验收失败。"
+  },
+  "inverse_real_anchor_evaluation": {
+    "population": "全部冻结测试单目标实测观察；真实D/P/E/v仅由独立评分端使用。目标请求取[y_i-delta_t,y_i+delta_t]、该观察真实协议和明确提供的历史R。",
+    "scope": "检验给定R下逆模型对真实留出配方的条件支持，不宣称神经头已学会R分布，也不把邻近配比当作实验成功。",
+    "ratio_window_half_width": 0.005,
+    "ratio_window": "a=max(0,v_i-0.005)，b=min(1,v_i+0.005)。该窗口是配方概率质量的评价分辨率，不是性质容差。",
+    "probability": "P_i=P(D_i|q_i,c_i,R_i)*P(P_i|D_i,q_i,c_i,R_i)*P(E_i|D_i,P_i,q_i,c_i,R_i)*P_v。E_i=NONE时P_v=1；否则P_v=sum_k pi_k*[Phi((logit(b)-mu_k)/sigma_k)-Phi((logit(a)-mu_k)/sigma_k)]。",
+    "notation": "q_i为目标性质区间，c_i为真实测试协议；pi_k、mu_k、sigma_k为最终真实D/P/E条件下第k个MDN分量的权重、z均值和尺度；Phi为标准正态CDF；logit(0)=-infinity，logit(1)=infinity。",
+    "numerical_rules": "采用稳定的float64对数CDF差计算。每个概率因子的评分下限固定为1e-12，记录每项触底次数；条件模型和对照同口径。禁止用可任意增大的z点密度作为成功指标。",
+    "probability_floor": 1e-12,
+    "score": "NLL_i=-log(P_i)，使用自然对数，单位nat；先在材料内平均，再在材料间平均，最后四任务等权。",
+    "control": "同架构、同训练数据、同目标子集采样、同种子、同更新预算的无目标数值消融。保留任务ID、目标mask、协议和R，移除目标数值及上下界数值。",
+    "improvement": "Delta_s,t=NLL_no_target_values_s,t-NLL_conditional_s,t。",
+    "required_thresholds": {
+      "each_seed_four_target_mean_Delta_min_nat": 0.1,
+      "each_target_three_seed_mean_Delta_min_nat": 0
+    },
+    "joint_real_anchors": "对所有获准双目标共同状态另行计算相同的条件概率质量和配对改进，作为必须报告的补充；不设额外优势门槛，不替代单目标门槛，不构造缺失的三/四目标实测锚点。"
+  },
+  "computational_query_panel": {
+    "total_requests": 96,
+    "construction": {
+      "single_target_requests": 24,
+      "single_target_rule": "4目标、3个固定中心、协议A/B各一套。",
+      "two_target_requests": 48,
+      "two_target_rule": "6个目标对、低/高中心的4个角、协议A/B各一套。",
+      "three_target_requests": 8,
+      "three_target_rule": "4个三目标mask，各取全低和全高两个角，使用协议A。",
+      "four_target_requests": 16,
+      "four_target_rule": "四目标低/高中心的全部16个角，使用协议A。"
+    },
+    "intervals": "每项范围均为固定中心加减对应delta；中心取design_tolerances中的数值，不从模型预测反推。",
+    "protocol_families": {
+      "tg": "DSC、dsc_inflection、soft_segment",
+      "tm": "DSC、dsc_peak、hard_segment",
+      "tensile_strength_ultimate": "明确ultimate或最大工程应力的已核准拉伸端点",
+      "elongation_at_break": "明确断裂伸长的已核准拉伸端点"
+    },
+    "protocol_selection": "在各指定端点类内，仅按修正后train中每个完整真实协议的独立材料数降序选择A/B，平局按规范化协议SHA-256升序。完整协议保留扫描、峰身份、条件和缺失mask，不能为获得两个协议而混入不同相域或Tm onset。每个协议至少有2个训练材料；不足时数据准备不通过，不伪造默认协议。",
+    "locking": "具体协议字段、ID、96条请求及其SHA-256在任何模型训练前写入data_lock；候选R不预指定，采用冻结外层R搜索规则。",
+    "feasibility": "该面板是预注册的计算设计挑战，不保证所有组合物理可行。未命中请求仍进入分母，测试后不得删除难请求。",
+    "final_panel_access": "开发阶段不得用该面板的性能选择超参数或搜索策略；仅在最终锁定窗口计算正式指标。"
+  },
+  "candidate_search_and_baselines": {
+    "candidate_budget": 512,
+    "top_k": 20,
+    "budget_unit": "一个候选在当前请求全部约束上的单个搜索前向模型预测向量计一个逻辑评分；同时记录实际逐任务前向调用数。",
+    "accounting": "重复、非法或失败的提案占用提案名额，缓存不能产生额外免费探索；合法候选前向评分最多512次。检索若穷尽训练配方可提前停止并记录实际用量，不能访问留出配方库补足。",
+    "main_method": "初始256个提案中192个来自条件逆模型的自回归原料采样与MDN连续采样，64个来自合法随机探索；未给R时在32个R层各分配6个逆模型提案和2个随机提案。随后使用256个评分名额对初始优胜组合进行R/v细化。现有beam16分量均值接口必须补齐实际采样和预算器后才可使用本指标。",
+    "ranking": "首先按各约束中最大的归一化区间违反量排序，其次按预测到区间中心的平均归一化距离排序，最后按规范配方身份破平局。所有方法采用同一规则。",
+    "refinement": "选初始评分最好的16个不同配方作为父项，各产生16个后续提案；保持D/P/E，v在父值加Uniform(-0.1,0.1)后限制于[0.000001,0.999999]，NONE仍为0。未指定R时log(R)加Uniform(-0.1,0.1)后限制于冻结训练R范围，指定R时不改变R。父项不足16个时按固定顺序轮转。主模型与组合搜索基线使用完全相同细化规则。",
+    "baselines": {
+      "retrieval": "只检索核准训练主标签关联的真实配方，保持其D/P/E/R/v；不得使用测试材料或测试目标标签。候选超过512时按仅依赖训练标签、请求协议及性质距离的固定规则预选；缺失请求性质采用固定缺失惩罚，不使用未计费的模型补全。指定R时只保留与请求R在1e-8内一致的历史配方。",
+      "legal_random": "512个合法随机提案；D/P及非NONE的E在相应冻结角色库均匀取样，NONE概率0.1，有E时v服从Uniform(0.000001,0.999999)，R使用相同范围和分层规则。",
+      "combination_ratio_search": "256个合法随机初始提案加256个按同一父项选择与细化规则产生的提案，必须实际消耗比例优化评分预算。"
+    },
+    "top_k_diversity_policy": "按统一排名选取至多20项，每个D/P/E组合最多5项；不足20项如实返回，不用重复或微小扰动凑数。所有方法应用同一策略。",
+    "deduplication_tolerance": {
+      "R": 1e-06,
+      "v": 1e-06
+    },
+    "independent_proxy_recheck": "种子s的搜索只使用F_s；冻结其top20后，分别用另外两个种子的前向模型复核。额外复核最多40个完整目标向量，所有方法等额，结果不得回流搜索。搜索512与复核40分别记账，完整计算仍计入总墙钟预算。",
+    "no_free_precomputation": "不得在预算外扫描全规格组合或全比例网格，再把结果作为免费候选初始化。"
+  },
+  "computational_metrics": {
+    "proxy_candidate_hit": "一个冻结候选在搜索模型和另外两个复核模型上均满足该请求全部区间，才记为计算命中；这是跨初始化代理一致性，不是独立实验验证。",
+    "Hit_at_20": "冻结请求中至少有一个top20候选计算命中的请求数除以全部固定请求数；没有输出或预算内未找到候选均计0。",
+    "required_each_seed": {
+      "overall_Hit_at_20_min": 0.6,
+      "single_target_Hit_at_20_min": 0.75,
+      "two_target_Hit_at_20_min": 0.5,
+      "three_target_Hit_at_20_min": 0.25,
+      "four_target_Hit_at_20_min": 0.25,
+      "raw_proposal_chemical_legality_min": 0.99,
+      "returned_candidate_legality_min": 1,
+      "median_distinct_passing_DPE_combinations_over_successful_requests_min": 2
+    },
+    "baseline_comparison": {
+      "three_seed_mean_Hit_margin_over_strongest_baseline_min": 0.05,
+      "each_seed_Hit_margin_over_strongest_same_seed_baseline_min": 0,
+      "definition": "先对各方法分别求三个种子的平均Hit，再取三个基线中最大的平均值；主模型须至少高5个百分点。逐种子另要求不低于该种子最强基线。"
+    },
+    "seed_stability": {
+      "overall_Hit_max_minus_min_across_seeds_max": 0.15
+    },
+    "required_reporting": "逐请求、逐候选、逐约束、逐模型记录预测、排名、合法性、搜索预算、复核预算、失败原因和配方身份；按目标数、协议、NONE、规格可见性及R/v外推标志分层报告。"
+  },
+  "ablations": {
+    "no_target_values": "三个最终种子均训练，承担真实逆向锚点的配对对照；数据、抽样、蒸馏使用情况和更新预算与对应主模型一致。",
+    "single_component_MDN": "至少使用20261111，以K=1替代K=3，其余主配置、训练和搜索预算相同；报告真实锚点评分、计算命中及多样性。",
+    "without_forward_reranking": "至少对20261111记录由逆模型生成倾向直接排序的top20，并用相同冻结前向模型进行事后评价，报告前向筛选的贡献。",
+    "interpretation": "必须完成消融报告，但不把K=3优于K=1额外设为整个工具的硬门槛。若没有优势，不能宣称多峰头的优势已被证明。"
+  },
+  "statistics": {
+    "primary_estimand": "冻结有限留出集合与固定96请求面板上的可重算结果，不是未知材料总体成功率。",
+    "material_weighting": "同一材料多观察先在材料内等权，再在材料间等权；不平均成新的实测标签。",
+    "source_unit": "依赖性统计单位为原来源传递闭包，不能把观察行、扫描次数或模型种子当独立来源。",
+    "confidence_intervals": {
+      "closure_groups_at_least_8": "提供10000次按闭包重采样的95%百分位区间，种子20261114；注明来源组仍有限，区间仅作辅助报告，不替代固定集合硬门槛。",
+      "closure_groups_2_to_7": "报告逐组结果及留一组敏感性范围，不据少量组给强总体推断。",
+      "closure_groups_1": "总体置信区间为null，原因not_identifiable_from_one_cluster；不得对材料行或三个种子伪bootstrap。"
+    },
+    "seeds": "三个种子分别核验全部适用门槛并报告范围；不只报告最好种子。",
+    "metric_comparison_epsilon": 1e-06,
+    "epsilon_scope": "仅用于归一化浮点数比较，不扩大物理设计区间，不把统计未达标改为通过。"
+  },
+  "interface_and_provenance": {
+    "required_output": [
+      "D/P/E规格ID、结构表示、Mn或摩尔质量及有效位点资格",
+      "R、v、摩尔比和质量分数",
+      "兼容CoarsePGNN的代表性粗图及身份",
+      "每项请求的协议、单位、逐模型预测及逐约束判断",
+      "生成分数与代理筛选结论的明确区分",
+      "合成来源或来源不足状态"
+    ],
+    "stoichiometry_absolute_tolerance": 1e-08,
+    "NONE_v_exactly_zero": true,
+    "synthesis_rule": "任何被表述为来源事实的合成步骤必须有来源ID和具体定位。新组合只能给有出处的类似反应模板并标为建议；缺失温度、时间、溶剂或催化剂字段保留null，不由LLM补成已验证工艺。至少用一个有来源的训练配方完成路线依据回读用例。",
+    "default_protocol_rule": "缺省测试方案只能解析为锁定的版本化默认协议并在输出标明默认来源；不得把历史缺失字段改为常温常压，也不得把23°C等温条件冒充Tg/Tm扫描方案。",
+    "required_end_to_end_cases": [
+      "单性质双侧区间",
+      "四性质联合计算请求",
+      "同一性质在两个不同协议下的约束",
+      "E=NONE且v精确为0",
+      "用户给定非1的R被原样保留",
+      "未给R时执行外层R搜索并记录其范围",
+      "空合法原料集合返回INFEASIBLE_DOMAIN",
+      "同协议下互不相交的约束返回INFEASIBLE_CONSTRAINTS",
+      "上下界颠倒、非有限值或不支持单位返回INVALID_REQUEST",
+      "未知规格或未知协议明确拒绝或返回对应不支持状态",
+      "固定无命中工程夹具在预算耗尽后返回NO_SUPPORTED_CANDIDATE",
+      "来源不完整的合成信息保留缺失状态"
+    ],
+    "end_to_end_case_pass_fraction_required": 1,
+    "no_solution_semantics": "只有空合法域或可证明的约束矛盾才能称不可行；搜索未命中不能称物理无解。"
+  },
+  "final_lock_and_independent_verification": {
+    "before_first_optimizer_update": "合同状态和SHA-256、data_lock、资格规则、协议表及96请求面板必须冻结，并取得原会话训练授权。",
+    "before_opening_final_test": "冻结最终代码、模型配置、变换、候选与基线策略、三个种子前向/逆向权重、消融权重和评价脚本的散列；建立不可覆盖的最终评价窗口。",
+    "test_opening_count": 1,
+    "recomputation": "使用独立评价入口重新载入归档checkpoint，对全部留出观察和全部最终候选重算预测及指标；不能只重读训练程序写出的汇总表。",
+    "prediction_recompute_tolerance": "abs(p_recomputed-p_archived)/delta_t <= 1e-5，且合法性、候选身份、逐约束布尔判断和最终门槛结论一致。",
+    "review_evidence": "提供逐样本及逐请求结果、完整分母、区间或不可估计原因、三种子及基线/消融表、独立重算日志、C/A/合同/数据/权重散列和必读清单；大文本按可重组分片提供，大二进制提供实际下载校验与可解释的重算回执。",
+    "secret_links": "如以后使用私密临时证据链接，完成读取后撤销并提供回执；不得在公开结果回显令牌。"
+  },
+  "hypotheses_and_falsification": [
+    {
+      "id": "H_FORWARD",
+      "hypothesis": "当前数据上的CoarsePGNN可以达到预注册筛选分辨率。",
+      "falsification": "任一必需前向误差、命中率、基线改进、未见规格或种子稳定性门槛失败，则不能用计算搜索命中掩盖前向可靠性不足。"
+    },
+    {
+      "id": "H_INVERSE_CONDITIONING",
+      "hypothesis": "目标性质数值为真实留出配方提供可测的逆向条件信息。",
+      "falsification": "相对无目标数值对照的区间概率质量改进未达到门槛，说明尚未证明逆模型有效利用性质目标；不能仅凭网络能输出配方宣称反向学习成功。"
+    },
+    {
+      "id": "H_SEARCH_VALUE",
+      "hypothesis": "学习到的逆向提案在相同预算下提高计算筛选能力。",
+      "falsification": "未达到固定面板覆盖门槛，或未超过最强预算基线的预注册幅度，则未证明该逆向方案的计算设计价值。面板未命中不等于目标物理不可行。"
+    }
+  ],
+  "completion_and_failure": {
+    "pass_rule": "A1至A5的证据要求及本合同全部required门槛同时满足，且原会话完成独立核准，才能研究PASS。",
+    "current_no_training_claim": "当前不存在真实训练性能；本合同不是已达到指标的声明。",
+    "budget": {
+      "maximum_total_rounds": 10,
+      "maximum_total_compute_seconds": 259200,
+      "completed_rounds_at_preregistration": 2,
+      "consumed_compute_seconds_at_preregistration": 55.47320987191051
+    },
+    "budget_exhaustion": "轮数或累计计算预算先到即停止；交付实际完成内容、全部负结果、未完成项和散列，结论为未达标或证据不足，不冒充完成。",
+    "final_test_failure": "最终测试失败后不调整阈值、分母、协议、目标面板或模型。仅允许不改变锁定代码/权重/规则的传输重取或执行恢复，并保留原失败记录。",
+    "execution_error": "散列冲突、身份不闭合、泄漏、非有限计算、实现与冻结公式不一致属于执行或实现错误，不能解释成科学负结果。",
+    "scientific_negative_result": "实现正确但门槛未达到属于有效负结果；不能通过扩大目标、重划分、补造标签、删除困难样本或新增合成要求改变本次完成条件。"
+  }
+}
