@@ -1,0 +1,591 @@
+{
+  "job_id": "round-006-229bbba3",
+  "code_sha": "94f8f785d5c3bfb4197903d5588e7a5490d3e80d",
+  "spec_sha256": "41bffcb38838d3c967f96654af8a0ec0498f9165fbd659dcdfe258978a7094fc",
+  "host": "cn2",
+  "cwd": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository",
+  "python": "/opt/anaconda2023/bin/python",
+  "platform": "Linux-4.18.0-348.7.1.el8_5.x86_64-x86_64-with-glibc2.28",
+  "started_at": "2026-11-12T06:43:59.257615+00:00",
+  "checks": [
+    {
+      "id": "strict_deterministic_nine_stage_fit_and_independent_reload",
+      "argv": [
+        "/usr/bin/env",
+        "PYTHONPATH=src",
+        "OMP_NUM_THREADS=8",
+        "CUBLAS_WORKSPACE_CONFIG=:4096:8",
+        "/opt/anaconda2023/bin/python",
+        "-c",
+        "import subprocess,json\nsteps=[['/opt/anaconda2023/bin/python', '-m', 'pytest', '-q', 'tests/test_inverse_training_gate.py', 'tests/test_inverse_fitting.py', 'tests/test_inverse_metrics.py', 'tests/test_inverse_access.py', 'tests/test_inverse_preprocessing_reuse.py', '--junitxml=/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round006_unit_tests.xml'], ['/opt/anaconda2023/bin/python', '-m', 'coarsepgnn_inverse', 'train', '--config', 'configs/inverse/pu_20261112_round006.json', '--output', '/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit'], ['/opt/anaconda2023/bin/python', '-m', 'coarsepgnn_inverse.reload_validation', '--config', 'configs/inverse/pu_20261112_round006.json', '--training-dir', '/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit', '--output', '/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/independent_validation.json']]\nfor i,step in enumerate(steps):\n print(json.dumps({\"pipeline_step\":i,\"argv\":step}),flush=True)\n subprocess.run(step,check=True)\n"
+      ],
+      "expected_exit": 0,
+      "started_at": "2026-11-12T06:43:59.293886+00:00",
+      "log": "check-000.log",
+      "exit_code": 0,
+      "ended_at": "2026-11-12T06:47:00.618203+00:00",
+      "passed": true,
+      "log_hash": {
+        "size": 553266,
+        "sha256": "54d5c92f70e85feaa9ec0ac6ec2b6b835e0fcf509d5013330d5e4a9279fd74c5",
+        "md5": "28ad90a6dba2514ceb02599e2fc82ba0"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/success_contract.json",
+      "sha256": "e0d18e2181c800ec077a5c58800e66fefb67d99609bcf83a844eb204a2c292ef"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_004_qualification/data_lock.json",
+      "sha256": "d6ea2d43d60ba12784e91f03d37515210e300b0144597fa12d0412162b06f52d"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_004_qualification/train_labels.json",
+      "sha256": "3301d5f5372ed26eaab27a472ab1f054607ff96193ade35922e8039344099f79"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_004_qualification/validation_labels.json",
+      "sha256": "5613a496a3ab26bba29d55678346bcefd30205dc50bfb7e2e06e7c78fb2a3254"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/configs/inverse/pu_20261112_round006.json",
+      "sha256": "7bdcc99dd66145b8fa39c10d9548f4fab9d44333603796f8c42035526f65de4f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round006_authorization.json",
+      "sha256": "38d873afed4b8a26a48c22492591b07ce7b3fdd00dd537640757a7d402859148"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round006_review_raw.txt",
+      "sha256": "00d1a0d4fd8c3e8db50a414328f7a5c5d4b2653817cd9f66e37661a4ce60aa15"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_005_fit/inputs_ready.json",
+      "sha256": "efc85171ce01657bba50e4d362a52707666e6b0197eb462d0876bffb13d88dfd"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round006_unit_tests.xml",
+      "size": 3913,
+      "sha256": "7d84978db8bb2b65d2577aef6e2e1df2297d366638d57aca36dc3f1779714322",
+      "md5": "b604f47b0930d73cafaa08491258b691"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/run_config.json",
+      "size": 2137,
+      "sha256": "ec98895c0b8b021ac7e64c167c61547b2c222a82e283bfc053a0861cacb3dbf2",
+      "md5": "4df4a6258fb3a14e472dadaec5fdd58e"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inputs_ready.json",
+      "size": 1389,
+      "sha256": "efc85171ce01657bba50e4d362a52707666e6b0197eb462d0876bffb13d88dfd",
+      "md5": "0a0ddcceb16af1a5f92239b5d05c45ac"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/preprocessing_provenance.json",
+      "size": 79752,
+      "sha256": "a5d949c905216533a5ae48ad8b2f653f14451a42bc0a3062668a6176e70025cf",
+      "md5": "4d9d06874564ab3e4bd9dc3e306ac749"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/input_preparation_runtime.json",
+      "size": 151,
+      "sha256": "dac36db3eaef31d9ce75d917ec8064e593f09414c1b559f20e7b824e717de824",
+      "md5": "7aaf81c22452deb17f119f0fa5f22f52"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/checkpoint_manifest.json",
+      "size": 3636,
+      "sha256": "0a5d20560f7a11317cf179dbe13ebbd70999380e910aa13b828ef341edcaff78",
+      "md5": "a42ee9e5da8c954df73637fecc09328f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/training_result.json",
+      "size": 276758,
+      "sha256": "8930d26a08c6b7fff8309117073b2df2ab0e46c75b797f6d3577568d6c8f9850",
+      "md5": "dbcc9b0c6db14332a8d7be62e0e4de3a"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/forward_validation_metrics.json",
+      "size": 7301,
+      "sha256": "eb76cb4616730963d66825b712ec659539ada63cd72a8a84fff5b7ab964f9fb1",
+      "md5": "85f2f4b1420ec2969f55e56cb9dce61a"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/forward_validation_scored_rows.json",
+      "size": 99576,
+      "sha256": "e789a71c3c1bdf0fdb3514139d40417cd048650f1ab39a77045ed72444032a94",
+      "md5": "b7c9e946cb4fb453a88886c71188f02d"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_validation_metrics.json",
+      "size": 3562,
+      "sha256": "b7f157e1bf70d143bd9bf31c2c02abb40deb423b7a6d3c2a1988417932e441dc",
+      "md5": "2516c1c27db69deed726124d61b2ed54"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_validation_scored_rows.json",
+      "size": 101903,
+      "sha256": "c80f208482184c43eceea362c06e49c361787ed613bb3566c01ac2f875832392",
+      "md5": "3caa26d8f1dadfc6ca7b957097b09731"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_validation_outputs.pt",
+      "size": 915570,
+      "sha256": "dd5f34b6759c74b3b54caf75d1f31754538f0a235b4d7a70a1e19f64e4d412a3",
+      "md5": "b15d399c40a24835f9964f07d93b71df"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/independent_validation.json",
+      "size": 2838,
+      "sha256": "d7c939987ca7f47a0aebc8643252320a1276940e65e08df45bf9bba7742863cd",
+      "md5": "59e1b81960710cc0272debec2cee7a71"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/startup_test_access_guard.json",
+      "size": 211,
+      "sha256": "f575e72716a63701fe3c321bb593b0023cdd3f26807e21665aac4659a1b4e73f",
+      "md5": "b923085cf50462accd2201727fd60ab9"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_validation_predictions.json",
+      "size": 14161,
+      "sha256": "6ef959d4650e1f6f3831f826aeb6b109dacb707de0445dda3c7f46fa8b413e1d",
+      "md5": "362748cf71ce07250b5e4d720a2f6dd9"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_validation_predictions.json",
+      "size": 19614,
+      "sha256": "1dc156789c747d6db662287e192f61ffdab4e1fc540c7061b3ebe1a20b9a363a",
+      "md5": "01fc75758809943e62bcee943e1ec157"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_validation_predictions.json",
+      "size": 29725,
+      "sha256": "9ae74d3598f45bf650af9a4fb60d9a458544365e8bef3f3b102b24d5bf7a5ec0",
+      "md5": "4ae9eb85dec337a52ba570c84b6a8e45"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_validation_predictions.json",
+      "size": 31611,
+      "sha256": "1cad04f7516ab40875ed6418de3de2ac0783b51dfcc35e1959872bff1a123952",
+      "md5": "c0a2c61f854e8c6c3ea49aaea9d67679"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_structure_batch_check.json",
+      "size": 196,
+      "sha256": "387951b26e8f08e101e785cb34f789e20bccfeec29e2274ab4a0c3cf11642159",
+      "md5": "9bbceffba6dbb9d7b4e97973bb5031ee"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_full_batch_check.json",
+      "size": 196,
+      "sha256": "c912bd299347988be1a4dbc7c3a394092302affffa82e6555620bbf0875bc9b8",
+      "md5": "caa92c08ab802e91f87e5fffbe41db31"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_structure_batch_check.json",
+      "size": 197,
+      "sha256": "de812150e69e3dcab75052943369d3866a82fd450f7873dc976773a41a42f39f",
+      "md5": "627b4ff1413a74ba521bd29ae88f15be"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_full_batch_check.json",
+      "size": 197,
+      "sha256": "f311aa202f36afde70ca46f3cb6d8fe868d2c93a53b012611969c290ec0cfd40",
+      "md5": "40bf46a814da8269c22d71015f5710ff"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_structure_batch_check.json",
+      "size": 196,
+      "sha256": "448c4b901b5a1fc3c80fa6b8c713e4a42659db24b57dd42066c5f8c7f2fda4c4",
+      "md5": "79dfb85d901e4ca6891e4b0faaa3a93f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_full_batch_check.json",
+      "size": 197,
+      "sha256": "c012ef29ad8c34bb1b10f6116323c4d65cf19b1d624042c1bb3bc34b36fbac78",
+      "md5": "712274447c556dc1aff8361416d5cdf3"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_structure_batch_check.json",
+      "size": 194,
+      "sha256": "226f0b3378a4eda99f46f7192997c54813f64d51584e62e75eab94051948a9aa",
+      "md5": "64605fbfba53665903884ee3bf2b34b7"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_full_batch_check.json",
+      "size": 197,
+      "sha256": "a1d31c9b1576f3869fcbb15fddf81e86d3a35ac95bc4b7c866096b672913148e",
+      "md5": "aab819bf01a36c6ca0fcc602e5d5f844"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_full_batch_check.json",
+      "size": 195,
+      "sha256": "e8807f94bedea99294e96e10f59d0543260b498aa9e1472e44dc7c6318338323",
+      "md5": "6383e23d4c10d1e25aaf6abd1a0b8510"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_structure/best.pt",
+      "size": 20209632,
+      "sha256": "8a534b864b6bd8f918a9cbe1dcf1c968c69c93d5c1dfc5791c30af69a5aa7e14",
+      "md5": "851659001fe2b6f07609aa4c79e344e4"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_structure/last.pt",
+      "size": 58555284,
+      "sha256": "251127722fc05441fef8b7b3d1f00fb2103db3c391544ce37d5990b73e876818",
+      "md5": "2f6a9f33413811a2360ecc4f7e5e4592"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_structure/configuration.json",
+      "size": 954,
+      "sha256": "cadfa102454a0f448306443a9e80c6063ef1b192c22bb4aa6aa582c86691ce87",
+      "md5": "9a5597f587b425e8b95d7767558db60d"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_structure/completion.json",
+      "size": 17129,
+      "sha256": "a1b1d70b0cba2010560ec1bcdb66e8c3039b03e0308fe2a31fb8353c5d32f516",
+      "md5": "928dfaea47877a1786ab14014299af5e"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_structure/resume_transition.json",
+      "size": 26083,
+      "sha256": "4aad75a894589d23fc6e7d9e6c0e75ffeb5eee5c6206ced2940c1981b06d13fe",
+      "md5": "cb5ebe71f2f8a5c37028d946b0c400e8"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_structure/runtime.json",
+      "size": 736,
+      "sha256": "e68859bb4db9d95c9d159d0ef7f597d83015cf996d8b1fe64bf6a15965113b4e",
+      "md5": "68e12420fab55edcc4481316ffe0b2aa"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_full/best.pt",
+      "size": 21227845,
+      "sha256": "71df5f6a5707542a5ea103d5e6d9b7d27fc8c186c5115d8fd5b1cb452a186bd4",
+      "md5": "f5d1f05111e13091cd8fc669e02b7914"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_full/last.pt",
+      "size": 23290144,
+      "sha256": "a5f0d08cf8da5be5050891f0541158aad82b4785fb8fbe4032fe7f2a96c0fbbe",
+      "md5": "71c55848746436aa5ed253d7df0d6786"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_full/configuration.json",
+      "size": 949,
+      "sha256": "5b7d7a4a19b3483f93261ce117ae0a77f18330884c2c683440cb39fe67b47621",
+      "md5": "56fecb18150378420b30fbcd4cb8b5f2"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_full/completion.json",
+      "size": 34850,
+      "sha256": "d5c49a8f4da0cda52b4515c86984ac1b2895f84337511a766912d452791bce67",
+      "md5": "a1023e506d9838c2eb4103d4fa2a5002"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_full/resume_transition.json",
+      "size": 26077,
+      "sha256": "176bb37492e5e072b482a45038ca6b92121bd5f8d288b9a5bbf13a489e196fd1",
+      "md5": "c2a62662e6a02b98607f3ff9cbd818cb"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tg_full/runtime.json",
+      "size": 741,
+      "sha256": "4c842cc6ad3a85bb28b773fcc8cf6ebcf1d7f7cd6fd1285112935a89981c2218",
+      "md5": "0cd14917d625d12573178cd3df346d0d"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_structure/best.pt",
+      "size": 20209632,
+      "sha256": "3f2b203353d1a4dc163b639685de1e1649a81e87c0ba9d928096bd1fd89300b5",
+      "md5": "d9cf7fa182c004fc8399319c79caf773"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_structure/last.pt",
+      "size": 58558228,
+      "sha256": "ffaff20efc53b997077c793697a46552c9736484a028672da4c3852d07f756e7",
+      "md5": "008bfcc9eab2b5ca5034e3cb45df7eef"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_structure/configuration.json",
+      "size": 954,
+      "sha256": "3271d399d4dfff5457f434b938bcae84040cfb266d1aa22124b3fe117b7000e1",
+      "md5": "7d8e6944b2dbbaf66d51444fadb79c3c"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_structure/completion.json",
+      "size": 22593,
+      "sha256": "4a347fca6115645a8260211bfe5620a40ab0e4ef83c2ffbb3e70758bd3b0f1f0",
+      "md5": "3ca5852901763c6684f155a207f40dd4"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_structure/resume_transition.json",
+      "size": 25635,
+      "sha256": "452c6cf0042394f0a8f340ad7df97ec1e2c85aaf6a3958f029f4c564dbdb08f2",
+      "md5": "b070f77fb13132afcc52211a1f9d1c05"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_structure/runtime.json",
+      "size": 741,
+      "sha256": "8f64a3b57b18ea8b64da88efd4e558ca56a8e5e2b5412665d7a16819bc4566e8",
+      "md5": "b947550b7cd29b7fc62298b60f1bfe53"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_full/best.pt",
+      "size": 21227845,
+      "sha256": "5a4164a707b0813f460d6c5d8cf82b27138c47116fb1a898824a863de69f61cd",
+      "md5": "431b69a6f687b94ecb2c6ac461cd355c"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_full/last.pt",
+      "size": 23284704,
+      "sha256": "a1e192cdf5b0682dd010998a13763d453daa4598b6bbdc10c4e8eeb9a66a59a3",
+      "md5": "75451b93c1b646ccc24a275199d3e87a"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_full/configuration.json",
+      "size": 949,
+      "sha256": "b00471a13b62b2dc08aada73a6424549365aeed0338f222f78fb1ecfa9fd4857",
+      "md5": "34060c1d638bad1a274e054566758650"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_full/completion.json",
+      "size": 25057,
+      "sha256": "6a1804fa97544354c03492a862fa70d38a0a24fabc188bb72d50cecc265de3ae",
+      "md5": "5e3e11c28cfaf665728f6e53a31bde92"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_full/resume_transition.json",
+      "size": 25629,
+      "sha256": "7fa2d07a18779918bed9221d338eed4e70dafb87e53d45c0c433c93486ffeba0",
+      "md5": "f3c9e50f099f95379f5a49d4a2ee8865"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tm_full/runtime.json",
+      "size": 739,
+      "sha256": "2c74d955839dc3a084e9771094a580d62a5271a0890fc53894d6c7096d151f36",
+      "md5": "043a030c2f6191ac80c76439bf7ced21"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_structure/best.pt",
+      "size": 20209632,
+      "sha256": "a443c0f5fc61f28806cf25bb652beb71bb190e972c7a45599a650854929338ab",
+      "md5": "b1786009c78f2f8b5fc635d43ef00c34"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_structure/last.pt",
+      "size": 58566932,
+      "sha256": "6ae032b9c828e7d0bcad330e792b63108c6bb8b5d695ae623ac90d78ae0ad09d",
+      "md5": "b3a402266d7f9aef77d70e1b48f521ac"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_structure/configuration.json",
+      "size": 977,
+      "sha256": "93d5f14372c3f7923c176f09961312601a7d321ddf88801aac1fffa61ba6eddb",
+      "md5": "a5c9deb16ba413ce5b2ea0098b85df54"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_structure/completion.json",
+      "size": 38378,
+      "sha256": "b57c47ee0f764aadb003d29f38764e07d51ed55a03fe0e09e5e10fb24a16a5ca",
+      "md5": "1e1c2a8b2e29ed9da1c978ff9150726f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_structure/resume_transition.json",
+      "size": 27129,
+      "sha256": "225e42d2b881d818c233e1731a93a840ba3e98e2d2d768e4fb124900047085e8",
+      "md5": "6a0337dc5b259aa06b9645b3ea4f47ac"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_structure/runtime.json",
+      "size": 739,
+      "sha256": "4267321b9bce97d91bf9e1c4d0e3ddd3d67e349a47996b47ce5c43e3dd3ab925",
+      "md5": "3f32ab698e31eb537008242b0313bc97"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_full/best.pt",
+      "size": 21227909,
+      "sha256": "f1f2fd3f4378fd92162ebb143b592b8407d5142280285d6d4437143aa6264014",
+      "md5": "9ca76136f01006eec405eb5a5bf562fa"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_full/last.pt",
+      "size": 23294496,
+      "sha256": "691d5d97b89c0ea9c686f7433529267e7ab66f5a21faccda87259245c1b28ee2",
+      "md5": "758862fe14a88d00c9e692f1c7a142f9"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_full/configuration.json",
+      "size": 972,
+      "sha256": "5aa9073ff7d51bdf1e6bf16aadc8febf19d1433f9a80f10477d6c684bf91650e",
+      "md5": "6121d78146de26321b45d8f73d19f26f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_full/completion.json",
+      "size": 42715,
+      "sha256": "dbfcb7228c0b1851d86fd36d2715b0f9d988c052961485b6c0d3cf92dc0d610f",
+      "md5": "a07fe6eaf6a329b26ed95fd09eedcb6c"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_full/resume_transition.json",
+      "size": 27124,
+      "sha256": "6224366dbb9221a4b7b28777d39c09240b3cb9be1e04ee0b12df6fdbf4e9d030",
+      "md5": "678b7026b395ff7304480745679ed214"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/tensile_strength_ultimate_full/runtime.json",
+      "size": 742,
+      "sha256": "73803190c6b0903c4db9fa5302a83d9c3f5563014a863292341222897cd387a7",
+      "md5": "6279dbdff7a3c1898b88b816b6ff0877"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_structure/best.pt",
+      "size": 20209632,
+      "sha256": "60e14a3c26f2776c182e054067b68aa0e144a18bc9dc618f7a6aaadc4916c1b6",
+      "md5": "720684f824235f93a93b135c93788a08"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_structure/last.pt",
+      "size": 58565076,
+      "sha256": "0ac4e6b77334bacc77b7c8d247aff936c088601d4edc82697deffb1f096b74d1",
+      "md5": "a11ca24e79936e351a47a2672ef83d6d"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_structure/configuration.json",
+      "size": 971,
+      "sha256": "8fb4507298470e34b242f3c4fbcc3b9dabd1742e8b571034b199e86edf298de9",
+      "md5": "ca9db3d3a3438b83c50a3059a8c165b1"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_structure/completion.json",
+      "size": 34873,
+      "sha256": "c4c4b09aa832187b722ac3de9a4af11c7e77011af7815a771c5e3be8122276f6",
+      "md5": "3423853d8f2e03c46929ec1308dceba1"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_structure/resume_transition.json",
+      "size": 26613,
+      "sha256": "72d39c4dc64a96cc01fbcafe48bc6390f5558f22840a5ad1ab6e6ce7b92b315e",
+      "md5": "557f7f1c203c63710bbcdc78b6dbee52"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_structure/runtime.json",
+      "size": 737,
+      "sha256": "9a40d3739d8290a3dc1ba81ec16fd36a89d0bee932037c97149bc7a2735b7b9b",
+      "md5": "5c6f5cefcd21510bdda8e3c29ecb7cb5"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_full/best.pt",
+      "size": 21227909,
+      "sha256": "881a1bd984f8cbc8b3c82d7dc89bb1c32008134770dabd27ead653591a336cf0",
+      "md5": "1329157eed00baff4e6b54b5214117f2"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_full/last.pt",
+      "size": 23279584,
+      "sha256": "f398aaaafda0acf7e517534d74c34011730d5bedf79bec38d121c491932c7422",
+      "md5": "4cf4d10ecf5757ae6361e24f53ce3ac3"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_full/configuration.json",
+      "size": 966,
+      "sha256": "f34aa31074d50780a06ec5868ccf7ff8e6f90a66e489bc3244d87356dd83f8e7",
+      "md5": "11b434aacfedaa38ddf8fa6f3cd64814"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_full/completion.json",
+      "size": 15691,
+      "sha256": "05b80dcaa8ed5a12c0d7d55ab405729c5781b6498c3917732b980e4f77a95f30",
+      "md5": "c2c6cd00f34297b06134e6e33f2d9756"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_full/resume_transition.json",
+      "size": 26607,
+      "sha256": "ba77da546181179e6fdf1c93b5808d28604b122d3f8091bf4578ec25f6697943",
+      "md5": "f342ba50ae742c17dc2bdd2f3783c062"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/elongation_at_break_full/runtime.json",
+      "size": 739,
+      "sha256": "d2b67baefc9d0d68944a4f3808376b3edae923016e9c84a016c45328cb6ed564",
+      "md5": "ef05c8eeeaaa152cdd3f38d223d5dab5"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_full/best.pt",
+      "size": 7641608,
+      "sha256": "a1c6339fb60390ece7e934b79f5421a78d682e1d3b015620eef369eb48615b44",
+      "md5": "4709c57104c0aad730629c8489acaf3a"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_full/last.pt",
+      "size": 14581780,
+      "sha256": "b13b58c677b521db679c71eb3433123542cd328df8273565b67b777466607645",
+      "md5": "c0b2392e8d3f7ec66fd7ac8949334fdf"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_full/configuration.json",
+      "size": 954,
+      "sha256": "81a531469cf0acc859867dbe89166044c485866c737d7e0b2021fb7344aee861",
+      "md5": "bdf5f486cbd5656c14cede5eac017792"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_full/completion.json",
+      "size": 17587,
+      "sha256": "f48f55ad0db5bd4d4fcbab9d0c0efc7b692061eb20c56b781f815106486c9ac1",
+      "md5": "f4771ca7dfb25d6de94f6f2118edf400"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_full/resume_transition.json",
+      "size": 19258,
+      "sha256": "881c204f635074e6a8711e8cbd094b8ae37dcfe0b51944d3e201290d41ded54e",
+      "md5": "8e2200c2bb4a4dcbfcb0caba678e7a0b"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_full/runtime.json",
+      "size": 738,
+      "sha256": "ce193c7355f972a2e031b0301d18b779621b4548b72039d9fae901005569b8dc",
+      "md5": "a57d6ad409f3dd24fa5d635858a1a79f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/execution_settings.json",
+      "size": 1196,
+      "sha256": "759a00a3741aeca7bbb3dbbadfd21fb3c0b0eff4d957c46a4e973b4556d862fc",
+      "md5": "80c56b00b25ee098fe58e0e2344d09b4"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/preprocessing_reuse_receipt.json",
+      "size": 2456,
+      "sha256": "764dc06e5b50b69a637da892e278adfe9c9170bdc70b3e5d6e925fc2c25bb0fa",
+      "md5": "1c70db6f9cce29c198a761e361c3335f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/condition_rebuild_receipt.json",
+      "size": 201,
+      "sha256": "4b2e842d8daa5887b3dbeb30cec56824d2f825955a88945c681db0135e9e3e1e",
+      "md5": "eda5bcf678e697005d0732f374958306"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/preprocessing_call_audit.json",
+      "size": 443,
+      "sha256": "ce1beadf96b4462896472c05d3ce1c13dfccea3ba1818bf6715b1a5e526b8261",
+      "md5": "556b8dcadf9f9a8bb1ebf92a0e908fc4"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/independent_validation.call_audit.json",
+      "size": 443,
+      "sha256": "ce1beadf96b4462896472c05d3ce1c13dfccea3ba1818bf6715b1a5e526b8261",
+      "md5": "556b8dcadf9f9a8bb1ebf92a0e908fc4"
+    }
+  ],
+  "provenance_valid": true,
+  "status": "passed",
+  "ended_at": "2026-11-12T06:47:01.782689+00:00",
+  "elapsed_seconds": 182.52508211589884
+}
