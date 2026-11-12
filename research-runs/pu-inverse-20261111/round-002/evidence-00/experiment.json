@@ -1,0 +1,129 @@
+{
+  "hypothesis": "按原子来源身份和否定语义修正标签后，可获得无混淆的主监督；开发路径在任何测试文件hash或内容读取前拒绝误路由。",
+  "baseline": "保留round_001全部证据并显式替代错误重复差值；固定原闭包与集合归属。",
+  "parameters": {
+    "fit_models": false,
+    "optimizer_updates": 0,
+    "seed": 20261111,
+    "threads": 4,
+    "rule_version": "pu_endpoint_adjudication_v2_20261112"
+  },
+  "metrics": [
+    {
+      "name": "test_access_attempts",
+      "unit": "count",
+      "sample_size": "four real task batches",
+      "uncertainty": "deterministic engineering check"
+    },
+    {
+      "name": "closure_overlap",
+      "unit": "count",
+      "sample_size": 3657,
+      "uncertainty": "exact set intersections"
+    }
+  ],
+  "stop_conditions": "任一输入或谱系冲突、测试访问成功、检查失败、1800秒上限。",
+  "environment": {
+    "host": "codex-cn2",
+    "python": "/opt/anaconda2023/bin/python",
+    "torch": "2.5.1+cu121",
+    "pyg": "2.6.1",
+    "rdkit": "2025.3.2",
+    "gpu": "RTX4090 no compute processes before launch"
+  },
+  "inputs": [
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/2_database_preparation/PU_elastomer_TPU_database/data/exports/PU_DATABASE_V2_4_B0024_20260901T060554Z_68742fed/database_v24.sqlite",
+      "sha256": "5b159b1d7cdbf2975a163757332053e764dae2a14e7d86b07c94a71eb808e8cc"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/2_database_preparation/PU_elastomer_TPU_database/data/curated/backups/database_before_tg_unification_20260817T104436.sqlite",
+      "sha256": "990696891c7e479032aebfc6c615eb26a31bcd13b1145f52aa1acaa26ad4dd5f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/conditional_pair_benchmark/results/COARSEPGNN_FULL_TWO_STAGE_20261103T075525Z/inputs/tg/rows.json",
+      "sha256": "41bf4d5eaeb26af8439caefccb5ffd36803956411ea3e3d2dafba23d3b28cbfb"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/conditional_pair_benchmark/results/COARSEPGNN_FULL_TWO_STAGE_20261103T075525Z/inputs/tm/rows.json",
+      "sha256": "bbaf4fcf7256a658ff13e47f72c185d493133bd2f5444d2891c506d0c5bb872f"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/conditional_pair_benchmark/results/COARSEPGNN_FULL_TWO_STAGE_20261103T075525Z/inputs/elongation_at_break/rows.json",
+      "sha256": "00587098cc3ee0ea17db5a9ddadba00d759cc8f544a6aa1a8bb1e6d500dc9497"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/conditional_pair_benchmark/results/COARSEPGNN_FULL_TWO_STAGE_20261103T075525Z/inputs/tensile_strength_ultimate/rows.json",
+      "sha256": "25f0d34b7a0752a7b93913f5c01c599a961f2843389bdec06907cb506cfc6864"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/preflight_002/data/observations.json",
+      "sha256": "73f6d64375f2fff7baa32a8ca6e83debbc7beee854eec75bcd81073693382311"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/preflight_002/data/catalog.json",
+      "sha256": "2490ad9aa5ae462b9c476816337bac9163427b6717e4092331280ed582c57f12"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/preflight_002/data/formulations.json",
+      "sha256": "7e001579fb2989479ba3cb91365318789ddd7ce58231428b0ed85ca5a92cc1c9"
+    },
+    {
+      "path": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_001_adjudication/measurement_adjudication.csv",
+      "sha256": "6ac2a8fd35bf36976163e045bb049a51268326f6fab6d91a50aee4c183185d52"
+    }
+  ],
+  "outputs": [
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/measurement_adjudication.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/tg_mean_membership.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/grade_identity_review.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/grade_id_migration.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/affected_materials.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/joint_state_review.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/joint_state_edges.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/approved_catalog.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/approved_formulations.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/training_evidence.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/training_measurement_precision.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/evaluation_denominators.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/split_labels_manifest.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/graph_reaudit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/post_adjudication_audit.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/approved_data_manifest.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/test_access_guard_results.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/checkpoint_lineage.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/runtime_estimate.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/split_access_policy.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/engineering_manifest.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/thermal_identity_review.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/reported_uncertainty_review.csv",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/evaluation_denominators_stratified.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/grade_visibility.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/joint_mask_denominators.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/condition_identity_checks.json",
+    "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication/adjudication_corrections.json"
+  ],
+  "timeout_seconds": 1800,
+  "checks": [
+    {
+      "id": "sequential_audit_pipeline",
+      "argv": [
+        "/usr/bin/env",
+        "PYTHONPATH=src",
+        "OMP_NUM_THREADS=4",
+        "/opt/anaconda2023/bin/python",
+        "scripts/run_pu_inverse_adjudication.py",
+        "--config",
+        "configs/inverse/pu_20261112_round002.json",
+        "--output",
+        "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_002_adjudication"
+      ],
+      "expected_exit": 0
+    }
+  ],
+  "job_id": "round-002-e0b5d020",
+  "cwd": "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository",
+  "code_sha": "843384339cb4af923f077e9e567a648a3a727725",
+  "evidence_prefix": "research-runs/pu-inverse-20261111",
+  "spec_sha256": "95939f48bb5afb630a673c9babf00485036a6fa0d461fa08d242da0a69badd7a"
+}
