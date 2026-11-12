@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "success": true,
+  "operation": "exec",
+  "data": {
+    "alias": "codex-cn2",
+    "command": "/opt/anaconda2023/bin/python -c 'import json,pathlib\nr=pathlib.Path('\"'\"'/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111'\"'\"')\npaths=[r/'\"'\"'round_006_fit/checkpoint_manifest.json'\"'\"',r/'\"'\"'round_008_integrated/main_20261112/training/checkpoint_manifest.json'\"'\"',r/'\"'\"'round_008_integrated/no_target_values_20261111/training/checkpoint_manifest.json'\"'\"']\nfor p in paths:\n d=json.loads(p.read_text());print(json.dumps({'\"'\"'path'\"'\"':str(p),'\"'\"'entries'\"'\"':{k:v for k,v in d['\"'\"'checkpoints'\"'\"'].items() if k=='\"'\"'inverse_full'\"'\"'}},ensure_ascii=False))\np=r/'\"'\"'round_009_final'\"'\"';print(json.dumps({'\"'\"'files'\"'\"':[{'\"'\"'name'\"'\"':str(f.relative_to(p)),'\"'\"'bytes'\"'\"':f.stat().st_size} for f in sorted(p.rglob('\"'\"'*'\"'\"')) if f.is_file()]}))'",
+    "exit_code": 0,
+    "stdout": "{\"path\": \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/checkpoint_manifest.json\", \"entries\": {\"inverse_full\": {\"path\": \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_006_fit/inverse_full/best.pt\", \"sha256\": \"a1c6339fb60390ece7e934b79f5421a78d682e1d3b015620eef369eb48615b44\"}}}\n{\"path\": \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_008_integrated/main_20261112/training/checkpoint_manifest.json\", \"entries\": {\"inverse_full\": {\"path\": \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_008_integrated/main_20261112/training/inverse_full/best.pt\", \"sha256\": \"46df6ee52f66eba0709647bdaae195a3f25c21e8e5108b785b9a2295bf18cba9\", \"bytes\": 14552168}}}\n{\"path\": \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_008_integrated/no_target_values_20261111/training/checkpoint_manifest.json\", \"entries\": {\"inverse_full\": {\"path\": \"/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/round_008_integrated/no_target_values_20261111/training/inverse_full/best.pt\", \"sha256\": \"92e21d4c3e57277f291f8fd170c56c0a4f1ce171c952b9737143249b52a1b0f9\", \"bytes\": 14552232}}}\n{\"files\": [{\"name\": \"failure.json\", \"bytes\": 1512}, {\"name\": \"round_result.json\", \"bytes\": 616}, {\"name\": \"round_start.json\", \"bytes\": 572}, {\"name\": \"worker.log\", \"bytes\": 1584}]}\n",
+    "stderr": "",
+    "output": {
+      "stdout": {
+        "truncated": false,
+        "total_bytes": 1527,
+        "total_lines": 4
+      },
+      "stderr": {
+        "truncated": false,
+        "total_bytes": 0,
+        "total_lines": 0
+      }
+    }
+  },
+  "error": null,
+  "meta": {
+    "request_id": null,
+    "platform": null,
+    "transport": null,
+    "elapsed_ms": null,
+    "warnings": []
+  }
+}

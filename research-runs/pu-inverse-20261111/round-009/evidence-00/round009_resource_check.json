@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0",
+  "success": true,
+  "operation": "exec",
+  "data": {
+    "alias": "codex-cn2",
+    "command": "/opt/anaconda2023/bin/python -c 'import hashlib,json,subprocess,pathlib,datetime,os,shutil\nroot=pathlib.Path('\"'\"'/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111'\"'\"');repo=root/'\"'\"'repository'\"'\"'\ndef sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()\ndef git(*args):return subprocess.check_output(['\"'\"'git'\"'\"','\"'\"'-C'\"'\"',str(repo),*args],text=True).strip()\nassert git('\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"')=='\"'\"'4c73113dba4a733990c3d56f89f95e90920cfe1a'\"'\"'\nassert git('\"'\"'branch'\"'\"','\"'\"'--show-current'\"'\"')=='\"'\"'research/pu-inverse-20261111'\"'\"'\nassert not git('\"'\"'status'\"'\"','\"'\"'--porcelain'\"'\"')\nassert sha(root/'\"'\"'pu_inverse_C9_schema_fix.bundle'\"'\"')=='\"'\"'086fb983f1e2b4c1e48f1441bfc374dcb7d709604be48a6988a9f36428b8acb5'\"'\"'\nassert sha(root/'\"'\"'round009_authorization.json'\"'\"')=='\"'\"'3ae5f8308f9dcc2857934038bc7820c255377532721d230ba87720490ce83335'\"'\"'\nassert sha(root/'\"'\"'round009_source_manifest.json'\"'\"')=='\"'\"'f6f0ae30e81c3142d5b727ef01a892286e8a8ec0e2f1d62ba69af25347ecdf50'\"'\"'\ngit('\"'\"'fetch'\"'\"',str(root/'\"'\"'pu_inverse_C9_schema_fix.bundle'\"'\"'),'\"'\"'research/pu-inverse-20261111'\"'\"')\ngit('\"'\"'merge'\"'\"','\"'\"'--ff-only'\"'\"','\"'\"'FETCH_HEAD'\"'\"')\na=json.loads((root/'\"'\"'round009_authorization.json'\"'\"').read_text());m=json.loads((root/'\"'\"'round009_source_manifest.json'\"'\"').read_text())\nassert git('\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"')==a['\"'\"'consumer_code_sha'\"'\"']==m['\"'\"'consumer_code_sha'\"'\"']\nassert not git('\"'\"'status'\"'\"','\"'\"'--porcelain'\"'\"')\nfor name,h in m['\"'\"'files'\"'\"'].items():assert sha(repo/name)==h,name\nfor name,h in a['\"'\"'static_inputs'\"'\"'].items():assert sha(pathlib.Path(name))==h,name\nprint(json.dumps({'\"'\"'status'\"'\"':'\"'\"'READY_FOR_FORMAL_R9'\"'\"','\"'\"'head'\"'\"':git('\"'\"'rev-parse'\"'\"','\"'\"'HEAD'\"'\"'),'\"'\"'source_files'\"'\"':len(m['\"'\"'files'\"'\"']),'\"'\"'static_inputs'\"'\"':len(a['\"'\"'static_inputs'\"'\"']),'\"'\"'clean'\"'\"':True,'\"'\"'at'\"'\"':datetime.datetime.now(datetime.timezone.utc).isoformat(),'\"'\"'gpu'\"'\"':subprocess.check_output(['\"'\"'nvidia-smi'\"'\"','\"'\"'--query-gpu=name,memory.total,memory.used,utilization.gpu'\"'\"','\"'\"'--format=csv,noheader'\"'\"'],text=True),'\"'\"'gpu_processes'\"'\"':subprocess.check_output(['\"'\"'nvidia-smi'\"'\"','\"'\"'--query-compute-apps=pid,process_name,used_memory'\"'\"','\"'\"'--format=csv,noheader'\"'\"'],text=True),'\"'\"'load'\"'\"':os.getloadavg(),'\"'\"'disk_free_bytes'\"'\"':shutil.disk_usage(root).free,'\"'\"'output_exists'\"'\"':(root/'\"'\"'round_009_final'\"'\"').exists()}))'",
+    "exit_code": 0,
+    "stdout": "{\"status\": \"READY_FOR_FORMAL_R9\", \"head\": \"90bcf23a0e7f4508ca255f0becaa9be899a538d0\", \"source_files\": 157, \"static_inputs\": 25, \"clean\": true, \"at\": \"2026-11-12T12:53:10.468273+00:00\", \"gpu\": \"NVIDIA GeForce RTX 4090, 24564 MiB, 1 MiB, 0 %\\n\", \"gpu_processes\": \"\", \"load\": [0.02, 0.12, 0.07], \"disk_free_bytes\": 20872075149312, \"output_exists\": false}\n",
+    "stderr": "From /home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/pu_inverse_C9_schema_fix.bundle\n * branch            research/pu-inverse-20261111 -> FETCH_HEAD\n",
+    "output": {
+      "stdout": {
+        "truncated": false,
+        "total_bytes": 352,
+        "total_lines": 1
+      },
+      "stderr": {
+        "truncated": false,
+        "total_bytes": 192,
+        "total_lines": 2
+      }
+    }
+  },
+  "error": null,
+  "meta": {
+    "request_id": null,
+    "platform": null,
+    "transport": null,
+    "elapsed_ms": null,
+    "warnings": []
+  }
+}

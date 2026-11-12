@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_round.py", line 102, in <module>
+    main()
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_round.py", line 86, in main
+    result = evaluate(args.plan, args.output, deadline=args.deadline)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_evaluation.py", line 164, in evaluate
+    plan, review, auth, files = check_inputs(plan_path)
+                                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_evaluation.py", line 62, in check_inputs
+    files = {**expected, **metadata_files, **model_bindings(plan, review), **auth['static_inputs']}
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jifengwang/data/45_polyermization_prediction/inverse_design/runs/pu-inverse-20261111/repository/src/coarsepgnn_inverse/final_common.py", line 140, in model_bindings
+    if p.stat().st_size != item['bytes'] or sha256(p) != item['sha256']:
+                           ~~~~^^^^^^^^^
+KeyError: 'bytes'
