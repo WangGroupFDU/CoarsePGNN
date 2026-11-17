@@ -244,3 +244,70 @@ def test_unresolved_family_stays_explicit_without_invented_group(tmp_path):
     audit = attach_publication_identities([row], tmp_path, map_path)
     assert row["shared_trainable"] and row["source_family_ids"] == []
     assert audit["unresolved_family_sources"] == ["source1"]
+
+
+@pytest.mark.parametrize("value,text", [
+    (10, "Second DSC scan from -100 to 250 C at 10 C/min."),
+    (105, "16 h cure at 105 C; tensile test temperature not reported."),
+    (180, "First heat to 180 C and hold 5 min; second DSC scan from -90 to 180 C."),
+    (23, "DMA temperature sweep; Table reports Tg and storage modulus at 23 C."),
+    (25, "Tested at 25 C; no separately verified structured temperature field."),
+])
+def test_generic_text_temperature_is_not_assumed_test_temperature(value, text):
+    """原文中的数值与量纲不同，均不能通过通用温度正则获得测试语义。"""
+    original = {"value": value, "unit": "°C", "mask": 1,
+                "source": "condition_raw_text", "status": "parsed"}
+    raw = observation(condition_raw=text, conditions={"temperature_c": original})
+    row = normalize_record(raw, {})
+    assert row["conditions"]["temperature_c"]["mask"] == 0
+    assert row["conditions"]["temperature_c"]["value"] is None
+    assert row["shared_trainable"] and row["value"] == -40
+    assert row["raw_records"][0]["conditions"]["temperature_c"] == original
+    assert row["condition_corrections"][0]["before"] == original
+    assert row["condition_corrections"][0]["after"] == row["conditions"]["temperature_c"]
+
+
+@pytest.mark.parametrize("provenance", [
+    {"source": "structured_column", "status": "reported"},
+    {"status": "source_database"},
+    {"source": "source_database", "status": "reported"},
+])
+def test_explicit_structured_test_temperature_is_preserved(provenance):
+    field = {"value": 23, "unit": "°C", "mask": 1, **provenance}
+    row = normalize_record(observation(conditions={"temperature_c": field}), {})
+    assert row["conditions"]["temperature_c"] == field
+    assert "condition_corrections" not in row
+
+
+def test_explicit_test_temperature_column_overrides_legacy_processing_value():
+    field = {"value": 220, "mask": 1, "source": "condition_raw_text", "status": "parsed", "unit": "°C"}
+    row = normalize_record(observation(test_temperature_c=23, condition_raw="Processing at 220 C.",
+                                       conditions={"temperature_c": field}), {})
+    assert row["conditions"]["temperature_c"]["value"] == 23
+    assert row["conditions"]["temperature_c"]["source"] == "structured_column"
+    assert row["conditions"]["temperature_c"]["mask"] == 1
+    assert row["raw_records"][0]["conditions"]["temperature_c"] == field
+
+
+def test_temperature_correction_ledger_keeps_observation_and_recipe(tmp_path):
+    raw = observation(condition_raw="Dried at 65 C; actual test temperature unknown.",
+                      conditions={"temperature_c": {"value": 65, "mask": 1, "source": "condition_raw_text"}})
+    path = tmp_path / "rows.json"
+    path.write_text(json.dumps([raw]))
+    result = build_dataset([path], tmp_path / "out")
+    ledger = [json.loads(line) for line in (tmp_path / "out/condition_corrections.jsonl").read_text().splitlines()]
+    assert result["audit"]["condition_correction_count"] == len(ledger) == 1
+    assert ledger[0]["observation_id"] == "o1" and ledger[0]["shared_trainable"]
+    assert ledger[0]["before"]["value"] == 65 and ledger[0]["after"]["value"] is None
+    assert result["audit"]["forward_observation_ids"] == result["audit"]["inverse_observation_ids"] == ["o1"]
+    assert result["rows"][0]["value"] == -40
+    assert len(result["rows"][0]["components"]) == 3
+    assert result["rows"][0]["raw_records"][0]["raw_source_record"] == raw
+
+
+def test_explicit_scalar_condition_input_remains_supported(tmp_path):
+    path = tmp_path / "rows.json"
+    path.write_text(json.dumps([observation(conditions={"temperature_c": 23})]))
+    result = build_dataset([path], tmp_path / "out")
+    assert result["rows"][0]["conditions"]["temperature_c"] == {"value": 23, "mask": 1}
+    assert result["audit"]["condition_correction_count"] == 0

@@ -10,6 +10,8 @@
 
 详细来源、任务计数、字段级处理和端点修复见 [数据合同](pu_retrain_data_contract.md)。
 
+交付前原文审计确认旧通用解析把速率/制样/调理/扫描程序等温度误填为标量测试温度。新规则 `explicit_test_temperature_v1` 将没有结构化测试温度正证据的该字段设为未知，并逐项保存 871 条修改前后记录；3972 个共同监督观察及其标签、配方、其他条件均不变。此前 family 目录的运行已经停止为诊断，最终数据位于 `outputs/pu-all-data-condition-20261117/dataset`。这是基于来源语义的修复，不按外折效果改变数据。
+
 ## 2. 两条原则如何同时满足
 
 每个外层模型只使用约 80% 的来源闭包训练，在其余约 20% 的闭包上评价。五个外折合起来，每条观察恰好得到一次来自“没有训练过该观察及其关联闭包”的预测。各折训练出的不同模型也让全部可用记录参与了训练。
@@ -76,7 +78,7 @@ python -m coarsepgnn_retrain prepare \
   --output outputs/pu-all-data/dataset
 ```
 
-`fetch` 固定 GitHub 版本并核对下载及解包原字节。`prepare` 输出完整 `dataset.jsonl`、`audit.json` 和 `source_inventory.json`。来源家族映射须与公开 `sources.csv` 的 SHA-256 及完整来源集合一致；源表改变时拒绝套用。当前增强母表 SHA-256 为 `40a2f8aa8f05a104c05ece27d56066fc10ff2c8259032149ab854168a4c1942b`。文件清单、父子关系及正反向 ID 清单都可审查。任何既有非空输出目录都不会被覆盖。
+`fetch` 固定 GitHub 版本并核对下载及解包原字节。`prepare` 输出完整 `dataset.jsonl`、`audit.json`、`source_inventory.json` 和逐字段 `condition_corrections.jsonl`。来源家族映射须与公开 `sources.csv` 的 SHA-256 及完整来源集合一致；源表改变时拒绝套用。当前条件语义修复后母表 SHA-256 为 `e461b6d700c1a9a12979892b1a2689685549ae88ed4204272fd382cf1fb5c169`。文件清单、父子关系及正反向 ID 清单都可审查。任何既有非空输出目录都不会被覆盖。
 
 若服务器上可以读取完整原库，改用实际 SQLite 路径，避免把旧 `accepted` 子集当成入口：
 

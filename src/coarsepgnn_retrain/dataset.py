@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 SCHEMA_VERSION = "pu_shared_observations_v2"
+CONDITION_POLICY = "explicit_test_temperature_v1"
 MAIN_TARGETS = ("tg", "tm", "tensile_strength_ultimate", "elongation_at_break")
 ROLE_MAP = {"d": "D", "diisocyanate": "D", "isocyanate": "D", "p": "P",
             "polyol": "P", "macrodiol": "P", "e": "E", "chain_extender": "E",
@@ -187,6 +188,13 @@ def _restore_members(source_rows: list[dict], measurements: dict, campaigns: dic
         row["source_input_row"] = index
         row["raw_source_record"] = _safe_raw(original)
         row["_supplemental_source_refs"] = supplemental_refs
+        # 仅在纠正通用原文温度回填时读取真实测试温度列；不猜测原文数值含义。
+        fields = row.get("conditions") or _json(row.get("condition_normalized_json"), {}).get("fields", {})
+        temperature_field = fields.get("temperature_c", {})
+        if (isinstance(temperature_field, Mapping) and temperature_field.get("source") == "condition_raw_text"
+                and _number(campaign.get("test_temperature_c")) is not None
+                and _number(row.get("test_temperature_c")) is None):
+            row["test_temperature_c"] = float(campaign["test_temperature_c"])
         for field in ("definition_raw", "statistic_type", "uncertainty_value", "uncertainty_type", "repeat_count"):
             if measurement.get(field) not in (None, ""):
                 row[field] = measurement[field]
@@ -339,6 +347,32 @@ def _components(row: Mapping, graph_root: Path | None) -> tuple[list[dict], list
     return result, issues
 
 
+def _test_temperature_semantics(row: Mapping, conditions: dict) -> list[dict]:
+    """屏蔽无测试语义证据的旧原文回填，完整保留修改前字段供逐项审计。
+
+    速率、固化、调理、扫描程序或其他性质的参考温度均不能因带有 C 单位
+    而充当当前测试温度。本规则只识别结构化正证据，不按标签或模型误差修正。
+    """
+    before = conditions.get("temperature_c", {})
+    if (before.get("source") != "condition_raw_text" or not before.get("mask")
+            or before.get("status") == "source_database"):
+        return []
+    explicit = _number(row.get("test_temperature_c"))
+    if explicit is None:
+        explicit = _number(row.get("raw_database_context", {}).get("campaign", {}).get("test_temperature_c"))
+    if explicit is not None:
+        after = {**before, "value": explicit, "mask": 1, "unit": "°C",
+                 "source": "structured_column", "status": "reported"}
+        reason = "explicit_test_temperature_column_overrides_generic_raw_temperature"
+    else:
+        after = {**before, "value": None, "mask": 0, "source": "condition_semantics_rule",
+                 "status": "test_temperature_not_established"}
+        reason = "generic_raw_temperature_does_not_establish_test_temperature"
+    conditions["temperature_c"] = after
+    return [{"field": "temperature_c", "policy": CONDITION_POLICY,
+             "before": _safe_raw(before), "after": _safe_raw(after), "reason": reason}]
+
+
 def normalize_record(raw: Mapping, source_ref: dict, *, graph_root: Path | None = None) -> dict:
     """把一条原始观察转换为共享记录；不要求完整四标签、完整条件或单一D/P/E。"""
     row = dict(raw)
@@ -369,6 +403,9 @@ def normalize_record(raw: Mapping, source_ref: dict, *, graph_root: Path | None 
                   for name, v in conditions.items()}
     for field in conditions.values():
         field["mask"] = int(bool(field.get("mask", field.get("value") is not None)) and field.get("value") is not None)
+    condition_corrections = _test_temperature_semantics(row, conditions)
+    if condition_corrections:
+        issues.append("legacy_raw_temperature_semantics_corrected")
     # 旧流程误覆盖判据时优先恢复原已知字段，不由数值或模型表现猜判据。
     criterion = _first(row, "transition_criterion", default="reported_unspecified")
     if not _known(criterion):
@@ -430,6 +467,8 @@ def normalize_record(raw: Mapping, source_ref: dict, *, graph_root: Path | None 
             "composition_complete": bool(components and all(c["ratio_mask"] for c in components)),
             "label_kind": label_kind, "lineage": {"parent_ids": [parent] if parent else [], "member_ids": list(member_ids)},
             "issues": sorted(set(issues)), "source_refs": [source_ref] + row.get("_supplemental_source_refs", []), "raw_records": [_safe_raw(row)]}
+    if condition_corrections:
+        record["condition_corrections"] = condition_corrections
     # SQLite/独立 JSON 入口也保留出版物身份；不能要求另有 CSV 才建立来源闭包。
     publication = dict(row.get("source_publication") or {})
     identities = set()
@@ -545,6 +584,9 @@ def build_dataset(source_paths: Sequence[str | Path], output_dir: str | Path, *,
     trainable = [r for r in rows if r["shared_trainable"]]
     ids = [r["observation_id"] for r in trainable]
     condition_fields = sorted({name for row in trainable for name in row["conditions"]})
+    corrections = [{"observation_id": row["observation_id"], "source_id": row["source_id"],
+                    "target": row["target"], "shared_trainable": row["shared_trainable"], **item}
+                   for row in rows for item in row.get("condition_corrections", [])]
     audit = {"schema_version": SCHEMA_VERSION, "input_rows": input_count, "restored_atomic_observations": expanded_count - input_count,
              "retained_observations": len(rows), "duplicate_imports_merged": expanded_count - len(rows),
              "raw_records_preserved": sum(len(r["raw_records"]) for r in rows),
@@ -563,6 +605,10 @@ def build_dataset(source_paths: Sequence[str | Path], output_dir: str | Path, *,
              "partial_composition_trainable": sum(not r["composition_complete"] for r in trainable),
              "multi_component_trainable": sum(any(n > 1 for n in Counter(c["role"] for c in r["components"]).values()) for r in trainable),
              "publication_identity_audit": publication_audit,
+             "condition_semantics_policy": CONDITION_POLICY,
+             "condition_correction_count": len(corrections),
+             "condition_corrections_trainable_by_target": dict(sorted(Counter(
+                 item["target"] for item in corrections if item["shared_trainable"]).items())),
              "fitting_performed": False, "scope": "entire supplied SQLite measurements table" if sqlite_path or any(p.suffix in {".sqlite", ".sqlite3", ".db"} for p in paths)
              else "all supplied published records; not a claim of exhaustive original database coverage"}
     output.mkdir(parents=True, exist_ok=True)
@@ -571,12 +617,18 @@ def build_dataset(source_paths: Sequence[str | Path], output_dir: str | Path, *,
         for row in rows:
             stream.write(canonical(row) + "\n")
     audit["dataset_sha256"] = file_sha256(data_path)
+    correction_path = output / "condition_corrections.jsonl"
+    with correction_path.open("x", encoding="utf-8") as stream:
+        for item in corrections:
+            stream.write(canonical(item) + "\n")
+    audit["condition_corrections_sha256"] = file_sha256(correction_path)
     for filename, payload in (("audit.json", audit), ("source_inventory.json", inventory)):
         with (output / filename).open("x", encoding="utf-8") as stream:
             json.dump(payload, stream, ensure_ascii=False, indent=2, allow_nan=False)
             stream.write("\n")
     return {"rows": rows, "audit": audit, "dataset_path": str(data_path),
-            "audit_path": str(output / "audit.json"), "source_inventory_path": str(output / "source_inventory.json")}
+            "audit_path": str(output / "audit.json"), "source_inventory_path": str(output / "source_inventory.json"),
+            "condition_corrections_path": str(correction_path)}
 
 
 def attach_publication_identities(rows: list[dict], provenance_dir: str | Path | None,

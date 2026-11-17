@@ -30,7 +30,7 @@
 
 新母表中 3961 条标记为直接测量记录，11 条保留为来源图中数字化提取的记录，246 条标记为派生均值父记录。数字化记录不伪装为直接表格读数；派生父记录不伪装为独立实验。
 
-保留与监督数量来自 `outputs/pu-all-data-family-20261117/dataset/audit.json`，与此前母表逐字段比对，除新增来源元数据外全部一致。构建闭包时也包含不进入监督损失的父记录，避免先过滤再划分破坏关联链。修复后 v3 分组在真实母表的只读构建/验证中得到 173 个闭包、最大 603 行，外折监督数为 775/795/774/772/856；实际训练必须使用绑定此母表与 v3 规则的 `splits.json`。
+保留与监督数量来自 `outputs/pu-all-data-condition-20261117/dataset/audit.json`。最终母表在来源元数据增强版本上修复了 871 条记录的测试温度字段语义；全部观察、标签、原料、配比、原始字段与来源身份不变，具体边界见第 4.2 节。构建闭包时也包含不进入监督损失的父记录，避免先过滤再划分破坏关联链。修复后 v3 分组在真实母表的只读构建/验证中得到 173 个闭包、最大 603 行，外折监督数为 775/795/774/772/856；实际训练必须使用绑定此母表与 v3 规则的 `splits.json`。
 
 全部 4218 条都有可用来源、材料、配方和原图散列；**`tensor_hash` 实际有值条数为 0**。因此不能声称已经取得“全部模型输入张量零跨折重合”的实测证据。新模型使用原料指纹、规格与配比；原图散列仅作为谱系关联的辅助字段。可观测配方身份用于更保守地整组划分，但也不等于对每个拟合后输入张量做了完整散列去重。
 
@@ -89,6 +89,18 @@
 
 所有需要拟合的缺失值填补、尺度、目标变换、原料目录只在当前训练折建立。固定分子指纹和固定文本哈希不使用性质标签拟合词表。外层留出集出现训练目录外原料时，应保留其预测与支持范围标记，报告未知原料覆盖率；不能悄悄删除困难样本来提高逆向性能。
 
+### 4.2 已确认的测试温度语义修复
+
+交付前对来源关系表的只读复核发现：旧 `condition_raw_text` 通用解析把升降温速率中的数字、固化/干燥/浸泡/老化温度、扫描程序保持温度，或其他性质的参考温度填入了标量 `temperature_c`。这不是“数值看起来高”而推测的异常；对应原文和空的 `test_temperature_c` 列构成直接语义证据。只读原件回执为 `outputs/pu-all-data-family-20261117/descriptive_label_audit.json`，SHA-256 `55b4ff9b28e49fc14fc20d3bd5b1d45b5384294ea3698a70552a386f1e06c747`。
+
+固定规则 `explicit_test_temperature_v1` 仅处理原来标记为 `source=condition_raw_text` 的正掩码测试温度。若有显式结构化 `test_temperature_c`，以该列为准；`structured_column` 和 `source_database` 的已有真实字段保留。没有该类证据时令此测试温度 `value=null, mask=0`，不从原文再猜“室温”，也不把速率、制样或扫描温度变成测试温度。该规则不查看性质标签或模型误差，不更改任何成功门槛或候选配置。
+
+实际修正 871 条保留记录，其中 781 条共同监督观察和 90 条派生父记录。781 条中，529 条把 C/min 速率数当作 C，190 条来自制样或调理，57 条来自扫描程序保持温度，5 条来自储能模量的参考温度。按任务为 Tg 237、Tm 311、UTS 17、伸长 59、辅助强度 50、辅助热事件 107；这些观察全部仍然参加原有监督，只屏蔽未经证实的这一条件字段。
+
+逐条修改前/后字段与规则保存在新母表的 `condition_corrections.jsonl`，SHA-256 `3bf959ebf8abecba4429f4cde23da56657c1fb4e76793cf42a44e54a79f35de9`。`condition_semantics_repair_receipt.json`（SHA-256 `5cd0ed567f69661f7a8f1c29e49f9a0bd6177bf000a37f0ac8818309c55a5ac1`）逐字段确认：只有 871 行的 `conditions.temperature_c`、`issues` 与新增 `condition_corrections` 改变；全部 4218 个保留 ID、3972 个监督 ID、标签、组分、配比、家族、其他条件和 `raw_records` 差异均为零。
+
+此前 family 目录中的运行已停止并作为带此条件噪声的诊断保留。新版本使用同一划分键、候选和训练政策重新运行；不能用旧/新外折性能选择数据版本。条件语义缺口已经确认，但它对模型误差的因果贡献没有由这份审计确定。
+
 ## 5. 正向和逆向共享训练观察
 
 [`training.py`](../src/coarsepgnn_retrain/training.py) 的 `fit_pair` 接收一个共同的 `train_rows` 集合，同时构建两个方向的训练批次。每个仍在训练的方向，其每个 epoch 都遍历全部共同观察一次，并保存覆盖数量、唯一 ID 数和 ID 散列；发现遗漏、重复或逆向记录无实际监督即报错。
@@ -134,7 +146,8 @@
 | `pu/provenance/sources.csv` | `65e03519ec923e431770e346d7009698dbb1fd73834f3fb924e9d68536ee0d75` |
 | `tg_mean_membership_r4.csv` | `4eb5c95e122c428c014f8d40b926f48ba71831a71d609b30f02ca79f40813e4c` |
 | `training_evidence_r4.json` | `e64a64857651a0dada7230dc7deb7848b57012bdb55584fe2e518070e29d91d5` |
-| 来源元数据增强母表 `outputs/pu-all-data-family-20261117/dataset/dataset.jsonl` | `40a2f8aa8f05a104c05ece27d56066fc10ff2c8259032149ab854168a4c1942b` |
+| 条件语义修复后母表 `outputs/pu-all-data-condition-20261117/dataset/dataset.jsonl` | `e461b6d700c1a9a12979892b1a2689685549ae88ed4204272fd382cf1fb5c169` |
+| 来源元数据增强诊断母表 `outputs/pu-all-data-family-20261117/dataset/dataset.jsonl` | `40a2f8aa8f05a104c05ece27d56066fc10ff2c8259032149ab854168a4c1942b` |
 | 已审查家族映射 `configs/retrain/pu_source_family_keys.json` | `b06f0fe7cb32ef24346fb79d0493c4c18a3ee5f29e2bf0b5b2cb2d145f925437` |
 | 家族修复前母表 `outputs/pu-all-data-20261117/dataset/dataset.jsonl` | `77ed927aa80254cfafa2f9b96acd49dad789f5d7c0fe1556835185e78eea3af3` |
 | 端点修正前母表 `outputs/retrain-20261117/dataset/dataset.jsonl` | `c81611d0af5f865d6ac23eaec32438bd6a7a7fd6d047366acb6aceecd962f224` |
@@ -151,7 +164,7 @@ python -m coarsepgnn_retrain prepare \
   --evidence downloads/pu-all-data/training_evidence_r4.json \
   --graph-root downloads/pu-all-data/assets/pu \
   --source-family-map configs/retrain/pu_source_family_keys.json \
-  --output outputs/pu-all-data-family/dataset
+  --output outputs/pu-all-data-condition/dataset
 ```
 
 另行取得 SQLite 时，内嵌来源的 DOI、专利号及已有显式家族 ID 通过只读关联入口保留；未经本次核实的家族状态为 `not_reviewed`。不把当前公开 202 来源映射强塞进不同数据库。SQLite 适配修复后重新构建当前公开母表，字节 SHA-256 与上述增强母表精确相同；核对回执为 `outputs/pu-all-data-family-20261117/sqlite_adapter_compatibility.json`，没有改写现有母表。
@@ -162,7 +175,9 @@ python -m coarsepgnn_retrain prepare \
 
 `outputs/pu-all-data-20261117/` 是端点修正后、家族闭包修复前的诊断根目录，母表 UTS/辅助强度为 475/393。其原始观察、共享监督和标签语义有效，但旧分组遗漏已确认家族关系，已有模型性能不作为最终泛化结论。
 
-`outputs/pu-all-data-family-20261117/` 是本次来源元数据增强和划分修复后的新输出根目录。新母表仅新增 `publication_identifiers`、`source_family_ids`、`source_publication`、`source_identity_provenance` 四项元数据；全部既有字段、4218 个保留 ID 与 3972 个共同监督 ID 逐项一致。实际比较回执为该目录内 `metadata_annotation_receipt.json`，原始 CSV 保留及旧隔离缺口回读见 `outputs/pu-source-family-audit-20261117/old_split_identity_audit.json`。
+`outputs/pu-all-data-family-20261117/` 保存来源元数据增强和划分修复后、测试温度语义修复前的诊断版本。新母表仅新增 `publication_identifiers`、`source_family_ids`、`source_publication`、`source_identity_provenance` 四项元数据；全部既有字段、4218 个保留 ID 与 3972 个共同监督 ID 逐项一致。实际比较回执为该目录内 `metadata_annotation_receipt.json`，原始 CSV 保留及旧隔离缺口回读见 `outputs/pu-source-family-audit-20261117/old_split_identity_audit.json`。
+
+`outputs/pu-all-data-condition-20261117/` 是测试温度语义修复后的最终新版本根目录；修复不改变来源闭包键和观察资格。其运行完成与独立复核状态必须从实际回执读取，不由数据准备完成推定。
 
 最终划分清单必须绑定新母表身份、任务、监督资格及最新分组政策。不能无条件复用旧清单，也不能覆盖旧结果后改称最终版本。数据修复的依据是可观察来源和配方身份，不是留出性能。
 

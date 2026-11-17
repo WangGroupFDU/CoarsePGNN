@@ -21,7 +21,11 @@
 
 允许数值字段为测试温度、湿度、应变/横梁速度、升降温速率、频率、试样厚度和扫描/事件序号。允许类别字段为方法、标准、加载方式、气氛、试样几何、制样、调理、转变判据与相域；另外使用结构架构标签。`condition_raw`、`definition_raw`、`raw_records`、publication/family 元数据不作输入。
 
-实际允许字段未发现直接目标数值/结果描述。字符串中出现的 `MPa` 为模压或热压制样压力，`fracture` 描述加载终点/状态，不能据这些词单独认定泄漏。Tg/Tm 观察中的测试温度字段与其目标相等的候选数为 0。全部字段及原文例子保存在 `outputs/retrain-20261117/field_audit.json`；三条 UTS 端点修复和来源元数据增强均已证明没有改变条件字段。
+实际允许字段未发现直接目标数值/结果描述。字符串中出现的 `MPa` 为模压或热压制样压力，`fracture` 描述加载终点/状态，不能据这些词单独认定泄漏。Tg/Tm 观察中的测试温度字段与其目标相等的候选数为 0。全部字段及原文例子保存在 `outputs/retrain-20261117/field_audit.json`；三条 UTS 端点修复和来源元数据增强均已证明没有改变条件字段。这个检查关注答案泄漏，并未证明字段语义正确。后续逐原文复核确认通用温度解析存在语义混用，故不能据先前检查把条件提取称为全部正确。
+
+后续只读回执 `outputs/pu-all-data-family-20261117/descriptive_label_audit.json` 完整列出 102 个原文模板，涉及 781 条监督观察的 `temperature_c`：529 条来自 C/min 速率数、190 条来自制样/调理、57 条来自扫描程序保持温度、5 条来自其他性质参考温度。连同 90 个不监督父记录共 871 条。公开 `test_temperature_c` 对这些记录均为空；`features.py:75–82,247–257` 确实消费了其原正掩码值，所以旧 family 运行停止为诊断。
+
+最终 `dataset.py:_test_temperature_semantics` 采用 `explicit_test_temperature_v1`：结构化测试温度保留；仅对没有结构化证据的 legacy `condition_raw_text` 标量温度设未知，不猜测室温或从原文重提取。871 项 ledger 保存全部 before/after；逐字段比对显示除此温度、issues 及新增 ledger 外没有变化，所有 3972 个监督 ID 和原始字段均保留。修复依据是输入语义证据，不是外折误差，也没有证明该缺口对误差的具体因果贡献。
 
 只读脚本 `scripts/audit_pu_retrain_inputs.py` 进一步比较了源无关配方、允许条件与任务签名。其固定文字哈希步骤与 `features.py` 白名单一致，不拟合中心/尺度或词表。旧划分中“配方 + 完整允许条件 + 任务”完全相同的跨折签名为 0；但两份文献可能用不同措辞、不同缺失程度重录同一实验，因此这不能抵消已经确认的专利家族隔离缺口。
 
@@ -54,7 +58,9 @@
 - 原始字段/谱系/条件签名审计脚本：`scripts/audit_pu_retrain_inputs.py`。
 - 固定来源映射编译脚本：`scripts/build_pu_source_family_map.py`；映射 `configs/retrain/pu_source_family_keys.json`。
 - 旧分组缺口实际回执：`outputs/pu-source-family-audit-20261117/old_split_identity_audit.json`，SHA-256 `ceb11078100b5dce6fe2a49529ca287f8d94ab6f1013ba7c51cedd9932730afd`。
-- 新母表：`outputs/pu-all-data-family-20261117/dataset/dataset.jsonl`，SHA-256 `40a2f8aa8f05a104c05ece27d56066fc10ff2c8259032149ab854168a4c1942b`。
+- 最终新母表：`outputs/pu-all-data-condition-20261117/dataset/dataset.jsonl`，SHA-256 `e461b6d700c1a9a12979892b1a2689685549ae88ed4204272fd382cf1fb5c169`。
+- 温度语义修复逐字段回执：`outputs/pu-all-data-condition-20261117/condition_semantics_repair_receipt.json`，SHA-256 `5cd0ed567f69661f7a8f1c29e49f9a0bd6177bf000a37f0ac8818309c55a5ac1`。
+- 871 项温度修正 ledger：`outputs/pu-all-data-condition-20261117/dataset/condition_corrections.jsonl`，SHA-256 `3bf959ebf8abecba4429f4cde23da56657c1fb4e76793cf42a44e54a79f35de9`。
 - 元数据增强逐字段不变回执：`outputs/pu-all-data-family-20261117/metadata_annotation_receipt.json`，SHA-256 `1a22353c67faaf13d1e89d6c7f90671c314cd66f4ca0530a682a27d305a4b371`。
 - SQLite 独立入口修复的公开数据字节兼容回执：`outputs/pu-all-data-family-20261117/sqlite_adapter_compatibility.json`。
 
