@@ -1,0 +1,36 @@
+[
+  {
+    "request_id": "illustrative_hdi_polyether_tg",
+    "target": "tg",
+    "components": [
+      {
+        "component_id": "illustrative_HDI",
+        "name": "hexamethylene diisocyanate",
+        "role": "D",
+        "smiles": "O=C=NCCCCCCN=C=O",
+        "functionality": 2,
+        "identity_mask": true,
+        "molecule_ratio": 0.5,
+        "ratio_mask": true
+      },
+      {
+        "component_id": "illustrative_polyether_diol_Mn1000",
+        "name": "polyether diol",
+        "role": "P",
+        "psmiles": "[*]OCC[*]",
+        "mn_g_mol": 1000,
+        "functionality": 2,
+        "identity_mask": true,
+        "molecule_ratio": 0.5,
+        "ratio_mask": true
+      }
+    ],
+    "conditions": {
+      "method": {"value": "DSC", "mask": true},
+      "heating_rate_c_min": {"value": 10, "mask": true}
+    },
+    "transition_criterion": "dsc_midpoint",
+    "transition_scope": "whole_material",
+    "architecture": "linear"
+  }
+]

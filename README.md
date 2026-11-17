@@ -4,6 +4,12 @@
 
 This repository contains the electrophile–nucleophile topology generator, the frozen PU Hybrid condition encoder, and the v1.0.1 software for the archived OpenPoly/PU experiments. The release author is **Jifeng Wang, Fudan University**.
 
+## PU all-observation retraining
+
+The new `coarsepgnn_retrain` workflow retains the complete published PU observation pool, restores explicitly recorded atomic Tg measurements, and uses the same **3,972 supervised observations** for forward and inverse learning. It supports variable component sets, continuous ratios and field-level missingness. Five outer provenance-grouped folds with three inner folds separate model selection from held-out evaluation; deployment models are subsequently refit on the full pool.
+
+See the [training workflow](docs/pu_retrain_all_data.md) and [data contract](docs/pu_retrain_data_contract.md) for source coverage, exact endpoint definitions, commands and interpretation limits. Historical research runs remain immutable. This new evaluation is retrospective grouped cross-validation; its outcome is reported separately from the previous frozen experiment.
+
 ## Published reproducibility archive: v1.1.0
 
 The datasets, fixed cross-validation splits, and model assets are published on [Zenodo as v1.1.0](https://zenodo.org/records/22741277), dated 7 November 2026. Cite the version-specific DOI [10.5281/zenodo.22741277](https://doi.org/10.5281/zenodo.22741277).

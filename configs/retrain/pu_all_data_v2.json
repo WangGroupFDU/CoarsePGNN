@@ -1,0 +1,95 @@
+{
+  "schema_version": "pu-all-data-training-v2",
+  "experiment": "pu-all-data-20261117",
+  "principles": [
+    "retain all traceable experimental observations",
+    "evaluate on untrained provenance closures"
+  ],
+  "evaluation": "retrospective_nested_grouped_cv",
+  "outer_folds": 5,
+  "inner_folds": 3,
+  "seeds": [
+    20261117,
+    20261118,
+    20261119
+  ],
+  "bootstrap_replicates": 2000,
+  "forward_selection": "per outer fold: pooled inner-validation observations, equal primary-task MAE normalized by each inner-train IQR; candidate order breaks ties",
+  "inverse_selection": "per outer fold: pooled supported complete-catalog inner observations, equal primary-task composite loss; full denominator coverage retained",
+  "forward_family_selection": {
+    "schema_version": "pu-forward-family-choice-v1",
+    "metric": "pooled_inner_primary_task_mean_normalized_mae",
+    "families": [
+      "baseline",
+      "neural"
+    ],
+    "tie_break": "baseline_then_neural",
+    "selection_seed_policy": "neural_first_configured_seed; baseline_recorded_seed",
+    "inverse_policy": "retain_neural_per_seed_unchanged"
+  },
+  "deployment_selection": "mean of inner scores across all outer folds; median inner selected epoch; never use outer scores or pick a seed",
+  "baseline_candidates": [
+    {
+      "name": "ridge",
+      "family": "ridge",
+      "alpha": 10.0
+    },
+    {
+      "name": "extra_trees",
+      "family": "extra_trees",
+      "n_estimators": 128,
+      "min_samples_leaf": 2,
+      "max_features": 1.0
+    }
+  ],
+  "candidates": [
+    {
+      "name": "set_linear",
+      "hidden": 128,
+      "fingerprint_bits": 256,
+      "dropout": 0.1,
+      "condition_dropout": 0.0,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 128,
+      "max_epochs": 120,
+      "patience": 20,
+      "gradient_clip": 1.0,
+      "mixture_components": 5,
+      "mechanical_log": false,
+      "auxiliary_weight": 0.25
+    },
+    {
+      "name": "set_log_mechanics",
+      "hidden": 128,
+      "fingerprint_bits": 256,
+      "dropout": 0.1,
+      "condition_dropout": 0.0,
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 128,
+      "max_epochs": 120,
+      "patience": 20,
+      "gradient_clip": 1.0,
+      "mixture_components": 5,
+      "mechanical_log": true,
+      "auxiliary_weight": 0.25
+    },
+    {
+      "name": "set_regularized",
+      "hidden": 256,
+      "fingerprint_bits": 256,
+      "dropout": 0.2,
+      "condition_dropout": 0.1,
+      "lr": 0.0003,
+      "weight_decay": 0.001,
+      "batch_size": 128,
+      "max_epochs": 120,
+      "patience": 20,
+      "gradient_clip": 1.0,
+      "mixture_components": 5,
+      "mechanical_log": true,
+      "auxiliary_weight": 0.25
+    }
+  ]
+}
